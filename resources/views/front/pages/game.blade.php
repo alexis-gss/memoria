@@ -11,47 +11,57 @@
                 {{ $gameModel->name }}
                 <span class="d-none d-sm-block angles"></span>
             </h1>
-            <div
-                class="d-flex justify-content-center align-items-center user-select-none w-100 flex-row flex-wrap text-center">
-                <div class="rounded-2 shadow">
+            <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center user-select-none w-100 text-center">
+                <div class="d-flex flex-row justify-content-center align-items-center pb-2 pb-lg-0">
                     <a class="btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
                         data-bs-tooltip="tooltip" data-bs-placement="top" href="{{ route('fo.games.index') }}"
                         title="{{ __('bo_other_back_home') }}">
                         <i class="fa fa-arrow-left"></i>
                     </a>
+                    <span class="d-lg-none mx-1">-</span>
+                    <a
+                        href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
+                        target="_blank"
+                        class="d-lg-none btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
+                    >
+                        {{ __('fo_images_details') }}
+                        <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>
+                    </a>
                 </div>
-                <span class="mx-1">-</span>
-                <button
-                    class="game-folder btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                    style="background-color:{{ $gameModel->folder->color }}"
-                    name="folder"
-                    value="{{ $gameModel->folder->slug }}"
-                >
-                    {{ $gameModel->folder->name }}
-                </button>
-                @if ($gameModel->tags->isNotEmpty() && $gameModel->tags->contains('published', true))
-                    <span class="ms-1">-</span>
-                    @foreach ($gameModel->tags->sortBy('name') as $tag)
-                        @if ($tag->published)
-                            <button
-                                class="game-tags btn btn-secondary text-decoration-none text-white border-0 rounded-2 px-2 py-0 ms-1"
-                                name="tag"
-                                value="{{ $tag->slug }}"
-                            >
-                                {{ $tag->name }}
-                            </button>
-                        @endif
-                    @endforeach
-                @endif
-                <span class="mx-1">-</span>
-                <a
-                    href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
-                    target="_blank"
-                    class="btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                >
-                    {{ __('fo_images_details') }}
-                    <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>
-                </a>
+                <span class="d-none d-lg-block mx-1">-</span>
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    <button
+                        class="game-folder btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
+                        style="background-color:{{ $gameModel->folder->color }}"
+                        name="folder"
+                        value="{{ $gameModel->folder->slug }}"
+                    >
+                        {{ $gameModel->folder->name }}
+                    </button>
+                    @if ($gameModel->tags->isNotEmpty() && $gameModel->tags->contains('published', true))
+                        <span class="ms-1">-</span>
+                        @foreach ($gameModel->tags->sortBy('name') as $tag)
+                            @if ($tag->published)
+                                <button
+                                    class="game-tags btn btn-secondary text-decoration-none text-white border-0 rounded-2 px-2 py-0 ms-1"
+                                    name="tag"
+                                    value="{{ $tag->slug }}"
+                                >
+                                    {{ $tag->name }}
+                                </button>
+                            @endif
+                        @endforeach
+                    @endif
+                    <span class="d-none d-lg-block mx-1">-</span>
+                    <a
+                        href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
+                        target="_blank"
+                        class="d-none d-lg-block btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
+                    >
+                        {{ __('fo_images_details') }}
+                        <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>
+                    </a>
+                </div>
             </div>
             <div class="d-flex flex-column flex-sm-row-reverse justify-content-center align-items-center w-100 mt-3 px-1">
                 <p class="text-secondary mb-3 ms-sm-5 m-sm-0">
