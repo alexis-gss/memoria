@@ -40,7 +40,7 @@
                             'icon' => 'fa-solid fa-book',
                             'title' => __('bo_other_home_documentation'),
                             'text' => __('bo_other_home_documentation_details'),
-                            'link' => 'https://docs-memoria.alexis-gousseau.com',
+                            'link' => 'https://doc-memoria.alexis-gousseau.com',
                             'linkTitle' => __('bo_tooltip_home_documentation'),
                             'linkText' => __('bo_other_home_documentation_label', ['projectName' => config('app.name')]),
                         ],

@@ -6,6 +6,22 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.3.0] - 18.04.25**
+
+### Added
+-   feat: ✨ add game details button
+-   feat: ✨ add prefilter functionnality by url
+-   feat: 💄 rebrand games gallery into memoria
+
+### Changed
+-   chore: ⬆️ update composer dependencies
+-   style: 💄 update style class for game informations
+
+### Fixed
+-   fix: ♿ switch between page's title and name's projet in document's title
+-   fix: ♿️ upgrade accessibility on front
+-   fix: 🐛 get url without params for pictures paginate
+
 ## **[v5.2.0] - 10.01.25**
 
 ### Added

@@ -107,7 +107,7 @@
                         </li>
                         <li class="list-group-item bg-transparent border-0 py-1">
                             <a class="link-light link-offset-2 link-opacity-75-hover"
-                                href="https://docs-memoria.alexis-gousseau.com" target="_blank"
+                                href="https://doc-memoria.alexis-gousseau.com" target="_blank"
                                 title="{{ __('bo_tooltip_home_documentation') }}" data-bs-tooltip="tooltip">
                                 {{ __('fo_footer_documentation_label') }}
                             </a>

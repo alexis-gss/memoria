@@ -34,11 +34,10 @@ Each element (name, image, folder, color, etc.) can be managed in the back-offic
 [![Bootstrap](https://img.shields.io/badge/bootstrap-%23563D7C.svg?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/docs/master)
-[![Gitbook](https://img.shields.io/badge/GitBook-7B36ED?style=for-the-badge&logo=gitbook&logoColor=white)](https://www.gitbook.com/)
 
 # Documentation
 
-You can find all the documentation of this project on this link : [Memoria documentation](https://docs-memoria.alexis-gousseau.com).
+You can find all the documentation of this project on this link : [Memoria documentation](https://doc-memoria.alexis-gousseau.com).
 
 # Contributing
 
@@ -58,7 +57,7 @@ When implementing a feature please create an issue first explaining your idea an
 
 # Changelog
 
-Latest version v5.2.0.
+Latest version v5.3.0.
 
 See the [CHANGELOG.md](CHANGELOG.md) file for details.
 
