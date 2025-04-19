@@ -167,6 +167,7 @@
     "fo_footer_about": "A propos",
     "fo_footer_sitemap": "Plan du site",
     "fo_footer_languages": "Langages",
+    "fo_footer_languages_choose": "Choisir la langue",
     "fo_tooltip_footer_back": "Accéder à la partie administrative du projet",
     "fo_tooltip_footer_access_page": "Accéder à la page :pageName du projet",
     "fo_back_to_homepage": "Retourner à la liste des :model",

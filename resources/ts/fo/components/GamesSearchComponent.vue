@@ -39,9 +39,9 @@
           <!-- Filter by folders -->
           <div class="col-12 col-md-6 border-custom p-0 py-1 pe-md-1 pb-md-0">
             <select
-              class="form-select border-0 rounded-3 bg-primary shadow-none text-bg-primary px-2 py-2"
+              class="form-select border-0 rounded-3 bg-primary shadow-none text-bg-primary px-2 py-2 cursor-pointer"
               name="folder"
-              role="button"
+              :aria-label="trans.methods.__('fo_search_folder')"
               @change="setSelectedValue($event)"
             >
               <option
@@ -63,10 +63,10 @@
           <!-- Filter by tags -->
           <div class="col-12 col-md-6 p-0 pt-1 ps-md-1">
             <select
-              class="form-select bg-primary rounded-3 border-0 shadow-none text-bg-primary px-2 py-2"
+              class="form-select bg-primary rounded-3 border-0 shadow-none text-bg-primary px-2 py-2 cursor-pointer"
               name="tag"
-              role="button"
               @change="setSelectedValue($event)"
+              :aria-label="trans.methods.__('fo_search_tag')"
             >
               <option
                 value="0"

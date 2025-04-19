@@ -29,7 +29,8 @@
                         </li>
                         @if (isset($globalVersion))
                             <li class="list-group-item bg-transparent border-0 text-light pt-1 pb-0">
-                                {{ __('fo_footer_currently') }} v{{ $globalVersion }}</li>
+                                {{ __('fo_footer_currently') }} v{{ $globalVersion }}
+                            </li>
                         @endif
                     </ul>
                 </div>
@@ -79,10 +80,12 @@
                                     </script>
                                 @endpush
                                 @csrf
-                                <select class="form-select bg-primary text-bg-primary border-0 w-fit" name="lang" role="button">
+                                <select class="form-select bg-primary text-bg-primary border-0 w-fit cursor-pointer"
+                                    aria-label="{{ __('fo_footer_languages_choose') }}" name="lang">
                                     @foreach (config('app.locales') as $key => $locale)
                                         <option value="{{ $locale }}" @selected($locale === app()->getLocale())>
-                                            {{ str($locale)->upper() }}</option>
+                                            {{ str($locale)->upper() }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </form>

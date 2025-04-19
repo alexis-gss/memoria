@@ -34,13 +34,13 @@
               <div class="card placeholder-glow text-center shadow border-0 h-100">
                 <template v-if="paginationParameters.loading">
                   <div class="ratio ratio-16x9 card-img-top overflow-hidden">
-                    <div class="placeholder placeholder-img rounded-3 w-100" />
+                    <div class="placeholder placeholder-img w-100" />
                   </div>
                   <div class="card-body d-flex justify-content-center align-items-center">
-                    <span class="placeholder rounded-3 col-8" />
+                    <span class="placeholder col-8" />
                   </div>
                   <div class="card-footer">
-                    <span class="placeholder rounded-3 col-6" />
+                    <span class="placeholder col-6" />
                   </div>
                 </template>
                 <button

@@ -168,6 +168,7 @@
     "fo_footer_about": "About",
     "fo_footer_sitemap": "Sitemap",
     "fo_footer_languages": "Languages",
+    "fo_footer_languages_choose": "Choose language",
     "fo_tooltip_footer_back": "Access the project's administrative part",
     "fo_tooltip_footer_access_page": "Access the project's :pageName page",
     "fo_back_to_homepage": "Back to the :model list",
