@@ -183,7 +183,7 @@ class Controller extends BaseController
      *
      * @param \Illuminate\Database\Eloquent\Builder $query       The eloquent query builder.
      * @param string                                $search      The query string.
-     * @param callable                              $searchQuery The query string.
+     * @param callable|null                         $searchQuery The query string.
      * @param string                                ...$fields   Either a simple array or a string
      *                                                           in case of a string the two fields
      *                                                           would be concatenate to make the search.
@@ -192,7 +192,7 @@ class Controller extends BaseController
     protected function searchQuery(
         Builder $query,
         string $search,
-        callable $searchQuery = null,
+        callable|null $searchQuery = null,
         string ...$fields
     ): \Illuminate\Database\Eloquent\Builder {
         if (count($fields)) {
@@ -351,7 +351,7 @@ class Controller extends BaseController
      */
     protected function paginate(
         Builder $query,
-        ItemsPerPaginationEnum $pagination = null
+        ItemsPerPaginationEnum|null $pagination = null
     ): \Illuminate\Contracts\Pagination\LengthAwarePaginator {
         $currentRoutePath = Str::of(request()->route()->getName())->slug();
         $sessionKey       = "pagination.{$currentRoutePath}";

@@ -109,13 +109,21 @@ class StaticPage extends Model implements Sitemapable
      */
     public function toSchemaOrg(): \Spatie\SchemaOrg\WebPage
     {
-        return Schema::WebPage()
+        return Schema::webPage()
+            ->name($this->seo_title)
+            ->description($this->seo_description)
+            ->headline($this->title)
             ->inLanguage(config('app.locale'))
-            ->relatedLink(route($this->type->routeName()))
+            ->keywords(['page'])
+            ->dateCreated($this->created_at)
+            ->dateModified($this->updated_at)
             ->isAccessibleForFree(true)
-            ->headline($this->seo_description)
+            ->relatedLink(route($this->type->routeName()))
             ->mainEntityOfPage(route($this->type->routeName()))
-            ->publisher($this->toPersonSchema())
-            ->author($this->toPersonSchema());
+            ->publisher($this->getPersonSchema())
+            ->reviewedBy($this->getPersonSchema())
+            ->author($this->getPersonSchema())
+            ->creator($this->getPersonSchema())
+            ->isPartOf($this->getWebsiteSchema());
     }
 }

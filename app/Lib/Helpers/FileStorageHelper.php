@@ -44,7 +44,7 @@ class FileStorageHelper
         Model $model,
         $file,
         bool $slugify = false,
-        string $filename = null,
+        string|null $filename = null,
         bool $private = false
     ): string {
         // phpcs:enable

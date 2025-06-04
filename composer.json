@@ -70,6 +70,12 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "phpcs": [
+            "./vendor/bin/phpcs"
+        ],
+        "phpstan": [
+            "./vendor/bin/phpstan"
         ]
     },
     "extra": {

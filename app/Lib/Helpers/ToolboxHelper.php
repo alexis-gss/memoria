@@ -81,14 +81,14 @@ class ToolboxHelper
      * @param \Illuminate\Support\Collection $items
      * @param integer                        $perPage
      * @param array                          $options
-     * @param integer                        $page
+     * @param integer|null                   $page
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public static function customPaginate(
         Collection $items,
         int $perPage,
         array $options,
-        int $page = null
+        int|null $page = null
     ): \Illuminate\Pagination\LengthAwarePaginator {
         $page   = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $result = new LengthAwarePaginator(

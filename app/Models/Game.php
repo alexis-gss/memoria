@@ -166,31 +166,47 @@ class Game extends Model implements Sitemapable
      */
     public function toSchemaOrg(): \Spatie\SchemaOrg\WebPage
     {
-        $schema = Schema::WebPage()
-            ->inLanguage(config('app.locale'))
-            ->datePublished($this->published_at)
-            ->genre("Game image gallery")
+        return Schema::webPage()
+            ->name($this->name)
+            ->description(trans('fo_description', ['game' => $this->name]))
             ->headline($this->name)
-            ->isPartOf($this->folder->name)
-            ->relatedLink(route('fo.games.show', $this));
-        if ($this->pictures->first()) {
-            $schema->image(
-                sprintf(
-                    '%s/storage/pictures/%s/%s',
-                    route("fo.games.index"),
-                    $this->slug,
-                    $this->pictures->first()->uuid . ".webp"
-                )
+            ->inLanguage(config('app.locale'))
+            ->keywords(['page'])
+            ->dateCreated($this->created_at)
+            ->dateModified($this->updated_at)
+            ->isAccessibleForFree(true)
+            ->relatedLink(route('fo.games.show', $this))
+            ->mainEntityOfPage(route('fo.games.show', $this))
+            ->publisher($this->getPersonSchema())
+            ->reviewedBy($this->getPersonSchema())
+            ->creator($this->getPersonSchema())
+            ->author($this->getPersonSchema())
+            ->isPartOf($this->getWebsiteSchema())
+            ->mainEntity(
+                Schema::imageGallery()
+                    ->inLanguage(config('app.locale'))
+                    ->datePublished($this->published_at)
+                    ->isAccessibleForFree(true)
+                    ->genre("Game image gallery")
+                    ->headline($this->name)
+                    ->isPartOf(
+                        Schema::creativeWorkSeries()->name($this->folder->name)
+                    )
+                    ->relatedLink(route('fo.games.show', $this))
+                    ->significantLink(sprintf('%s/%s', config('app.akora_url'), $this->akora_id))
+                    ->primaryImageOfPage(
+                        Schema::imageObject()
+                            ->url(asset($this->picture))
+                            ->headline("Main picture from the game " . $this->name)
+                    )
+                    ->mainEntity(Schema::thing()->name($this->name))
+                    ->about(Schema::thing()->name("Pictures from the game " . $this->name))
+                    ->reviewedBy($this->getPersonSchema())
+                    ->editor($this->getPersonSchema())
+                    ->publisher($this->getPersonSchema())
+                    ->creator($this->getPersonSchema())
+                    ->author($this->getPersonSchema())
             );
-        }
-        return $schema
-            ->about(
-                Schema::Thing()
-                    ->name($this->name)
-            )
-            ->reviewedBy($this->toPersonSchema())
-            ->editor($this->toPersonSchema())
-            ->author($this->toPersonSchema());
     }
 
     // * RELATIONSHIPS

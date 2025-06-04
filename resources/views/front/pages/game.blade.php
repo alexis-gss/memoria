@@ -97,5 +97,7 @@
 @endsection
 
 @push('scripts')
+    {!! $gameModel->setPersonSchema()->toScript() !!}
+    {!! $gameModel->setWebsiteSchema()->toScript() !!}
     {!! $gameModel->toSchemaOrg()->toScript() !!}
 @endpush

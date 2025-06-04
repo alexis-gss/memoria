@@ -53,5 +53,7 @@
 @endsection
 
 @push('scripts')
+    {!! $staticPageModel->setPersonSchema()->toScript() !!}
+    {!! $staticPageModel->setWebsiteSchema()->toScript() !!}
     {!! $staticPageModel->toSchemaOrg()->toScript() !!}
 @endpush
