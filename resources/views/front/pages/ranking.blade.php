@@ -10,7 +10,7 @@
             <div class="col-12">
                 <div class="my-5">
                     <h1 class="title-font-regular position-relative mx-auto mb-3 w-fit px-5 py-1 text-center">
-                        {{ __('fo_ranking') }}
+                        {{ __('fo_ranking_title') }}
                         <span class="d-none d-sm-block angles"></span>
                     </h1>
                     <div class="d-flex justify-content-center align-items-center user-select-none w-100 flex-row text-center">

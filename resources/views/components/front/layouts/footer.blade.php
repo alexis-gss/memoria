@@ -44,8 +44,8 @@
                         <li class="list-group-item bg-transparent border-0 pt-2 pb-1">
                             <a class="link-light link-offset-2 link-opacity-75-hover" data-bs-tooltip="tooltip"
                                 role="button" href="{{ route('fo.games.index') }}"
-                                title="{{ __('fo_tooltip_footer_access_page', ['pageName' => str(__('fo_homepage'))->lower()]) }}">
-                                {{ __('fo_homepage') }}
+                                title="{{ __('fo_tooltip_footer_access_page', ['pageName' => str(__('fo_home_title'))->lower()]) }}">
+                                {{ __('fo_home_title') }}
                             </a>
                         </li>
                         <li class="list-group-item bg-transparent border-0 pt-1 pb-0">

@@ -17,8 +17,8 @@ enum StaticPageTypeEnum: int
      * @phpstan-ignore-next-line
      */
     private const LABELS = [
-        self::home->name    => 'fo_homepage',
-        self::ranking->name => 'fo_ranking',
+        self::home->name    => 'fo_home_title',
+        self::ranking->name => 'fo_ranking_title',
     ];
 
     /**

@@ -157,8 +157,6 @@
     "fo_last_games_added": "Latest games added :",
     "fo_ranking_details": "Top :number favorite video games",
     "fo_ranking_no_games": "No games present in the ranking.",
-    "fo_homepage": "Home",
-    "fo_ranking": "Ranking",
     "fo_footer_currently": "Currently",
     "fo_footer_details": "Designed and built by :conceptor, :appName is a gallery of pictures from a lot of games, realised under Laravel.",
     "fo_footer_back_label": "Administration",

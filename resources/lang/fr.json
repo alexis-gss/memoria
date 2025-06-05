@@ -156,8 +156,6 @@
     "fo_last_games_added": "Derniers jeux ajoutés :",
     "fo_ranking_details": "Top :number des jeux vidéo préférés",
     "fo_ranking_no_games": "Aucun jeu présent dans le classement.",
-    "fo_homepage": "Accueil",
-    "fo_ranking": "Classement",
     "fo_footer_currently": "Actuellement",
     "fo_footer_details": "Conçu et construit par :conceptor, :appName est une galerie d'images issues de nombreux jeux, réalisée sous Laravel.",
     "fo_footer_back_label": "Administration",
