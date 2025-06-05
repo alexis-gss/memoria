@@ -19,13 +19,20 @@ trait Sitemap
     public static function updateSitemap(): void
     {
         SpatieSitemap::create()
-            ->add(StaticPage::all())
-            ->add(Game::query()
-                ->where('published', true)
-                ->orderBy('slug', 'ASC')
-                ->whereHas('folder', function (Builder $query) {
-                    $query->where('published', true);
-                })->get())
+            ->add(
+                StaticPage::all()
+                    ->map(fn(StaticPage $staticPage) => $staticPage->toSitemapTag())
+            )
+            ->add(
+                Game::query()
+                    ->where('published', true)
+                    ->orderBy('slug', 'ASC')
+                    ->whereHas('folder', function (Builder $query) {
+                        $query->where('published', true);
+                    })
+                    ->get()
+                    ->map(fn(Game $game) => $game->toSitemapTag())
+            )
             ->writeToFile(public_path('sitemap.xml'));
     }
 
