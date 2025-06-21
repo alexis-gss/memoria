@@ -162,7 +162,7 @@ class GameController extends Controller
                 $query->where([['published', true], ['id', $gameModel->folder->getKey()]]);
             })
             ->orderby('published_at', 'DESC')
-            ->paginate(5)
+            ->paginate(6)
             ->through(function (Game $randomGameModel) {
                 return view('components.front.card-game', ['gameModel' => $randomGameModel])->render();
             });

@@ -172,13 +172,13 @@ function setSwiper(): void {
         spaceBetween: 25,
       },
       768: {
-        centeredSlides: true,
-        slidesPerView: 2,
+        centeredSlides: relatedGamesViews.value.length <= 1 ? true : false,
+        slidesPerView: relatedGamesViews.value.length <= 1 ? 1 : 2,
         spaceBetween: 35,
       },
       992: {
-        centeredSlides: true,
-        slidesPerView: 3,
+        centeredSlides: relatedGamesViews.value.length <= 2 ? true : false,
+        slidesPerView: relatedGamesViews.value.length <= 2 ? (relatedGamesViews.value.length <= 1 ? 1 : 2) : 3,
         spaceBetween: 35,
       },
     },
