@@ -18,7 +18,6 @@
                     <p class="m-0">
                 @endif
                 {{ __('bo_other_stats_picture_id', [
-                    'id' => $ratingModel->picture->getKey(),
                     'game' => $ratingModel->picture->game->name,
                 ]) }}
                 @if ($pictureExist)
@@ -30,7 +29,6 @@
                 @if ($pictureExist)
                     <x-back.modal-view-picture id="ModalViewPicture{{ $key }}" :pictureAlt="$ratingModel->picture->label"
                         :pictureTitle="__('bo_other_stats_picture_id', [
-                            'id' => $ratingModel->picture->getKey(),
                             'game' => $ratingModel->picture->game->name,
                         ])" :pictureSrc="sprintf(
                             '%s/storage/pictures/%s/%s.webp',

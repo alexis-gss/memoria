@@ -1,4 +1,4 @@
-<p class="fs-5 fw-semibold mb-4 text-center">
+<p class="fs-5 fw-semibold my-4 mt-xxl-0 text-center">
     {{ str(__('bo_other_stats_most_visited_pages'))->ucFirst()->value() }}
 </p>
 @if ($models->isNotEmpty())
