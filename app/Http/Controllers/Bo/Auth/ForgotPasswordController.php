@@ -27,7 +27,7 @@ class ForgotPasswordController extends Controller
                 'created_at' => Carbon::now()
             ]);
 
-            Mail::to($fields['email'])->send(new LinkResetPassword((object)$fields));
+            Mail::to($fields['email'])->send(new LinkResetPassword((object) $fields));
 
             return redirect()->back()->with('success', trans('auth.reset_password_email'));
         });

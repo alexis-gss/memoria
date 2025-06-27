@@ -63,7 +63,7 @@ class ResetPasswordController extends Controller
             $userModel->save();
 
             // Notification target user.
-            Mail::to($userModel->email)->send(new ResetPassword((object)$userModel));
+            Mail::to($userModel->email)->send(new ResetPassword((object) $userModel));
 
             $passwordReset->delete();
 

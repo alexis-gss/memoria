@@ -53,7 +53,7 @@ trait HasPicture
         ?int $maxWidth = null,
         ?int $maxHeight = null
     ): array {
-        $sizes = (object)[
+        $sizes = (object) [
             'minWidth'  => $minWidth ?? $this->minWidth,
             'minHeight' => $minHeight ?? $this->minHeight,
             'maxWidth'  => $maxWidth ?? $this->maxWidth,
@@ -92,7 +92,7 @@ trait HasPicture
         ?int $maxWidth = null,
         ?int $maxHeight = null
     ): array {
-        $sizes = (object)[
+        $sizes = (object) [
             'required'  => $required ?? $this->required,
             'limitMin'  => $limitMin ?? $this->limitMin,
             'limitMax'  => $limitMax ?? $this->limitMax,

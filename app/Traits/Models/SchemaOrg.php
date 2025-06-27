@@ -24,9 +24,9 @@ trait SchemaOrg
     /**
      * Set the website schema.
      *
-     * @return \Spatie\SchemaOrg\Website
+     * @return \Spatie\SchemaOrg\WebSite
      */
-    public function setWebsiteSchema(): \Spatie\SchemaOrg\Website
+    public function setWebsiteSchema(): \Spatie\SchemaOrg\WebSite
     {
         return Schema::website()
             ->setProperty('@id', config('app.url') . '#website')
@@ -93,9 +93,9 @@ trait SchemaOrg
     /**
      * Get the website schema.
      *
-     * @return \Spatie\SchemaOrg\Website
+     * @return \Spatie\SchemaOrg\WebSite
      */
-    public function getWebsiteSchema(): \Spatie\SchemaOrg\Website
+    public function getWebsiteSchema(): \Spatie\SchemaOrg\WebSite
     {
         return Schema::website()->setProperty('@id', config('app.url') . '#website');
     }
