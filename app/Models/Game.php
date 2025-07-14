@@ -168,7 +168,7 @@ class Game extends Model implements Sitemapable
     {
         return Schema::webPage()
             ->name($this->name)
-            ->description(trans('fo_description', ['game' => $this->name]))
+            ->description(trans('fo_game_description', ['game' => $this->name]))
             ->headline($this->name)
             ->inLanguage(config('app.locale'))
             ->keywords(['page'])

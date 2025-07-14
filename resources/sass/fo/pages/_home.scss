@@ -8,6 +8,10 @@
         padding-left: 100%;
         animation: defilement 80s infinite linear;
         white-space: nowrap;
+
+        &:hover {
+            animation-play-state: paused;
+        }
     }
 
     @keyframes defilement {

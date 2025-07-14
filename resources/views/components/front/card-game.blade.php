@@ -1,5 +1,5 @@
 <a href="{{ route('fo.games.show', $gameModel->slug) }}" class="card shadow text-decoration-none text-center border-0 h-100"
-    title="{{ __('fo_access_game', ['gameName' => $gameModel->name]) }}">
+    data-bs-tooltip="tooltip" data-bs-placement="top" title="{{ __('fo_access_game', ['gameName' => $gameModel->name]) }}">
     <div class="ratio ratio-16x9 card-img-top overflow-hidden">
         <div class="picture-loader position-absolute top-0 start-0 d-flex justify-content-center align-items-center bg-primary w-100 h-100 z-3">
             <div class="spinner-border text-light" role="status">

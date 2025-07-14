@@ -1,7 +1,7 @@
 @extends('front.layout', ['brParam' => $gameModel])
 
 @section('title', $gameModel->name ?? __('fo_home_title'))
-@section('description', __('fo_description', ['game' => $gameModel->name]) ?? __('fo_home_description'))
+@section('description', __('fo_game_description', ['game' => $gameModel->name]) ?? __('fo_home_description'))
 @section('breadcrumb', request()->route()->getName())
 
 @section('content')
@@ -13,9 +13,11 @@
             </h1>
             <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center user-select-none w-100 text-center">
                 <div class="d-flex flex-row justify-content-center align-items-center pb-2 pb-lg-0">
-                    <a class="btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                        data-bs-tooltip="tooltip" data-bs-placement="top" href="{{ route('fo.games.index') }}"
-                        title="{{ __('bo_other_back_home') }}">
+                    <a
+                        href="{{ route('fo.games.index') }}"
+                        class="btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
+                        data-bs-tooltip="tooltip" title="{{ __('fo_other_back_home') }}"
+                    >
                         <i class="fa fa-arrow-left"></i>
                     </a>
                     <span class="d-lg-none mx-1">-</span>
@@ -23,6 +25,7 @@
                         href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
                         target="_blank"
                         class="d-lg-none btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
+                        data-bs-tooltip="tooltip" title="{{ __('fo_access_game_details', ['gameName' => $gameModel->name]) }}"
                     >
                         {{ __('fo_images_details') }}
                         <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>
@@ -35,6 +38,7 @@
                         style="background-color:{{ $gameModel->folder->color }}"
                         name="folder"
                         value="{{ $gameModel->folder->slug }}"
+                        data-bs-tooltip="tooltip" title="{{ __('fo_search_filter_by_folder', ['folder' => $gameModel->folder->name]) }}"
                     >
                         {{ $gameModel->folder->name }}
                     </button>
@@ -44,8 +48,8 @@
                             @if ($tag->published)
                                 <button
                                     class="game-tags btn btn-secondary text-decoration-none text-white border-0 rounded-2 px-2 py-0 ms-1"
-                                    name="tag"
-                                    value="{{ $tag->slug }}"
+                                    name="tag" value="{{ $tag->slug }}"
+                                    data-bs-tooltip="tooltip" title="{{ __('fo_search_filter_by_tag', ['tag' => $tag->name]) }}"
                                 >
                                     {{ $tag->name }}
                                 </button>
@@ -57,6 +61,7 @@
                         href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
                         target="_blank"
                         class="d-none d-lg-block btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
+                        data-bs-tooltip="tooltip" title="{{ __('fo_access_game_details', ['gameName' => $gameModel->name]) }}"
                     >
                         {{ __('fo_images_details') }}
                         <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>

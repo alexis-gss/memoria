@@ -27,20 +27,12 @@ class StaticPageController extends Controller
         /** @var \Illuminate\Support\Collection $gameLatestModels */
         $gameLatestModels = Game::query()->where('published', true)->orderBy('published_at', 'DESC')->take(20)->get();
 
-        /** @var string $gamesLatestString */
-        $gamesLatestString = "";
-        $gameLatestModels->map(function ($gameModel, $gameModelIndex) use ($gameLatestModels, &$gamesLatestString) {
-            $gamesLatestString .= $gameModel->name . (
-                ($gameModelIndex !== $gameLatestModels->count() - 1) ? " / " : "..."
-            );
-        });
-
         return view('front.pages.home', [
-            'staticPageModel'   => $staticPageModel,
-            'gamesLatestString' => $gamesLatestString,
-            'gameModels'        => $this->getGamesPublished(true, $this->gamesPerPage),
-            'folderModels'      => $this->getFoldersPublished(),
-            'tagModels'         => $this->getTagsPublished(),
+            'staticPageModel'  => $staticPageModel,
+            'gameLatestModels' => $gameLatestModels,
+            'gameModels'       => $this->getGamesPublished(true, $this->gamesPerPage),
+            'folderModels'     => $this->getFoldersPublished(),
+            'tagModels'        => $this->getTagsPublished(),
         ]);
     }
 

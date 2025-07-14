@@ -19,7 +19,14 @@
                         <p class="fw-bold m-0">{{ __('fo_last_games_added') }}</p>
                     </div>
                     <div class="home-text-content w-100 overflow-hidden ms-1">
-                        <p class="m-0">{{ $gamesLatestString }}</p>
+                        <div class="position-relative">
+                            @foreach($gameLatestModels as $gameLatestModel)
+                                <a href="{{ route('fo.games.show', $gameLatestModel->slug) }}" class="m-0"
+                                    data-bs-tooltip="tooltip" data-bs-placement="top"
+                                    title="{{ __('fo_access_game', ['gameName' => $gameLatestModel->name]) }}">{{ $gameLatestModel->name }}</a>
+                                <span>{{ (!$loop->last) ? '/' : '...' }}</span>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
