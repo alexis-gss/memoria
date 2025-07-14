@@ -3,6 +3,7 @@
     v-if="relatedGamesViews.length"
     class="row w-100 mx-auto pb-5"
     data-aos="fade-up"
+    ref="gamesRelated"
   >
     <div class="col-12">
       <h2 class="title-font-regular position-relative mx-auto mb-3 w-fit px-5 py-1 text-center">
@@ -14,6 +15,7 @@
         class="swiper-button swiper-games-related-button-prev btn btn-primary position-absolute rounded-circle border-0 z-2"
         :title="trans.methods.__('fo_slide_target', {'target': trans.methods.__('fo_prev')})"
         :aria-label="trans.methods.__('fo_slide_target_aria', {'target': trans.methods.__('fo_prev')})"
+        data-bs-tooltip="tooltip"
         type="button"
       >
         <FontAwesomeIcon icon="fa-solid fa-chevron-left" />
@@ -66,6 +68,7 @@
         class="swiper-button swiper-games-related-button-next btn btn-primary position-absolute rounded-circle border-0 z-2"
         :title="trans.methods.__('fo_slide_target', {'target': trans.methods.__('fo_next')})"
         :aria-label="trans.methods.__('fo_slide_target_aria', {'target': trans.methods.__('fo_next')})"
+        data-bs-tooltip="tooltip"
         type="button"
       >
         <FontAwesomeIcon icon="fa-solid fa-chevron-right" />
@@ -80,13 +83,14 @@
 
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { defineOptions, ref, reactive, onMounted } from "vue";
+import { defineOptions, ref, reactive, onMounted, nextTick } from "vue";
 import type { PropType } from "vue";
 import Swiper from "swiper";
 import { Keyboard, Navigation, Pagination } from "swiper/modules";
 import errors from "./../../modules/errors";
-import trans from "../../modules/trans";
-import route from "../../modules/route";
+import trans from "./../../modules/trans";
+import route from "./../../modules/route";
+import { Tooltips } from "./../../modules/tooltips";
 import type { AxiosResponse } from "~/axios";
 
 defineOptions({
@@ -110,10 +114,14 @@ const props = defineProps({
   },
 });
 
+// * REFS
+const gamesRelated = ref<HTMLDivElement|null>(null);
+
 // * DATA
 const gameSlug = ref<string>(props.gameSlug);
 const relatedGamesViews = ref<Array<string>>(props.relatedGamesViews.data);
 const slider = ref<Swiper|null>(null);
+const tooltips = ref<Tooltips|null>(null);
 
 /** Pagination parameters. */
 const paginationParameters = reactive<{
@@ -134,6 +142,12 @@ onMounted((): void => {
   relatedGamesViews.value = props.relatedGamesViews.data;
   setSwiper();
   gamesRelatedImageLazyLoad();
+  nextTick(() => {
+    tooltips.value = Tooltips.make({
+      type: "dom",
+      elements: gamesRelated.value!.querySelectorAll("[data-bs-tooltip=\"tooltip\"]")
+    });
+  });
 });
 
 // * METHODS
@@ -149,7 +163,7 @@ function setSwiper(): void {
     slidesPerView: 1.3,
     initialSlide: 0,
     centeredSlides: true,
-    spaceBetween: 10,
+    spaceBetween: relatedGamesViews.value.length <= 1 ? 0 : 10,
     navigation: {
       nextEl: ".swiper-games-related-button-next",
       prevEl: ".swiper-games-related-button-prev",
@@ -172,17 +186,42 @@ function setSwiper(): void {
         spaceBetween: 25,
       },
       768: {
-        centeredSlides: relatedGamesViews.value.length <= 1 ? true : false,
-        slidesPerView: relatedGamesViews.value.length <= 1 ? 1 : 2,
+        centeredSlides: true,
+        slidesPerView: 1.8,
         spaceBetween: 35,
       },
       992: {
-        centeredSlides: relatedGamesViews.value.length <= 2 ? true : false,
-        slidesPerView: relatedGamesViews.value.length <= 2 ? (relatedGamesViews.value.length <= 1 ? 1 : 2) : 3,
+        centeredSlides: false,
+        slidesPerView: 3,
         spaceBetween: 35,
       },
     },
   });
+  centerSlidesManuallyIfNeeded();
+}
+
+/**
+ * Center slides of the slider if needed.
+ * @return void
+ */
+function centerSlidesManuallyIfNeeded(): void {
+  if (window.innerWidth < 992) return;
+
+  const swiperEl = document.querySelector(".swiper-games-related") as HTMLElement;
+  const swiperWrapper = swiperEl?.querySelector(".swiper-wrapper") as HTMLElement;
+
+  const slideCount = relatedGamesViews.value.length;
+
+  if (!swiperEl || !swiperWrapper || slideCount >= 3) {
+    swiperWrapper.style.marginLeft = "";
+    return;
+  }
+  const containerWidth = swiperEl.offsetWidth;
+  const slideWidth = containerWidth / 3;
+  const visibleSlidesWidth = slideCount * slideWidth;
+
+  const offset = (containerWidth - visibleSlidesWidth) / 2;
+  swiperWrapper.style.marginLeft = `${offset}px`;
 }
 
 /**
@@ -291,6 +330,9 @@ function getNextRelatedGamesViews(): void {
 }
 #swiper-games-related .ratio {
   max-width: 366px;
+}
+.swiper-wrapper.centered-few-slides {
+  justify-content: center;
 }
 .fa-animation {
   animation: translation 1.5s cubic-bezier(.17,.84,.44,1) infinite;
