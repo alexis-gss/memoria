@@ -6,6 +6,21 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.3.1] - 17.06.25**
+
+### Changed
+-   chore: ⬆️ upgrade dependencies
+
+### Fixed
+-   fix: 🔍 update schema org for game and static page models
+-   fix: 🔍 set priority and frequency on update sitemap
+-   fix: ♿ update slide group for related games slider
+-   fix: 💬 update translation of page title
+-   fix: 💬 update translation of most liked pictures
+-   fix: 🚨 solving phpcs & phpstan errors
+-   fix: 🐛 slides width correction for related games
+-   fix: ♿ set link to games in latest games added
+
 ## **[v5.3.0] - 18.04.25**
 
 ### Added
