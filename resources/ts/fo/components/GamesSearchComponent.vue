@@ -15,7 +15,7 @@
             ref="searchInput"
             name="search"
             v-model="search"
-            @keyup="setTextValue($event)"
+            @input="setTextValue($event)"
             class="form-control border-0 rounded-3 text-bg-primary me-1 ps-2"
             :placeholder="trans.methods.__('fo_search', { games: `${paginationParameters.total}` })"
             type="text"
