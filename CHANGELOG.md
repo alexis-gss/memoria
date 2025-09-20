@@ -6,6 +6,14 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.3.2] - 20.09.25**
+
+### Fixed
+-   fix: 🐛 modify the detection of the game search value
+-   fix: 🦺 add some validations on controller methods
+-   fix: ♿️ add new button to access the Akora website in a game form
+-   fix: 💄 left alignment of text in the personal ranking list
+
 ## **[v5.3.1] - 17.06.25**
 
 ### Changed
