@@ -27,7 +27,7 @@ class UserCreate extends Command
     /**
      * The console command description.
      *
-     * @var string|null
+     * @var string
      */
     protected $description = 'Create user (Conceptor, Administrator or Visitor)';
 
@@ -128,8 +128,8 @@ class UserCreate extends Command
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
                 continue;
-            } //end try
-        }; //end while
+            }
+        };
     }
 
     /**
@@ -153,8 +153,8 @@ class UserCreate extends Command
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
                 continue;
-            } //end try
-        }; //end while
+            }
+        };
     }
 
     /**
@@ -178,8 +178,8 @@ class UserCreate extends Command
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
                 continue;
-            } //end try
-        }; //end while
+            }
+        };
     }
 
     /**
@@ -195,7 +195,7 @@ class UserCreate extends Command
             )) !== $this->secret('Confirm the password')
         ) {
             continue;
-        }; //end while
+        };
     }
 
     /**
@@ -207,7 +207,7 @@ class UserCreate extends Command
     {
         while (is_null($this->role)) {
             try {
-                $tmp                         = $this->choice(
+                $tmp = $this->choice(
                     'Select his role',
                     [
                         Str::of(RoleEnum::conceptor->label())->ucFirst()->value(),
@@ -215,8 +215,6 @@ class UserCreate extends Command
                         Str::of(RoleEnum::visitor->label())->ucFirst()->value()
                     ],
                     Str::of(RoleEnum::visitor->label())->ucFirst()->value(),
-                    $maxAttempts             = null,
-                    $allowMultipleSelections = false
                 );
                 if ($tmp === Str::of(RoleEnum::conceptor->label())->ucFirst()->value()) {
                     $tmp = RoleEnum::conceptor->value();

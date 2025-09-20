@@ -172,11 +172,11 @@ const props = defineProps({
   },
   modelListPaginate: {
     type: Object as PropType<LaravelPaginator>,
-    default: () => { return []; }
+    default: () => { return {}; }
   },
   modelSelected: {
     type: Object as PropType<VselectOption|VselectOption[]|null>,
-    default: () => { return []; }
+    default: () => { return {}; }
   },
   required: {
     type: Boolean,

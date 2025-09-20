@@ -107,7 +107,7 @@
     </rule>
     <rule ref="Squiz.Commenting.FunctionCommentThrowTag"/>
     <rule ref="Squiz.Commenting.InlineComment">
-        <exclude name="Squiz.Commenting.InlineComment.DocBlock" />
+        <severity>0</severity>
     </rule>
     <rule ref="Squiz.Commenting.LongConditionClosingComment">
         <exclude name="Squiz.Commenting.LongConditionClosingComment.SpacingBefore" />
