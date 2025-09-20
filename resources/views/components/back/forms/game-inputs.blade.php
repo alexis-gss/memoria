@@ -69,9 +69,21 @@
                         <i class="fa-solid fa-circle-info"></i>
                     </span>
                 </label>
-                <input class="form-control @error('akora_id') is-invalid @enderror" id="akora_id" name="akora_id"
-                    type="text" value="{{ old('akora_id', $gameModel->akora_id ?? '') }}"
-                    placeholder="{{ __('validation.custom.akora_associated') }}*" required>
+                <div class="input-group">
+                    <input class="form-control @error('akora_id') is-invalid @enderror" id="akora_id" name="akora_id"
+                        type="text" value="{{ old('akora_id', $gameModel->akora_id ?? '') }}"
+                        placeholder="{{ __('validation.custom.akora_associated') }}*" required>
+                    @php
+                        $url = config('app.akora_url');
+                        $scheme = parse_url($url, PHP_URL_SCHEME);
+                        $host = parse_url($url, PHP_URL_HOST);
+                        $akoraUrl = sprintf("%s://%s", $scheme, $host);
+                    @endphp
+                    <a class="btn btn-primary" href="{{ $akoraUrl }}" data-bs-tooltip="tooltip" data-bs-placement="top"
+                        title="{{ __('bo_tooltip_home_akora') }}" target="_blank">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
                 <small class="text-body-secondary">
                     {{ sprintf('%s %s', __('validation.numeric', [
                         'attribute' => __('validation.custom.akora_associated'),

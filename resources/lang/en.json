@@ -22,6 +22,7 @@
     "bo_tooltip_home_live": "Access to the project's front part",
     "bo_tooltip_home_documentation": "Access to the project's official documentation",
     "bo_tooltip_home_github": "Access to the project's official Github repository",
+    "bo_tooltip_home_akora": "Access to the Akora website",
     "bo_tooltip_statistics": "Show :model about this project",
     "bo_tooltip_list_models": "List all :count :model created",
     "bo_tooltip_name_folder": "Type the name of the folder",
