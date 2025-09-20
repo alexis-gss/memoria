@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Enums\Pagination\ItemsPerPaginationEnum;
 use App\Enums\Theme\BootstrapThemeEnum;
+use App\Http\Requests\Bo\JsonPaginateRequest;
+use App\Http\Requests\Bo\LangRequest;
+use App\Http\Requests\Bo\NavigationRequest;
+use App\Http\Requests\Bo\ThemeRequest;
 use App\Lib\Helpers\ToolboxHelper;
 use App\Models\Folder;
 use App\Models\Game;
@@ -12,7 +16,6 @@ use App\Models\Tag;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Schema;
@@ -370,15 +373,12 @@ class Controller extends BaseController
     /**
      * Set the current locale.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Bo\LangRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function setLang(Request $request): \Illuminate\Http\RedirectResponse
+    public function setLang(LangRequest $request): \Illuminate\Http\RedirectResponse
     {
-        $lang = $request->lang;
-        if (!\in_array($lang, config('app.locales'))) {
-            $lang = config('app.fallback_locale');
-        }
+        $lang = $request->validated('lang');
         app()->setLocale($lang);
         Session::put('lang', $lang);
         return redirect()->back()->with('success', trans('crud.messages.lang_updated'));
@@ -387,24 +387,24 @@ class Controller extends BaseController
     /**
      * Set the navigation size.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Bo\NavigationRequest $request
      * @return void
      */
-    protected function setNavigation(Request $request): void
+    protected function setNavigation(NavigationRequest $request): void
     {
-        Session::put("navigation", $request->isExtended);
+        Session::put("navigation", $request->validated('isExtended'));
     }
 
     /**
      * Set the bootstrap theme or light (default).
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Bo\ThemeRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    protected function setTheme(Request $request): \Illuminate\Http\RedirectResponse
+    protected function setTheme(ThemeRequest $request): \Illuminate\Http\RedirectResponse
     {
         $theme = ToolboxHelper::getValidatedEnum(
-            $request->theme ?: Session::get('theme', BootstrapThemeEnum::light->value()),
+            $request->validated('theme') ?: Session::get('theme', BootstrapThemeEnum::light->value()),
             'theme',
             '\App\Http\Controllers\BootstrapThemeEnum',
         );
@@ -417,30 +417,38 @@ class Controller extends BaseController
     /**
      * Get a paginate resource.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Bo\JsonPaginateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function jsonSearchPaginate(Request $request): \Illuminate\Http\JsonResponse
+    public function jsonSearchPaginate(JsonPaginateRequest $request): \Illuminate\Http\JsonResponse
     {
+        /** @var string $targetModel */
+        $targetModel = $request->validated('targetModel');
+
+        /** @var string $search */
+        $search = $request->validated('search');
+
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = $request->targetModel::query()->where('published', true);
-        $query = ($request->targetModel === "\App\Models\Folder")
+        $query = $targetModel::query()->where('published', true);
+        $query = ($targetModel === "\App\Models\Folder")
             ? $query->orderby('mandatory', 'DESC')
             : $query;
 
         /** @var \Illuminate\Pagination\LengthAwarePaginator $models */
         $models = $query->orderBy('name')
-            ->where('name', 'like', "%{$request->input('search')}%")
+            ->where('name', 'like', "%{$search}%")
             ->paginate($this->modelsPerPage)
             ->through(function ($model) {
                 $model->nameLocale = $model->getTranslation('name', config('app.locale'));
                 return $model;
             });
+
         /** @var \Illuminate\Support\Collection $modelsSorted */
         $modelsSorted = $models->sortBy('nameLocale');
-        $modelsSorted = ($request->targetModel === "\App\Models\Folder")
+        $modelsSorted = ($targetModel === "\App\Models\Folder")
             ? $modelsSorted->sortByDesc('mandatory')
             : $modelsSorted;
+
         return \response()->json(new LengthAwarePaginator(
             $modelsSorted->values(),
             $models->total(),

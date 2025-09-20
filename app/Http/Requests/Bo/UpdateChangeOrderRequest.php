@@ -24,7 +24,7 @@ class UpdateChangeOrderRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'direction' => $this->route('direction') === 'up' ? true : false
+            'direction' => $this->route('direction') === 'up' ? true : false,
         ]);
     }
 
