@@ -1,8 +1,8 @@
 {
     "name": "alexis-gss/memoria",
     "version": "5.3.1",
-    "type": "project",
     "description": "Gallery of pictures from a lot of games, realised under Laravel.",
+    "homepage": "https://memoria.alexis-gousseau.com",
     "authors": [
         {
             "name": "Alexis Gousseau",
@@ -17,6 +17,7 @@
         "images"
     ],
     "license": "MIT",
+    "type": "project",
     "require": {
         "php": "^8.3",
         "alexis-gss/laravel-activity-logs": "^1.0",
