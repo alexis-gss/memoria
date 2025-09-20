@@ -39,7 +39,7 @@
                                             {{ $rank < 10 ? 0 . $rank : $rank }}&nbsp;-&nbsp;
                                         </span>
                                     </div>
-                                    <p class="z-1 my-1">{{ $rankModel->game->name }}</p>
+                                    <p class="text-start z-1 my-1">{{ $rankModel->game->name }}</p>
                                 </a>
                             </li>
                         @endforeach
