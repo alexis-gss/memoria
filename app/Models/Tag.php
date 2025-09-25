@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LaravelActivityLogs\Traits\ActivityLog;
+use LaravelActivityLogs\Traits\HasActivityLog;
 
 /**
  * @property integer                         $id           Id.
@@ -34,7 +34,7 @@ use LaravelActivityLogs\Traits\ActivityLog;
  */
 class Tag extends Model
 {
-    use ActivityLog;
+    use HasActivityLog;
     use HasFactory;
     use HasTranslations;
 

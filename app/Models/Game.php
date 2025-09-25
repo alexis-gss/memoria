@@ -8,7 +8,7 @@ use App\Traits\Models\Sitemap;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use LaravelActivityLogs\Traits\ActivityLog;
+use LaravelActivityLogs\Traits\HasActivityLog;
 use Spatie\SchemaOrg\Schema;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
@@ -44,7 +44,7 @@ use Spatie\Sitemap\Tags\Url;
  */
 class Game extends Model implements Sitemapable
 {
-    use ActivityLog;
+    use HasActivityLog;
     use HasFactory;
     use SchemaOrg;
     use Sitemap;

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
-use LaravelActivityLogs\Traits\ActivityLog;
+use LaravelActivityLogs\Traits\HasActivityLog;
 
 /**
  * @property integer                         $id                Id.
@@ -38,7 +38,7 @@ use LaravelActivityLogs\Traits\ActivityLog;
  */
 class User extends Authenticatable
 {
-    use ActivityLog;
+    use HasActivityLog;
     use HasFactory;
     use Notifiable;
 
