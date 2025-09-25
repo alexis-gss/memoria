@@ -6,6 +6,13 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.3.3] - 25.09.25**
+
+### Changed
+-   chore: ⬆️ upgrade alexis-gss/laravel-activity-logs to v2.0.0
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.3.2...v5.3.3
+
 ## **[v5.3.2] - 20.09.25**
 
 ### Fixed
@@ -13,6 +20,8 @@ All notable changes to `memoria` will be documented in this file.
 -   fix: 🦺 add some validations on controller methods
 -   fix: ♿️ add new button to access the Akora website in a game form
 -   fix: 💄 left alignment of text in the personal ranking list
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.3.1...v5.3.2
 
 ## **[v5.3.1] - 17.06.25**
 
@@ -29,6 +38,8 @@ All notable changes to `memoria` will be documented in this file.
 -   fix: 🐛 slides width correction for related games
 -   fix: ♿ set link to games in latest games added
 
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.3.0...v5.3.1
+
 ## **[v5.3.0] - 18.04.25**
 
 ### Added
@@ -44,6 +55,8 @@ All notable changes to `memoria` will be documented in this file.
 -   fix: ♿ switch between page's title and name's projet in document's title
 -   fix: ♿️ upgrade accessibility on front
 -   fix: 🐛 get url without params for pictures paginate
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.2.0...v5.3.0
 
 ## **[v5.2.0] - 10.01.25**
 
