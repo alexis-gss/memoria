@@ -54,7 +54,7 @@
         "aos": "^2.3.4",
         "autoprefixer": "^10.4.19",
         "axios": "^1.7.2",
-        "bootstrap": "^5.3.3",
+        "bootstrap": "5.3.3",
         "cropperjs": "^1.6.2",
         "echarts": "^5.5.1",
         "eslint": "^8.57.0",
