@@ -254,14 +254,16 @@ onMounted((): void => {
   */
 function initResumable(): void {
   resumableJS.value = new Resumable({
-    chunkSize: 1024 * 1024 * 1024 * 1024,
+    chunkSize: 8 * 1024 * 1024, // 8MB.
     simultaneousUploads: 5,
     maxFiles: 75,
     testChunks: false,
     target: getUploadDocumentRoute(),
     query: {
       gameSlug: gameSlug.value,
-      _token: csrf.value,
+    },
+    headers: {
+      "X-CSRF-TOKEN": csrf.value,
     },
   });
   resumableJS.value.on("fileAdded", fileAdded);
