@@ -1,4 +1,4 @@
-name: Github actions validations
+name: Github actions
 
 on:
   push:
@@ -22,3 +22,9 @@ jobs:
     name: Validation Laravel tests
     needs: ['validation-sass', 'validation-typescript', 'validation-php']
     uses: alexis-gss/github-workflows/.github/workflows/validation-laravel-tests.yml@master
+  deployment:
+    name: Deployment production
+    needs: ['validation-sass', 'validation-typescript', 'validation-php', validation-laravel-tests]
+    uses: alexis-gss/github-workflows/.github/workflows/deployment.yml@master
+    secrets: inherit
+    if: github.ref == 'refs/heads/master'
