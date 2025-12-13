@@ -38,7 +38,7 @@
 
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { defineOptions, onMounted, ref, useAttrs } from "vue";
+import { onMounted, ref, useAttrs } from "vue";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
 

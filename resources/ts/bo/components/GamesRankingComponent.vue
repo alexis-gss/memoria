@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { defineOptions, onMounted, ref, useAttrs, nextTick } from "vue";
+import { onMounted, ref, useAttrs, nextTick } from "vue";
 import { VueNestable, VueNestableHandle } from "vue3-nestable";
 import route from "./../../modules/route";
 import { Tooltips } from "./../../modules/tooltips";

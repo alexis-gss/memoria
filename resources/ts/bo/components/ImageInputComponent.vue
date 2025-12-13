@@ -420,7 +420,7 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Cropper from "cropperjs";
-import { computed, defineOptions, nextTick, onMounted, reactive, ref, useAttrs, watch } from "vue";
+import { computed, nextTick, onMounted, reactive, ref, useAttrs, watch } from "vue";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
 

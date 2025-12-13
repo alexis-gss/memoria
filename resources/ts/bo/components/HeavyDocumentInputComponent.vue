@@ -160,7 +160,7 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Resumable from "resumablejs";
 import type { PropType } from "vue";
-import { computed, defineOptions, onMounted, ref, useAttrs, nextTick } from "vue";
+import { computed, onMounted, ref, useAttrs, nextTick } from "vue";
 import route from "./../../modules/route";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";

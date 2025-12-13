@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineOptions, onMounted, ref, useAttrs, watch } from "vue";
+import { computed, onMounted, ref, useAttrs, watch } from "vue";
 import trans from "./../../modules/trans";
 
 defineOptions({

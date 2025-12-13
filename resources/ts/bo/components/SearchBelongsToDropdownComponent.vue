@@ -131,7 +131,7 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { PropType } from "vue";
-import { computed, defineOptions, nextTick, onMounted, reactive, ref, useAttrs } from "vue";
+import { computed, nextTick, onMounted, reactive, ref, useAttrs } from "vue";
 import VueSelect from "vue-select";
 import errors from "../../modules/errors";
 import route from "../../modules/route";

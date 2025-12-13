@@ -123,7 +123,7 @@
 
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { defineOptions, onMounted, ref, useAttrs, nextTick } from "vue";
+import { onMounted, ref, useAttrs, nextTick } from "vue";
 import errors from "./../../modules/errors";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";

@@ -49,7 +49,7 @@ import type { Payload } from "@ckpack/vue-color";
 import { Sketch } from "@ckpack/vue-color";
 import type { ColorInput } from "@ctrl/tinycolor";
 import type { PropType } from "vue";
-import { computed, defineOptions, onMounted, ref, useAttrs, watch } from "vue";
+import { computed, onMounted, ref, useAttrs, watch } from "vue";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
 
