@@ -31,6 +31,7 @@
         "stylelint-ci": "node ./node_modules/.bin/stylelint --config './.stylelintrc.json' --max-warnings 0 '**/resources/**/*.scss' -f json"
     },
     "devDependencies": {
+        "@alexis-gss/husky-config": "^1.0.2",
         "@babel/core": "^7.24.7",
         "@babel/types": "^7.24.7",
         "@ckpack/vue-color": "^1.5.0",
