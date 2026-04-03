@@ -137,7 +137,7 @@
                   </template>
                   <p class="text-start m-0 pe-2 z-2">{{ game.name }}</p>
                 </div>
-                <span>{{ (game.pictures as Array<Object>).length }}</span>
+                <span>{{ String((game.pictures as Array<Object>).length).padStart(2, '0') }}</span>
               </a>
             </li>
           </ul>
@@ -288,7 +288,7 @@ function clearInputSearch(): void {
 
 /**
   * Set event on game buttons (folder/tags).
-  * @return LaravelModelList
+  * @return void
 */
 function initButtons(): void {
   let folder = document.querySelector(".game-folder");
