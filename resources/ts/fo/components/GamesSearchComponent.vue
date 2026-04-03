@@ -175,7 +175,7 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { defineOptions, onMounted, ref, useAttrs, reactive } from "vue";
+import { onMounted, ref, useAttrs, reactive } from "vue";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
 import trans from "./../../modules/trans";
@@ -199,6 +199,8 @@ const selectedTag = ref<string>("");
 const selectedFolder = ref<string>("");
 const loading = ref<boolean>(false);
 const tooltips = ref<Tooltips|null>(null);
+const debounceDelay = 300;
+let debounceTimer: ReturnType<typeof setTimeout>|null = null;
 
 /** Models parameters. */
 const modelsParameters = reactive<{
@@ -321,13 +323,10 @@ function showNavigation(): void {
   * @param event Event on select.
   * @return void
   */
-function setTextValue(event: Event|null): void {
-  const target = event?.target as HTMLInputElement|null;
-  search.value = target?.value ? target?.value : "";
-  paginationParameters.page = 1;
-  urlParams.delete("text");
-  (search.value.length) ? urlParams.set("text", search.value) : "";
-  ajaxGamesFiltered([selectedTag.value, selectedFolder.value], false, search.value);
+function setTextValue(event: Event): void {
+  const target = event.target as HTMLInputElement;
+  search.value = target.value;
+  debouncedSearch([selectedTag.value, selectedFolder.value], search.value);
 }
 
 /**
@@ -339,10 +338,48 @@ function setSelectedValue(event: Event): void {
   const select = event.target as HTMLSelectElement;
   if (select.name == "folder") selectedFolder.value = select.value;
   if (select.name == "tag") selectedTag.value = select.value;
+
+  // Reset debounce on select.
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+    debounceTimer = null;
+  }
+
   paginationParameters.page = 1;
   urlParams.delete(select.name);
-  (select.value.length) ? urlParams.set(select.name, select.value) : "";
+  if (select.value.length) urlParams.set(select.name, select.value);
   ajaxGamesFiltered([selectedTag.value, selectedFolder.value], false, search.value);
+}
+
+/**
+  * Debounced search.
+  * @param filters    Selected filters.
+  * @param searchText Search text.
+  * @return Promise<void>
+  */
+async function debouncedSearch(filters: string[], searchText: string): Promise<void> {
+  // Clear old timer.
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+
+  // Set new timer.
+  debounceTimer = setTimeout(() => {
+    performSearch(filters, searchText);
+  }, debounceDelay);
+}
+
+/**
+  * Get the search result with the filters and the text.
+  * @param filters    Selected filters.
+  * @param searchText Search text.
+  * @return void
+  */
+function performSearch(filters: string[], searchText: string): void {
+  paginationParameters.page = 1;
+  urlParams.delete("text");
+  if (searchText.length) urlParams.set("text", searchText);
+  ajaxGamesFiltered(filters, false, searchText);
 }
 
 /**

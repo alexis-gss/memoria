@@ -83,7 +83,7 @@
 
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { defineOptions, ref, reactive, onMounted, nextTick } from "vue";
+import { ref, reactive, onMounted, nextTick } from "vue";
 import type { PropType } from "vue";
 import Swiper from "swiper";
 import { Keyboard, Navigation, Pagination } from "swiper/modules";
@@ -262,7 +262,11 @@ function getGamesRelatedRoute(): string {
 function getNextRelatedGamesViews(): void {
   paginationParameters.loading = true;
   window.axios
-    .get(getGamesRelatedRoute() + "?page=" + (paginationParameters.page + 1))
+    .get(getGamesRelatedRoute(), {
+      params: {
+        page: paginationParameters.page + 1
+      }
+    })
     .then((response: AxiosResponse<any, any>) => {
       relatedGamesViews.value = relatedGamesViews.value.concat(response.data.data);
       paginationParameters.page = response.data.current_page;

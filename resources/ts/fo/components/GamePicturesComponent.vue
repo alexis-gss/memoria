@@ -124,7 +124,7 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Toast } from "bootstrap";
 import GLightbox from "glightbox";
-import { computed, defineOptions, onMounted, ref, useAttrs } from "vue";
+import { computed, onMounted, ref, useAttrs } from "vue";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
 import trans from "./../../modules/trans";
