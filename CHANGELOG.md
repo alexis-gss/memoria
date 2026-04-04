@@ -6,6 +6,20 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.4.0] - 04.04.26**
+
+### Added
+-   feat: ✨ add commit message validation from @alexis-gss/husky-config
+-   feat: ✨ add debounce to text search input
+
+### Changed
+-   chore: ⬆️ upgrade packages dependencies
+
+### Fixed
+-   fix: 🚸 format picture count with leading zero padding
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.3.4...v5.4.0
+
 ## **[v5.3.4] - 10.12.25**
 
 ### Changed
