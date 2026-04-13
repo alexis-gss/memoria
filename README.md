@@ -57,7 +57,7 @@ When implementing a feature please create an issue first explaining your idea an
 
 # Changelog
 
-Latest version [v5.4.0](https://github.com/alexis-gss/memoria/releases/tag/v5.4.0).
+Latest version [v5.4.1](https://github.com/alexis-gss/memoria/releases/tag/v5.4.1).
 
 See the [CHANGELOG.md](CHANGELOG.md) file for details.
 

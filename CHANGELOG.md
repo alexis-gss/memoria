@@ -6,6 +6,13 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.4.1] - 13.04.26**
+
+### Changed
+-   fix: 🩹 use real static page data in blade pages/breadcrumbs
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.4.0...v5.4.1
+
 ## **[v5.4.0] - 04.04.26**
 
 ### Added
