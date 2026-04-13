@@ -1,7 +1,7 @@
 @extends('front.layout')
 
-@section('title', $staticPageModel->seo_title ?? __('fo_home_title'))
-@section('description', $staticPageModel->seo_description ?? __('fo_home_description'))
+@section('title', $staticPageModel->seo_title)
+@section('description', $staticPageModel->seo_description)
 
 @section('content')
     <section class="main-home d-flex justify-content-center align-items-center mx-md-5 px-md-5 m-0 p-0 py-5" data-aos="fade">

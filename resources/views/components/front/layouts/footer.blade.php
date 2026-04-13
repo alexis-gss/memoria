@@ -35,26 +35,21 @@
                     </ul>
                 </div>
             </div>
-            {{-- SITEMAP --}}
+            {{-- LINKS --}}
             <div
                 class="col-12 col-lg-3 d-flex flex-column justify-content-start align-items-start align-items-lg-center pb-5 pb-lg-0">
                 <div>
-                    <p class="title-font-regular m-0">{{ __('fo_footer_sitemap') }}</p>
+                    <p class="title-font-regular m-0">{{ __('fo_footer_links') }}</p>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-transparent border-0 pt-2 pb-1">
-                            <a class="link-light link-offset-2 link-opacity-75-hover" data-bs-tooltip="tooltip"
-                                role="button" href="{{ route('fo.games.index') }}"
-                                title="{{ __('fo_tooltip_footer_access_page', ['pageName' => str(__('fo_home_title'))->lower()]) }}">
-                                {{ __('fo_home_title') }}
-                            </a>
-                        </li>
-                        <li class="list-group-item bg-transparent border-0 pt-1 pb-0">
-                            <a class="link-light link-offset-2 link-opacity-75-hover" data-bs-tooltip="tooltip"
-                                role="button" href="{{ route('fo.ranks.index') }}"
-                                title="{{ __('fo_tooltip_footer_access_page', ['pageName' => str(__('fo_footer_rank'))->lower()]) }}">
-                                {{ __('fo_footer_rank') }}
-                            </a>
-                        </li>
+                        @foreach ($globalStaticPages as $staticPageModel)
+                            <li class="list-group-item bg-transparent border-0 pt-2 pb-1">
+                                <a class="link-light link-offset-2 link-opacity-75-hover" data-bs-tooltip="tooltip"
+                                    role="button" href="{{ route($staticPageModel->type->routeName()) }}"
+                                    title="{{ __('fo_tooltip_footer_access_page', ['pageName' => $staticPageModel->title]) }}">
+                                    {{ $staticPageModel->title }}
+                                </a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
             </div>

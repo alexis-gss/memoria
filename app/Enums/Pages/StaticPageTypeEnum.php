@@ -22,7 +22,7 @@ enum StaticPageTypeEnum: int
     ];
 
     /**
-     * Optionnal labels definition.
+     * Optionnal routes definition.
      */
     private const ROUTES = [
         self::home->name    => 'fo.games.index',

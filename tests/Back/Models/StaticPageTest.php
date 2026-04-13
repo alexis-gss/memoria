@@ -30,7 +30,7 @@ class StaticPageTest extends TestCase
     /** @return void */
     public function testGuestCannotAccessStaticPagesReadView(): void
     {
-        $model    = StaticPage::factory()->createOneQuietly();
+        $model    = StaticPage::query()->inRandomOrder()->first();
         $response = $this->get(route(
             config('unit-tests.route.prefix') .
                 'static_pages.' .
@@ -43,7 +43,7 @@ class StaticPageTest extends TestCase
     /** @return void */
     public function testGuestCannotAccessStaticPagesUpdateView(): void
     {
-        $model    = StaticPage::factory()->createOneQuietly();
+        $model    = StaticPage::query()->inRandomOrder()->first();
         $response = $this->get(route(
             config('unit-tests.route.prefix') .
                 'static_pages.' .
@@ -60,7 +60,7 @@ class StaticPageTest extends TestCase
     /** @return void */
     public function testGuestCannotUpdateStaticPage(): void
     {
-        $model    = StaticPage::factory()->createOneQuietly();
+        $model    = StaticPage::query()->inRandomOrder()->first();
         $response = $this->patch(
             route(
                 config('unit-tests.route.prefix') . 'static_pages.' . config('unit-tests.route.action-update'),
@@ -96,7 +96,7 @@ class StaticPageTest extends TestCase
     {
         $authModel = AuthModel::factory()->createOneQuietly();
         $authModel->update(['published' => true, 'role' => RoleEnum::conceptor]);
-        $model    = StaticPage::factory()->createOneQuietly();
+        $model    = StaticPage::query()->inRandomOrder()->first();
         $response = $this->actingAs($authModel, 'backend')->get(
             route(config('unit-tests.route.prefix') . 'static_pages.' . config('unit-tests.view.resources-read'), $model)
         );
@@ -113,7 +113,7 @@ class StaticPageTest extends TestCase
     {
         $authModel = AuthModel::factory()->createOneQuietly();
         $authModel->update(['published' => true, 'role' => RoleEnum::conceptor]);
-        $model    = StaticPage::factory()->createOneQuietly();
+        $model    = StaticPage::query()->inRandomOrder()->first();
         $response = $this->actingAs($authModel, 'backend')->get(
             route(config('unit-tests.route.prefix') . 'static_pages.' . config('unit-tests.view.resources-update'), $model)
         );
@@ -132,7 +132,7 @@ class StaticPageTest extends TestCase
     /** @return void */
     public function testCanUpdateStaticPage(): void
     {
-        $model = StaticPage::factory()->createOneQuietly();
+        $model = StaticPage::query()->inRandomOrder()->first();
 
         $fieldTest = "";
         foreach (config('unit-tests.list-fields') as $field) {
@@ -155,7 +155,7 @@ class StaticPageTest extends TestCase
     /** @return void */
     public function testRelationActivityLogs(): void
     {
-        $staticPage  = StaticPage::factory()->createOneQuietly();
+        $staticPage  = StaticPage::query()->inRandomOrder()->first();
         $activityLog = ActivityLog::factory()->createOneQuietly([
             'user_id'      => null,
             'is_anonymous' => true,

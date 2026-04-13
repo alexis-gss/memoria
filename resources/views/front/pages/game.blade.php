@@ -1,7 +1,7 @@
 @extends('front.layout', ['brParam' => $gameModel])
 
-@section('title', $gameModel->name ?? __('fo_home_title'))
-@section('description', __('fo_game_description', ['game' => $gameModel->name]) ?? __('fo_home_description'))
+@section('title', $gameModel->name)
+@section('description', __('fo_game_description', ['game' => $gameModel->name]))
 @section('breadcrumb', request()->route()->getName())
 
 @section('content')
