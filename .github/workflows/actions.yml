@@ -9,22 +9,22 @@ on:
       - opened
 
 jobs:
-  validation-sass:
-    name: Validation sass
-    uses: alexis-gss/github-workflows/.github/workflows/validation-sass.yml@master
-  validation-typescript:
-    name: Validation typescript
-    uses: alexis-gss/github-workflows/.github/workflows/validation-typescript.yml@master
+  validation-stylelint:
+    name: Validation stylelint
+    uses: alexis-gss/github-workflows/.github/workflows/validation-stylelint.yml@master
+  validation-eslint:
+    name: Validation eslint
+    uses: alexis-gss/github-workflows/.github/workflows/validation-eslint.yml@master
   validation-php:
     name: Validation php
     uses: alexis-gss/github-workflows/.github/workflows/validation-php.yml@master
   validation-laravel-tests:
     name: Validation Laravel tests
-    needs: ['validation-sass', 'validation-typescript', 'validation-php']
+    needs: ['validation-stylelint', 'validation-eslint', 'validation-php']
     uses: alexis-gss/github-workflows/.github/workflows/validation-laravel-tests.yml@master
   deployment:
     name: Deployment production
-    needs: ['validation-sass', 'validation-typescript', 'validation-php', validation-laravel-tests]
+    needs: ['validation-stylelint', 'validation-eslint', 'validation-php', validation-laravel-tests]
     uses: alexis-gss/github-workflows/.github/workflows/deployment.yml@master
     secrets: inherit
     if: github.ref == 'refs/heads/master'
