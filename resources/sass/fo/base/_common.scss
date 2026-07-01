@@ -16,14 +16,6 @@ body {
             }
         }
     }
-
-    footer a {
-        color: $color-light;
-
-        &:hover, &:focus {
-            opacity: .75;
-        }
-    }
 }
 
 .title-font-regular {
@@ -49,29 +41,12 @@ body {
 
 .github-icon {
     position: absolute;
-    z-index: $zindex-fixed;
     width: 10rem;
     height: 2rem;
     transform: translate(-3rem, 1rem) rotate(-45deg);
 
     svg {
         transform: rotate(45deg);
-    }
-}
-
-.btn-scroll {
-    z-index: $zindex-fixed;
-    overflow: hidden;
-    width: 50.7px;
-    height: 58px;
-    transition: 0.3s;
-
-    &-hidden {
-        width: 0;
-        padding: 0 !important;
-        border: 0 !important;
-        opacity: 0;
-        visibility: hidden;
     }
 }
 

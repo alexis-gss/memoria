@@ -1,9 +1,30 @@
-.footer {
-    &-home {
-        padding-bottom: 3rem;
+footer {
+    .content {
+        &-home {
+            padding-bottom: 3rem;
+        }
+
+        &-page {
+            padding-bottom: 8.5rem;
+        }
     }
 
-    &-page {
-        padding-bottom: 8.5rem;
+    a {
+        color: $color-light;
+
+        &:hover,
+        &:focus {
+            opacity: .75;
+        }
+    }
+
+    .bump-wrapper {
+        line-height: 0;
+    }
+
+    .bump {
+        height: clamp(3.50rem, 5vw, 3.50rem);
+        margin-bottom: -1px;
+        filter: drop-shadow(0 -0.5rem 0.3rem rgba(var(--bs-black-rgb), .15));
     }
 }

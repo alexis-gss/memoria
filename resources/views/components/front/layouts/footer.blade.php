@@ -1,10 +1,17 @@
-<footer @class([
-    'bg-secondary text-light shadow pt-5',
-    'footer-home m-0' => request()->routeIs('fo.games.index'),
-    'footer-page' => !request()->routeIs('fo.games.index'),
-])>
-    <div class="container">
-        <div class="row w-100 mx-auto">
+<footer class="text-light">
+    <div class="position-relative bump-wrapper">
+        <svg class="bump d-block w-100" viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path class="btn btn-secondary btn-scroll" role="button" d="M0,60 C250,60 350,0 600,0 C850,0 950,60 1200,60 L1200,60 L0,60 Z" fill="var(--bs-secondary)">
+            </path>
+        </svg>
+        <i class="btn-scroll position-absolute top-50 start-50 translate-middle cursor-pointer fa fa-arrow-up"></i>
+    </div>
+    <div @class([
+        'bg-secondary pt-5',
+        'content-home' => request()->routeIs('fo.games.index'),
+        'content-page' => !request()->routeIs('fo.games.index'),
+    ])>
+        <div class="container row w-100 mx-auto">
             {{-- PROJECT DETAILS --}}
             <div
                 class="col-12 col-lg-3 d-flex flex-column justify-content-start align-items-start align-items-lg-center pb-5 pb-lg-0">

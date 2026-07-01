@@ -1,7 +1,7 @@
 window.onload = function() {
     let documentBody: HTMLBodyElement|null;
     let loadingScreen: HTMLDivElement|null;
-    let btnScroll: HTMLButtonElement|null;
+    let btnScroll: NodeListOf<HTMLButtonElement>;
     let homeTextContent: HTMLDivElement|null;
 
     selectors();
@@ -30,7 +30,7 @@ window.onload = function() {
     function selectors() {
         documentBody = document.querySelector("body");
         loadingScreen = document.querySelector("#loading-screen");
-        btnScroll = document.querySelector(".btn-scroll");
+        btnScroll = document.querySelectorAll(".btn-scroll");
         homeTextContent = document.querySelector(".main-home-latest");
     }
 
@@ -38,7 +38,9 @@ window.onload = function() {
      * Set all events on the page.
      */
     function events() {
-        btnScroll?.addEventListener("click", scrollToTheTop);
+        btnScroll?.forEach((btn) => {
+            btn.addEventListener("click", scrollToTheTop);
+        });
         window.addEventListener("resize", setLatestGamesWidth);
     }
 
