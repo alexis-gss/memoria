@@ -121,7 +121,6 @@ const confirmDelete = ref<HTMLButtonElement|null>(null);
 
 // * DATA
 const id = ref<string>("");
-const csrf = ref<string|null>(null);
 const ranks = ref<Array<RankObject>>([]);
 const message = ref<string>("");
 const loading = ref<boolean>(false);
@@ -133,7 +132,6 @@ onMounted((): void => {
         data = JSON.parse(json);
   id.value = data.id;
   ranks.value = data.rankModels;
-  csrf.value = document.querySelector("meta[name=\"csrf-token\"]")!.getAttribute("content");
   nextTick(() => {
     tooltips.value = Tooltips.make({
       type: "dom",

@@ -8,7 +8,7 @@ import axios from "axios";
 axios.defaults.headers.common = {
     Accept: "application/json, text/plain, */*",
     "X-Requested-With": "XMLHttpRequest",
-    "X-CSRFTOKEN": document.querySelector("meta[name=\"csrf-token\"]")?.getAttribute("content"),
+    "X-CSRF-TOKEN": document.querySelector("meta[name=\"csrf-token\"]")?.getAttribute("content"),
 };
 
 window.axios = axios;
