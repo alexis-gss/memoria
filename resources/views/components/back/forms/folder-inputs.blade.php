@@ -21,7 +21,7 @@
                                 'field' => str(__('validation.attributes.name'))->ucFirst(),
                                 'value' => empty(!$folderModel->getTranslation('name', config('app.fallback_locale')))
                                     ? $folderModel->getTranslation('name', config('app.fallback_locale'))
-                                    : '...',
+                                    : '…',
                             ]),
                         ) !!}
                     </div>

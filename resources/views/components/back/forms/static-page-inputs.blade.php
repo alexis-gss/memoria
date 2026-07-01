@@ -21,7 +21,7 @@
                                 'field' => str(__('validation.custom.seo_title'))->ucFirst(),
                                 'value' => empty(!$staticPageModel->getTranslation('seo_title', config('app.fallback_locale')))
                                     ? $staticPageModel->getTranslation('seo_title', config('app.fallback_locale'))
-                                    : '...',
+                                    : '…',
                             ]),
                         ) !!}
                     </div>
@@ -53,7 +53,7 @@
                                 'field' => str(__('validation.custom.seo_description'))->ucFirst(),
                                 'value' => empty(!$staticPageModel->getTranslation('seo_description', config('app.fallback_locale')))
                                     ? $staticPageModel->getTranslation('seo_description', config('app.fallback_locale'))
-                                    : '...',
+                                    : '…',
                             ]),
                         ) !!}
                     </div>
@@ -87,7 +87,7 @@
                                 'field' => str(__('validation.attributes.title'))->ucFirst(),
                                 'value' => empty(!$staticPageModel->getTranslation('title', config('app.fallback_locale')))
                                     ? $staticPageModel->getTranslation('title', config('app.fallback_locale'))
-                                    : '...',
+                                    : '…',
                             ]),
                         ) !!}
                     </div>

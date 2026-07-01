@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="relatedGamesViews.length"
-    class="row w-100 mx-auto pb-5"
+    class="games-related row w-100 mx-auto pb-5"
     data-aos="fade-up"
     ref="gamesRelated"
   >
@@ -39,10 +39,10 @@
                     <div class="placeholder placeholder-img w-100" />
                   </div>
                   <div class="card-body d-flex justify-content-center align-items-center">
-                    <span class="placeholder col-8" />
+                    <span class="placeholder placeholder-text rounded-2 col-8" />
                   </div>
                   <div class="card-footer">
-                    <span class="placeholder col-6" />
+                    <span class="placeholder placeholder-text rounded-2 col-6" />
                   </div>
                 </template>
                 <button
@@ -154,7 +154,7 @@ onMounted((): void => {
 
 /**
   * Create the slider for related games.
-  * @return void
+  * @return {void}
   */
 function setSwiper(): void {
   slider.value = new Swiper(".swiper-games-related", {
@@ -202,7 +202,7 @@ function setSwiper(): void {
 
 /**
  * Center slides of the slider if needed.
- * @return void
+ * @return {void}
  */
 function centerSlidesManuallyIfNeeded(): void {
   if (window.innerWidth < 992) return;
@@ -226,7 +226,7 @@ function centerSlidesManuallyIfNeeded(): void {
 
 /**
   * Verify when images of related games are loaded.
-  * @return void
+  * @return {void}
   */
 function gamesRelatedImageLazyLoad(): void {
   const nodeTargets = document.querySelectorAll("#swiper-games-related .card .img-fluid") as NodeListOf<HTMLImageElement>;
@@ -243,7 +243,7 @@ function gamesRelatedImageLazyLoad(): void {
 
 /**
   * Get the related games route.
-  * @return string
+  * @return {string}
   */
 function getGamesRelatedRoute(): string {
   const gamesRalatedRoute = route.methods.route("fo.games.related", {
@@ -257,7 +257,7 @@ function getGamesRelatedRoute(): string {
 
 /**
   * Get next pagination related games.
-  * @return void
+  * @return {void}
   */
 function getNextRelatedGamesViews(): void {
   paginationParameters.loading = true;
@@ -280,75 +280,3 @@ function getNextRelatedGamesViews(): void {
     .catch(errors.methods.ajaxErrorHandler);
 }
 </script>
-
-<style lang="scss" scopped>
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/placeholders";
-@import "./../../../sass/fo/utilities/variables";
-
-.swiper {
-  &-wrapper {
-    height: 100% !important;
-  }
-  &-button-disabled {
-    visibility: hidden;
-  }
-  &-slide {
-    height: auto;
-  }
-}
-.swiper-pagination {
-  &-bullet {
-    opacity: 1 !important;
-  }
-  &-bullet-active {
-    background-color: rgb(var(--bs-secondary-rgb)) !important;
-  }
-  button {
-    width: 1rem;
-    height: 1rem;
-    &:hover {
-      background-color: rgb(var(--bs-primary-rgb)) !important;
-    }
-  }
-}
-.swiper-button {
-  width: 36px;
-  height: fit-content !important;
-  &:first-of-type,
-  &:last-of-type {
-    bottom: -0.6rem;
-    @include media-breakpoint-up(md) {
-      top: 50%;
-      transform: translateY(-50%);
-    }
-  }
-  &:first-of-type {
-    left: calc(var(--bs-gutter-x) * .1);
-  }
-  &:last-of-type {
-    right: calc(var(--bs-gutter-x) * .1);
-  }
-}
-#swiper-games-related .ratio {
-  max-width: 366px;
-}
-.swiper-wrapper.centered-few-slides {
-  justify-content: center;
-}
-.fa-animation {
-  animation: translation 1.5s cubic-bezier(.17,.84,.44,1) infinite;
-}
-@keyframes translation {
-  0% { left: 0%;opacity: 0; }
-  30% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { left: calc(100% - 20.5px);opacity: 0; }
-}
-.games-related-hidden {
-  visibility: hidden;
-  height: 0;
-}
-</style>

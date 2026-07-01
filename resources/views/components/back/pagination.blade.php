@@ -47,7 +47,7 @@
                     @endif
                     {{-- HIDE PAGES TOO FAR --}}
                     @if ($paginator->currentPage() > 4)
-                        <li class="page-item d-none d-sm-block disabled"><span class="page-link">...</span></li>
+                        <li class="page-item d-none d-sm-block disabled"><span class="page-link">…</span></li>
                     @endif
                     {{-- SHOW ACTUAL PAGES + N-2/N+2 --}}
                     @foreach (range(1, $paginator->lastPage()) as $i)
@@ -82,7 +82,7 @@
                     @endforeach
                     {{-- HIDE PAGES TOO FAR --}}
                     @if ($paginator->currentPage() < $paginator->lastPage() - 3)
-                        <li class="page-item d-none d-sm-block disabled"><span class="page-link">...</span></li>
+                        <li class="page-item d-none d-sm-block disabled"><span class="page-link">…</span></li>
                     @endif
                     {{-- LAST PAGE --}}
                     @if ($paginator->currentPage() < $paginator->lastPage() - 2)

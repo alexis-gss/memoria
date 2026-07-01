@@ -9,13 +9,13 @@ use Diglactic\Breadcrumbs\Generator;
 $homeRouteName    = StaticPageTypeEnum::home->routeName();
 $rankingRouteName = StaticPageTypeEnum::ranking->routeName();
 
-// * HOMEPAGE
+// * HOMEPAGE.
 Breadcrumbs::for($homeRouteName, function (Generator $trail) use ($homeRouteName) {
     $staticPageHome = StaticPage::query()->where("type", StaticPageTypeEnum::home->value())->first();
     $trail->push($staticPageHome->title, route($homeRouteName));
 });
 
-// * GAMES
+// * GAMES.
 Breadcrumbs::for('fo.games.show', function (Generator $trail, Game|null $gameModel = null) use ($homeRouteName) {
     $trail->parent($homeRouteName);
     if (!is_null($gameModel)) {
@@ -23,7 +23,7 @@ Breadcrumbs::for('fo.games.show', function (Generator $trail, Game|null $gameMod
     }
 });
 
-// * RANKS
+// * RANKS.
 Breadcrumbs::for($rankingRouteName, function (Generator $trail) use ($homeRouteName, $rankingRouteName) {
     $staticPageRanking = StaticPage::query()->where("type", StaticPageTypeEnum::ranking->value())->first();
     $trail->parent($homeRouteName);

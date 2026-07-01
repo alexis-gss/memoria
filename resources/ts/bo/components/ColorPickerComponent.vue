@@ -35,7 +35,6 @@
       </div>
       <div :class="['position-absolute top-100 left-0 z-2', displayPicker ? 'd-inline-block' : 'd-none']">
         <Sketch
-          ref="popupPicker"
           v-model="internalColor"
           :preset-colors="presetColors"
         />
@@ -68,7 +67,6 @@ const attrs = useAttrs();
 // * REFS
 const colorPicker = ref<HTMLDivElement|null>(null);
 const fakePicker = ref<HTMLInputElement|null>(null);
-const popupPicker = ref<HTMLInputElement|null>(null);
 const nullableInput = ref<HTMLInputElement|null>(null);
 
 // * PROPS

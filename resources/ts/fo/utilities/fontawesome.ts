@@ -9,6 +9,8 @@ import {
     faChevronRight,
     faCircleCheck,
     faCircleExclamation,
+    faDeleteLeft,
+    faEraser,
     faGlobe,
     faMusic,
     faPause,
@@ -62,5 +64,7 @@ library.add(
     faSearch,
     faRotateRight,
     faRotateLeft,
+    faEraser,
+    faDeleteLeft,
 );
 dom.watch();

@@ -44,7 +44,7 @@ return [
     ],
     'search' => [
         'label'         => 'Search :elements',
-        'keywords'      => 'Your keywords here...',
+        'keywords'      => 'Your keywords here…',
         'apply_search'  => 'Apply a search',
         'remove_search' => 'Remove the search'
     ],

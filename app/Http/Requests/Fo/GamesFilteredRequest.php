@@ -4,7 +4,7 @@ namespace App\Http\Requests\Fo;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetGamesFilteredRequest extends FormRequest
+class GamesFilteredRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

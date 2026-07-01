@@ -21,7 +21,7 @@
                                 'field' => str(__('validation.attributes.name'))->ucFirst(),
                                 'value' => empty(!$tagModel->getTranslation('name', config('app.fallback_locale')))
                                     ? $tagModel->getTranslation('name', config('app.fallback_locale'))
-                                    : '...',
+                                    : '…',
                             ]),
                         ) !!}
                     </div>

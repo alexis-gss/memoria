@@ -5,6 +5,18 @@ import * as trans from "../modules/trans";
 
 export default {
     methods: {
+        /**
+         * Show a confirm sweetalert popup.
+         * @param {Object} self
+         * @param {() => void} after
+         * @param {SweetAlertOptions} options
+         * @param {string} title
+         * @param {string} text
+         * @param {string} btnAccept
+         * @param {string} btnDeny
+         * @param {string} btnColor
+         * @return {boolean}
+         */
         confirm(
             self: Object,
             after: (response: SweetAlertResult<any>) => void = (
@@ -17,7 +29,7 @@ export default {
             btnAccept: string = trans.default.methods.__("crud.sweetalert.confirm"),
             btnDeny: string = trans.default.methods.__("crud.sweetalert.cancel"),
             btnColor: string = "danger",
-        ) {
+        ): boolean {
             if (!self) {
                 throw Error("Self is needed to set \"this\" on callback");
             }
@@ -43,16 +55,21 @@ export default {
                 },
                 buttonsStyling: false,
                 background: getComputedStyle(document.body).getPropertyValue("--bs-body-bg"),
-            }).then((result) => {
+            }).then((result: SweetAlertResult) => {
                 if (result.isConfirmed) {
-                    if (after) {
-                        after.apply(self, [result]);
-                    }
+                    after.apply(self, [result]);
                 }
             });
             return false;
         },
-        message(title = "", self: Object, options: SweetAlertOptions = {}) {
+        /**
+         * Show a message in sweetalert popup.
+         * @param {string} title
+         * @param {Object} self
+         * @param {SweetAlertOptions} options
+         * @return {boolean}
+         */
+        message(title = "", self: Object, options: SweetAlertOptions = {}): boolean {
             if (!self) {
                 throw Error("Self is needed to set \"this\" on callback");
             }

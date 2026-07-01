@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Fo;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Fo\GetGamesFilteredRequest;
+use App\Http\Requests\Fo\GamesFilteredRequest;
 use App\Http\Requests\Fo\MusicOptionsRequest;
+use App\Http\Requests\Fo\NextPicturesGameRequest;
 use App\Http\Requests\Fo\NextRelatedGamesRequest;
 use App\Http\Requests\Fo\ShowGameRequest;
 use App\Lib\Helpers\ToolboxHelper;
@@ -52,7 +53,7 @@ class GameController extends Controller
 
         return response(view('front.pages.game', [
             'gameModel'         => $gameModel,
-            'pictureModels'     => $this->getPicturesOfGame($gameModel),
+            'pictureModels'     => $this->getPicturesOfGame($gameModel, $request->query('sort', 'date')),
             'ratingModels'      => $ratingModels,
             'gameModels'        => $this->getGamesPublished(true, $this->gamesPerPage),
             'folderModels'      => $this->getFoldersPublished(),
@@ -68,10 +69,10 @@ class GameController extends Controller
     /**
      * Return a list of games filtered.
      *
-     * @param \App\Http\Requests\Fo\GetGamesFilteredRequest $request
+     * @param \App\Http\Requests\Fo\GamesFilteredRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getGamesFiltered(GetGamesFilteredRequest $request): \Illuminate\Http\JsonResponse
+    public function getGamesFiltered(GamesFilteredRequest $request): \Illuminate\Http\JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -114,34 +115,43 @@ class GameController extends Controller
     /**
      * Return a list of games filtered.
      *
-     * @param string $gameSlug
+     * @param \App\Http\Requests\Fo\NextPicturesGameRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getNextPicturesOfGame(string $gameSlug): \Illuminate\Http\JsonResponse
-    {
-        $currentGameModel = Game::query()->where('slug', $gameSlug)->firstOrFail();
-        return response()->json($this->getPicturesOfGame($currentGameModel));
+    public function getNextPicturesGame(
+        NextPicturesGameRequest $request,
+    ): \Illuminate\Http\JsonResponse {
+        $validatedData = $request->validated();
+
+        $currentGameModel = Game::query()->where('slug', $validatedData['slug'])->firstOrFail();
+        return response()->json($this->getPicturesOfGame($currentGameModel, $validatedData['sort']));
     }
 
     /**
      * Return a list of games views render.
      *
      * @param \App\Models\Game $gameModel
+     * @param string           $sort
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function getPicturesOfGame(Game $gameModel): \Illuminate\Pagination\LengthAwarePaginator
-    {
+    public function getPicturesOfGame(
+        Game $gameModel,
+        string $sort = 'date',
+    ): \Illuminate\Pagination\LengthAwarePaginator {
         /** @var \Illuminate\Pagination\LengthAwarePaginator $pictureModels */
         $pictureModels = new LengthAwarePaginator([], 0, 12);
         if ($gameModel->pictures->isNotEmpty()) {
-            $gameModel->pictures->map(function ($picture) {
+            $gameModel->pictures->each(function ($picture) {
                 // @phpstan-ignore-next-line
                 $picture->ratings_count = $picture->ratings->count();
-                return $picture;
             });
+            $sortedPictures = match ($sort) {
+                'likes'  => $gameModel->pictures->sortByDesc('ratings_count')->values(),
+                default  => $gameModel->pictures->values(),
+            };
             $pictureModels = ToolboxHelper::customPaginate(
-                $gameModel->pictures,
-                ($gameModel->pictures->count() <= 12) ? $gameModel->pictures->count() : 12,
+                $sortedPictures,
+                ($sortedPictures->count() <= 12) ? $sortedPictures->count() : 12,
                 ['path' => Paginator::resolveCurrentPath()]
             );
         }

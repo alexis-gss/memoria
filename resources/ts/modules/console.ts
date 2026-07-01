@@ -7,5 +7,5 @@ document.addEventListener("DOMContentLoaded", function () {
         "font-size: 14px;",
         "color: rgb(255, 255, 255);",
     ].join(";");
-    console.log("%cMaybe there is something here... ?", consoleText);
+    console.log("%cMaybe there is something here… ?", consoleText);
 });

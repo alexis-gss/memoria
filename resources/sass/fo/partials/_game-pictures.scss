@@ -1,0 +1,54 @@
+.game-pictures {
+    .glightbox img,
+    .card img {
+        transition: .3s;
+    }
+
+    .glightbox:hover img,
+    .glightbox:focus img,
+    .card:hover img,
+    .card:focus img {
+        transform: scale(1.05) !important;
+    }
+
+    .picture-ratings {
+        width: fit-content;
+        min-width: 55px;
+        height: 40px;
+        border-radius: calc(var(--bs-border-radius-lg) - 0.2rem);
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 0;
+
+        svg {
+            transition: .3s;
+        }
+    }
+
+    .picture-ratings:has(> [data-prefix="far"]:not(.d-none)):hover,
+    .picture-ratings:has(> [data-prefix="far"]:not(.d-none)):focus {
+        color: $color-success !important;
+
+        svg {
+            transform: translate(2px,-2px) rotate(-10deg);
+        }
+    }
+
+    .picture-ratings:has(> [data-prefix="fas"]:not(.d-none)):hover,
+    .picture-ratings:has(> [data-prefix="fas"]:not(.d-none)):focus {
+        color: $color-danger !important;
+
+        svg {
+            transform: translate(2px,2px) rotate(10deg);
+        }
+    }
+
+    .form-select {
+        height: 24px;
+        padding: 0 2.25rem 0 0.5rem;
+
+        &:hover,
+        &:focus {
+            background-color: $color-light !important;
+        }
+    }
+}

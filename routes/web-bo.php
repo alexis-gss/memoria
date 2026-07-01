@@ -19,7 +19,7 @@ Route::prefix('bo')
     ->middleware('lang')
     ->group(
         function () {
-            // * AUTHENTICABLE ROUTES
+            // * AUTHENTICABLE ROUTES.
             Route::namespace('\App\Http\Controllers\Bo')
                 ->group(function () {
                     Auth::routes(
@@ -35,16 +35,16 @@ Route::prefix('bo')
                 });
             Route::middleware(['auth:backend', 'logoutusers'])
                 ->group(function () {
-                    // * HOME
+                    // * HOME.
                     Route::get('/', [HomeController::class, 'index'])->name('home');
 
-                    // * STATISTICS
+                    // * STATISTICS.
                     Route::get('/statistics', [StatisticController::class, 'index'])
                         ->name('statistics.index');
                     Route::post('/statistics', [StatisticController::class, 'index'])
                         ->name('statistics.update');
 
-                    // * GAMES
+                    // * GAMES.
                     Route::resource('games', GameController::class);
                     Route::patch('/games/{game}/change-order/{direction}', [GameController::class, 'changeOrder'])
                         ->where('direction', 'up|down')->name('games.change-order');
@@ -53,11 +53,11 @@ Route::prefix('bo')
                     Route::get('/games/{game}/duplicate', [GameController::class, 'duplicate'])
                         ->name('games.duplicate');
 
-                    // * PICTURES
+                    // * PICTURES.
                     Route::post('/pictures/upload', [PictureController::class, 'upload'])
                         ->name('pictures.upload');
 
-                    // * FOLDERS
+                    // * FOLDERS.
                     Route::resource('folders', FolderController::class);
                     Route::patch('/folders/{folder}/change-order/{direction}', [FolderController::class, 'changeOrder'])
                         ->where('direction', 'up|down')
@@ -69,7 +69,7 @@ Route::prefix('bo')
                     Route::get('/folders/json/paginate', [FolderController::class, 'jsonSearchPaginate'])
                         ->name('folders.json-paginate');
 
-                    // * TAGS
+                    // * TAGS.
                     Route::resource('tags', TagController::class);
                     Route::patch('/tags/{tag}/change-order/{direction}', [TagController::class, 'changeOrder'])
                         ->where('direction', 'up|down')
@@ -81,21 +81,21 @@ Route::prefix('bo')
                     Route::get('/tags/json/paginate', [TagController::class, 'jsonSearchPaginate'])
                         ->name('tags.json-paginate');
 
-                    // * RANKS
+                    // * RANKS.
                     Route::resource('ranks', RankController::class)->except(['show', 'edit']);
                     Route::post('/ranks/save-order/{ranks}', [RankController::class, 'saveOrder'])
                         ->name('ranks.save-order');
                     Route::get('/ranks/games', [RankController::class, 'jsonSearchPaginateRanks'])
                         ->name('ranks.games-paginate');
 
-                    // * STATIC PAGES
+                    // * STATIC PAGES.
                     Route::resource('static_pages', StaticPageController::class)
                         ->only(['index', 'show', 'edit', 'update']);
                     Route::patch('/static_pages/{static_page}/change-order/{direction}', [
                         StaticPageController::class, 'changeOrder'
                     ])->where('direction', 'up|down')->name('static_pages.change-order');
 
-                    // * USERS
+                    // * USERS.
                     Route::resource('users', UserController::class);
                     Route::patch('/users/{user}/change-order/{direction}', [UserController::class, 'changeOrder'])
                         ->where('direction', 'up|down')->name('users.change-order');

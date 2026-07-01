@@ -3,9 +3,8 @@ export default {
         /**
          * Parse error messages for a specific input.
          *
-         * @param inputName string
-         * @param allErrors Record<string, Array<string>>
-         * @return string
+         * @param {Record<string, Array<string>>} allErrors 
+         * @return {string}
          */
         parseValidationErrors(
             allErrors: Record<string, Array<string>> = {}
@@ -29,9 +28,9 @@ export default {
         /**
          * Parse error messages for a specific input.
          *
-         * @param inputName string
-         * @param allErrors Record<string, Array<string>>
-         * @return string
+         * @param {string} inputName
+         * @param {Record<string, Array<string>>} allErrors
+         * @return {string}
          */
         parseValidationInput(
             inputName: string,
@@ -51,26 +50,27 @@ export default {
         },
         /**
           * Return error message after the ajax call.
-          * @return void
+          * @param {any} event
+          * @return {void}
           */
-        ajaxErrorHandler(e: any): void {
+        ajaxErrorHandler(event: any): void {
             let message = "An error has occurred";
-            if (e.response.status === 422) {
+            if (event.response.status === 422) {
                 message = this.parseValidationErrors(
-                    e.response?.data?.errors ?? {}
+                    event.response?.data?.errors ?? {}
                 ) || message;
                 if (window.vueDebug) {
-                    console.warn(e.response.data.errors);
+                    console.warn(event.response.data.errors);
                 }
-            } else if (e.response.status === 419) {
+            } else if (event.response.status === 419) {
                 console.log("Your session has expired, the page will be reloaded");
                 setTimeout(() => window.location.reload(), 2000);
-            } else if (e.response.status === 403) {
+            } else if (event.response.status === 403) {
                 console.log("You are not authorized to perform this action");
                 setTimeout(() => window.location.reload(), 2000);
             } else {
                 if (window.vueDebug) {
-                    console.error(e);
+                    console.error(event);
                 }
             }
             console.log(message);

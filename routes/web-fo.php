@@ -8,32 +8,32 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('fo.')
     ->group(function () {
-        // * GAME
+        // * GAME.
         Route::get('/game/{slug}', [GameController::class, 'show'])
             ->where('slug', '^[a-zA-Z0-9-]*$')
             ->name('games.show');
-        Route::get('/game/{slug}/pictures', [GameController::class, 'getNextPicturesOfGame'])
+        Route::get('/game/{slug}/pictures', [GameController::class, 'getNextPicturesGame'])
             ->where('slug', '^[a-zA-Z0-9-]*$')
             ->name('games.pictures');
         Route::get('/game/{slug}/related', [GameController::class, 'getNextRelatedGames'])
             ->where('slug', '^[a-zA-Z0-9-]*$')
             ->name('games.related');
 
-        // * MUSIC
+        // * MUSIC.
         Route::post('/music/options', [GameController::class, 'saveMusicOptions'])
             ->name('music.options');
 
-        // * GAMES
-        Route::post('/games/filtered', [GameController::class, 'getGamesFiltered'])
+        // * GAMES.
+        Route::get('/games/filtered', [GameController::class, 'getGamesFiltered'])
             ->name('games.filtered');
 
-        // * STATIC PAGES
+        // * STATIC PAGES.
         Route::get('/', [StaticPageController::class, 'home'])
             ->name('games.index');
         Route::get('/ranking', [StaticPageController::class, 'ranking'])
             ->name('ranks.index');
 
-        // * RATINGS
+        // * RATINGS.
         Route::post('/ratings/{picture_id}/{picture_place}', [RatingController::class, 'update'])
             ->where('PICTUREID', '^[0-9]*$')
             ->where('PICTUREPLACE', '^[0-9]*$')

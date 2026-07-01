@@ -29,8 +29,9 @@
             type="button"
             :title="trans.methods.__('fo_clear_search')"
             data-bs-toggle="tooltip"
+            :disabled="!search.length && !selectedFolder.length && !selectedTag.length"
           >
-            <FontAwesomeIcon icon="fa-solid fa-xmark" />
+            <FontAwesomeIcon icon="fa-solid fa-delete-left" />
           </button>
         </div>
       </div>
@@ -202,13 +203,14 @@ const gamesSearch = ref<HTMLDivElement|null>(null);
 const searchInput = ref<HTMLInputElement|null>(null);
 
 // * DATA
-const urlParams = new URLSearchParams(window.location.search);
 const search = ref<string>("");
 const selectedTag = ref<string>("");
 const selectedFolder = ref<string>("");
+const externalSort = ref<string>("");
+const externalGrid = ref<string>("");
 const loading = ref<boolean>(false);
 const tooltips = ref<Tooltips|null>(null);
-const debounceDelay = 300;
+const debounceDelay = ref<number>(300);
 let debounceTimer: ReturnType<typeof setTimeout>|null = null;
 
 /** Models parameters. */
@@ -262,6 +264,15 @@ onMounted((): void => {
   /** Others */
   searchInput.value?.focus();
 
+  /** Read sort/grid from URL directly. */
+  const urlParams = new URLSearchParams(window.location.search);
+  externalSort.value = urlParams.get("sort") ?? "";
+  externalGrid.value = urlParams.get("grid") ?? "";
+  window.addEventListener("game-pictures:filters-changed", ((event: CustomEvent) => {
+    externalSort.value = event.detail.sort ?? "";
+    externalGrid.value = event.detail.grid ?? "";
+  }) as EventListener);
+
   initTooltips();
   initButtons();
 });
@@ -282,7 +293,8 @@ watch(() => props.isActive, (active) => {
 /**
   * Check if all models are loaded,
   * if not, get next models.
-  * @return void
+  * @param {HTMLElement} event
+  * @return {void}
   */
 function checkScroll(event: HTMLElement): void {
   if (
@@ -298,23 +310,20 @@ function checkScroll(event: HTMLElement): void {
 
 /**
   * Clear input search and selects.
-  * @return void
+  * @return {void}
   */
 function clearInputSearch(): void {
   searchInput.value!.value = search.value = selectedFolder.value = selectedTag.value = "";
   paginationParameters.page = 1;
-  document.querySelectorAll("select").forEach((element: HTMLSelectElement) => {
+  gamesSearch.value?.querySelectorAll("select").forEach((element: HTMLSelectElement) => {
     element.value = "0";
   });
-  urlParams.delete("text");
-  urlParams.delete("folder");
-  urlParams.delete("tag");
   ajaxGamesFiltered();
 }
 
 /**
   * Set event on game buttons (folder/tags).
-  * @return void
+  * @return {void}
 */
 function initButtons(): void {
   let breadcrumbs = document.querySelector(".btn-breadcrumbs");
@@ -322,14 +331,14 @@ function initButtons(): void {
     showNavigation();
   });
   let folder = document.querySelector(".game-folder");
-  folder?.addEventListener("click", (e) => {
-    setSelectedValue(e);
+  folder?.addEventListener("click", (event) => {
+    setSelectedValue(event);
     showNavigation();
   });
   let tags = document.querySelectorAll(".game-tags");
   tags.forEach(tag => {
-    tag.addEventListener("click", (e) => {
-      setSelectedValue(e);
+    tag.addEventListener("click", (event) => {
+      setSelectedValue(event);
       showNavigation();
     });
   });
@@ -337,7 +346,7 @@ function initButtons(): void {
 
 /**
   * Show the navigation panel.
-  * @return void
+  * @return {void}
   */
 function showNavigation(): void {
   window.dispatchEvent(
@@ -347,8 +356,8 @@ function showNavigation(): void {
 
 /**
   * Set text value variables.
-  * @param event Event on select.
-  * @return void
+  * @param {Event} event Event on select.
+  * @return {void}
   */
 function setTextValue(event: Event): void {
   const target = event.target as HTMLInputElement;
@@ -358,8 +367,8 @@ function setTextValue(event: Event): void {
 
 /**
   * Set selected folder/tag value variables.
-  * @param event Event on select.
-  * @return void
+  * @param {Event} event Event on select.
+  * @return {void}
   */
 function setSelectedValue(event: Event): void {
   const select = event.target as HTMLSelectElement;
@@ -373,16 +382,14 @@ function setSelectedValue(event: Event): void {
   }
 
   paginationParameters.page = 1;
-  urlParams.delete(select.name);
-  if (select.value.length) urlParams.set(select.name, select.value);
   ajaxGamesFiltered([selectedTag.value, selectedFolder.value], false, search.value);
 }
 
 /**
   * Debounced search.
-  * @param filters    Selected filters.
-  * @param searchText Search text.
-  * @return Promise<void>
+  * @param {string[]} filters Selected filters.
+  * @param {string} searchText Search text.
+  * @return {Promise<void>}
   */
 async function debouncedSearch(filters: string[], searchText: string): Promise<void> {
   // Clear old timer.
@@ -393,36 +400,53 @@ async function debouncedSearch(filters: string[], searchText: string): Promise<v
   // Set new timer.
   debounceTimer = setTimeout(() => {
     performSearch(filters, searchText);
-  }, debounceDelay);
+  }, debounceDelay.value);
 }
 
 /**
   * Get the search result with the filters and the text.
-  * @param filters    Selected filters.
-  * @param searchText Search text.
-  * @return void
+  * @param {string[]} filters Selected filters.
+  * @param {string} searchText Search text.
+  * @return {void}
   */
 function performSearch(filters: string[], searchText: string): void {
   paginationParameters.page = 1;
-  urlParams.delete("text");
-  if (searchText.length) urlParams.set("text", searchText);
   ajaxGamesFiltered(filters, false, searchText);
 }
 
 /**
+  * Build query params from current filters and search text.
+  * @param {string} searchText
+  * @return {URLSearchParams}
+  */
+function buildUrlParams(searchText: string = search.value): URLSearchParams {
+  const params = new URLSearchParams();
+  if (searchText.length) params.set("text", searchText);
+  if (selectedFolder.value.length) params.set("folder", selectedFolder.value);
+  if (selectedTag.value.length) params.set("tag", selectedTag.value);
+  if (externalSort.value.length) params.set("sort", externalSort.value);
+  if (externalGrid.value.length) params.set("grid", externalGrid.value);
+  return params;
+}
+
+/**
   * Return a list of games which corresponds to the search from selects.
-  * @param filters    Selected filters.
-  * @param pagination Pagination loader.
-  * @return void
+  * @param {string[]} filters Selected filters.
+  * @param {boolean} pagination Pagination loader.
+  * @param {string|null} search Words to search.
+  * @return {void}
   */
 function ajaxGamesFiltered(filters: string[] = [], pagination: boolean = false, search: string|null = null): void {
+  const urlParams = buildUrlParams(search ?? "");
   history.replaceState("Object", "", location.pathname + (urlParams.toString().length ? "?" + urlParams.toString() : ""));
   (pagination) ? paginationParameters.loading = true : loading.value = true;
   window.axios
-    .post(getRouteGamesFiltered(), {
-      filters_id: filters,
-      page: paginationParameters.page,
-      search: search
+    .get(getRouteGamesFiltered(), {
+      params: {
+        filters_id: filters,
+        page: paginationParameters.page,
+        search: search,
+      }
     })
     .then((reponse) => {
       paginationParameters.total = reponse.data.total;
@@ -439,7 +463,7 @@ function ajaxGamesFiltered(filters: string[] = [], pagination: boolean = false, 
 
 /**
   * Return the route with the parameter slug given.
-  * @return string
+  * @return {string}
   */
 function getRouteGamesFiltered(): string {
   const routeGamesFiltered = route.methods.route("fo.games.filtered");
@@ -451,8 +475,8 @@ function getRouteGamesFiltered(): string {
 
 /**
   * Return the route with the parameter slug given.
-  * @param slug Slug of the game.
-  * @return string
+  * @param {string} slug Slug of the game.
+  * @return {string}
   */
 function getRouteGameShow(slug: string): string {
   const routeGameShow = route.methods.route("fo.games.show", {
@@ -461,12 +485,16 @@ function getRouteGameShow(slug: string): string {
   if (!routeGameShow) {
     throw new Error("Undefined route fo.games.show");
   }
-  return routeGameShow;
+
+  const params = buildUrlParams();
+  const url = new URL(routeGameShow);
+  const queryString = params.toString();
+  return url.origin + url.pathname + (queryString ? `?${queryString}` : "");
 }
 
 /**
   * Initialise all tooltips in the component.
-  * @return void
+  * @return {void}
   */
 function initTooltips(): void {
   setTimeout(() => {

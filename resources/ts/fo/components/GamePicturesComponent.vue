@@ -1,7 +1,56 @@
 <template>
-  <div class="position-relative">
-    <!-- PICTURES -->
-    <template v-if="pictureModels.length > 0">
+  <div
+    ref="gamePicturesRef"
+    class="position-relative"
+  >
+    <template v-if="gamePictures.length > 0 && !gridChanging">
+      <!-- SELECTS -->
+      <div
+        class="d-flex flex-row justify-content-start align-items-center m-1 mt-0 gap-2"
+        data-aos="fade-up"
+      >
+        <select
+          v-model="currentSort"
+          @change="onSortChange"
+          class="form-select border-0 cursor-pointer w-auto"
+          :aria-label="trans.methods.__('fo_images_sort_aria_label')"
+        >
+          <option
+            v-for="(sortKey, sortIndex) in validSorts"
+            :key="sortIndex"
+            :value="sortKey"
+          >
+            {{ trans.methods.__(`fo_images_sort_${sortKey}`) }}
+          </option>
+        </select>
+        <select
+          v-model="currentGrid"
+          @change="onGridChange"
+          class="form-select d-none d-lg-block border-0 cursor-pointer rounded-2 w-auto"
+          :aria-label="trans.methods.__('fo_images_grid_aria_label')"
+        >
+          <option
+            v-for="(gridKey, gridIndex) in validGrids"
+            :key="gridIndex"
+            :value="gridKey"
+          >
+            {{ trans.methods.__(`fo_images_grid_${gridKey}`) }}
+          </option>
+        </select>
+        <button
+          v-if="hasActiveFilters"
+          class="d-flex justify-content-center align-items-center btn btn-secondary btn-sm rounded-2 px-2 py-1"
+          @click="resetFilters"
+          type="button"
+          :title="trans.methods.__('fo_images_reset_filters')"
+          data-bs-toggle="tooltip"
+        >
+          <FontAwesomeIcon
+            icon="fa-solid fa-eraser"
+          />
+        </button>
+      </div>
+      <!-- PICTURES -->
       <template
         v-for="paginateIndex in incrementNumber"
         :key="paginateIndex"
@@ -19,8 +68,8 @@
               data-aos="fade-up"
             >
               <div
+                v-if="gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex]"
                 class="p-1"
-                v-if="pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex]"
               >
                 <div class="shadow rounded-3">
                   <a
@@ -53,24 +102,24 @@
                   <button
                     :class="['picture-ratings btn btn-primary text-dark bg-white border-0 position-absolute bottom-0 end-0 m-1 z-2', {disabled: ratingLoading}]"
                     :disabled="ratingLoading"
-                    @click="ajaxPictureRating(pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id, getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
+                    @click="ajaxPictureRating(gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id, getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
                     :aria-label="trans.methods.__('Cliquez pour ajouter un like ou l\'enlever')"
                     type="button"
                   >
                     <span
-                      :id="`ratings-${pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id}`"
+                      :id="`ratings-${gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id}`"
                       :data-picture-id="getPictureNumber(paginateIndex, templateIndex) + pictureIndex"
                       class="me-1"
                     >
-                      {{ (pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].ratings_count) }}
+                      {{ (gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].ratings_count) }}
                     </span>
                     <FontAwesomeIcon
                       icon="fa-regular fa-thumbs-up"
-                      :class="[{'d-none': picturesRatings.includes(pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id)}]"
+                      :class="[{'d-none': picturesRatings.includes(gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id)}]"
                     />
                     <FontAwesomeIcon
                       icon="fa-solid fa-thumbs-up"
-                      :class="[{'d-none': !picturesRatings.includes(pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id)}]"
+                      :class="[{'d-none': !picturesRatings.includes(gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id)}]"
                     />
                   </button>
                 </div>
@@ -85,7 +134,7 @@
       class="text-center w-100"
       data-aos="fade-up"
     >
-      <template v-if="gameLoading">
+      <template v-if="gameLoading || gridChanging">
         <div
           class="spinner-border my-5 text-primary"
           role="status"
@@ -95,7 +144,7 @@
       </template>
       <template v-else>
         <div
-          v-if="pictureModels.length <= 0"
+          v-if="gamePictures.length <= 0"
           class="text-center mb-5 w-100"
         >
           {{ trans.methods.__("fo_images_no_one") }}
@@ -110,7 +159,7 @@
       </template>
     </div>
     <!-- RELATED GAMES -->
-    <template v-if="!gameLoading && (gamePage >= gameLastPage) && swiperInitialized">
+    <template v-if="!gameLoading && !gridChanging && (gamePage >= gameLastPage) && swiperInitialized">
       <GamesRelatedComponent
         :game-slug="gameSlug"
         :related-games-views="relatedGamesViews"
@@ -124,10 +173,11 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Toast } from "bootstrap";
 import GLightbox from "glightbox";
-import { computed, onMounted, ref, useAttrs } from "vue";
+import { computed, onMounted, ref, useAttrs, watch } from "vue";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
 import trans from "./../../modules/trans";
+import { Tooltips } from "./../../modules/tooltips";
 import GamesRelatedComponent from "./GamesRelatedComponent.vue";
 
 defineOptions({
@@ -145,21 +195,39 @@ const gameLastPage = ref<number>(0);
 const gameItems = ref<number>(0);
 const gameLoading = ref<boolean>(false);
 const gameViewer = ref<GLightbox|null>(null);
-const routeName = ref<string>("");
-
-/** Pictures */
-const pictureModels = ref<Array<{
+const gamePictures = ref<Array<{
   id: number,
   uuid: string,
   ratings_count: number,
 }>>([]);
-const picturesTemplate = ref<Array<number>>([4,3,2,3]);
-const picturesRatings = ref<Array<number>>([]);
-const ratingLoading = ref<boolean>(false);
+
+/** Filters */
+const defaultSort = ref<string>("date");
+const defaultGrid = ref<string>("progressive");
+const gridPatterns: Record<string, Array<number>> = {
+  "progressive": [4, 3, 2, 3],
+  "alternate": [2, 4, 2, 4],
+  "2columns": [2, 2, 2, 2, 2, 2],
+  "3columns": [3, 3, 3, 3],
+  "4columns": [4, 4, 4],
+};
+const currentSort = ref<string>(defaultSort.value);
+const currentGrid = ref<string>(defaultGrid.value);
+const validSorts: Array<string> = ["date", "likes"];
+const validGrids: Array<string> = Object.keys(gridPatterns);
 
 /** Games related component variables */
 const relatedGamesViews = ref<LaravelPaginator>();
 const swiperInitialized = ref<boolean>(false);
+
+/** Others */
+const gamePicturesRef = ref<HTMLDivElement|null>(null);
+const picturesTemplate = computed<Array<number>>(() => gridPatterns[currentGrid.value]);
+const picturesRatings = ref<Array<number>>([]);
+const routeName = ref<string>("");
+const ratingLoading = ref<boolean>(false);
+const tooltips = ref<Tooltips|null>(null);
+const gridChanging = ref<boolean>(false);
 
 // * LIFECYCLE
 onMounted((): void => {
@@ -170,12 +238,17 @@ onMounted((): void => {
   gamePage.value = data.pictureModels.current_page;
   gameLastPage.value = data.pictureModels.last_page;
   gameItems.value = data.pictureModels.per_page < 12 ? 12 : data.pictureModels.per_page;
-  pictureModels.value = data.pictureModels.data;
+  gamePictures.value = data.pictureModels.data;
   routeName.value = data.routeName;
   picturesRatings.value = data.ratingModels;
   relatedGamesViews.value = data.relatedGamesViews;
+
+  currentSort.value = getValidQueryParam("sort", validSorts, defaultSort.value);
+  currentGrid.value = getValidQueryParam("grid", validGrids, defaultGrid.value);
+
   checkScroll();
   updateGlightbox();
+  initTooltips();
 });
 
 // * COMPUTED
@@ -183,18 +256,31 @@ onMounted((): void => {
 /**
   * Increment the current page number when the
   * user scroll to the bottom.
-  * @return Array<number>
+  * @return {Array<number>}
   */
 const incrementNumber = computed<Array<number>>(() =>
-  pictureModels.value.map((_, index) => index)
+  gamePictures.value.map((_, index) => index)
     .filter((index) => index % gameItems.value === 0));
+
+/**
+  * Check if the current sort or grid is different from the default values.
+  * @return {boolean}
+  */
+const hasActiveFilters = computed<boolean>(() =>
+  currentSort.value !== defaultSort.value || currentGrid.value !== defaultGrid.value);
+
+/** WATCHERS */
+
+watch(hasActiveFilters, () => {
+  initTooltips();
+});
 
 // * METHODS
 
 /**
   * Check if all images are loaded,
   * if not, get next pictures.
-  * @return void
+  * @return {void}
   */
 function checkScroll(): void {
   window.addEventListener("scroll", () => {
@@ -218,16 +304,17 @@ function checkScroll(): void {
 
 /**
   * Load the current page.
-  @return void
+  * @param {boolean} replace If true, replace gamePictures instead of appending.
+  * @return {void}
   */
-function getPictures(): void {
+function getPictures(replace: boolean = false): void {
   window.axios
-    .get(getGamePicturesRoute() + "?page=" + gamePage.value)
+    .get(getGamePicturesRoute() + "?page=" + gamePage.value + "&sort=" + currentSort.value)
     .then((response) => {
       if (response.data.data !== undefined) {
-        pictureModels.value = pictureModels.value.concat(
-          Object.values(response.data.data)
-        );
+        gamePictures.value = replace
+          ? Object.values(response.data.data)
+          : gamePictures.value.concat(Object.values(response.data.data));
       }
       gameLoading.value = false;
       updateGlightbox();
@@ -237,7 +324,7 @@ function getPictures(): void {
 
 /**
   * Get the update rating route.
-  * @return string
+  * @return {string}
   */
 function getGamePicturesRoute(): string {
   const gamePicturesRoute = route.methods.route(routeName.value, {
@@ -252,9 +339,9 @@ function getGamePicturesRoute(): string {
 
 /**
   * Return the number of the picture.
-  * @param paginateIndex Number of the picture.
-  * @param templateIndex Number of the template.
-  * @return number
+  * @param {number} paginateIndex Number of the picture.
+  * @param {number} templateIndex Number of the template.
+  * @return {number}
   */
 function getPictureNumber(paginateIndex: number, templateIndex: number): number {
   let result = 0;
@@ -268,18 +355,20 @@ function getPictureNumber(paginateIndex: number, templateIndex: number): number 
 
 /**
   * Verify when an image of a game are loaded.
-  * @param e Event
-  * @return void
+  * @param {Event} event
+  * @return {void}
   */
-function gameImageLazyLoad(e: Event): void {
-  const nodeTarget = e.target as HTMLImageElement;
+function gameImageLazyLoad(event: Event): void {
+  const nodeTarget = event.target as HTMLImageElement;
   displayImage(nodeTarget, ".glightbox-wrapper");
 }
 
 /**
   * Display a specific image,
   * Then hide placeholder of the image.
-  * @return void
+  * @param {HTMLImageElement} image
+  * @param {string} parentClass
+  * @return {void}
   */
 function displayImage(image: HTMLImageElement, parentClass: string): void {
   image.classList.remove("d-none");
@@ -291,16 +380,16 @@ function displayImage(image: HTMLImageElement, parentClass: string): void {
 
 /**
   * Return the path of the picture.
-  * @param n Number of the picture.
-  * @return string
+  * @param {number} number
+  * @return {string}
   */
-function getPicturePath(n: number): string {
-  return `${location.origin}/storage/pictures/${gameSlug.value}/${pictureModels.value[n].uuid}.webp`;
+function getPicturePath(number: number): string {
+  return `${location.origin}/storage/pictures/${gameSlug.value}/${gamePictures.value[number].uuid}.webp`;
 }
 
 /**
   * Update Glightbox elements.
-  * @return void
+  * @return {void}
   */
 function updateGlightbox(): void {
   setTimeout(() => {
@@ -313,7 +402,7 @@ function updateGlightbox(): void {
 
 /**
   * Get the update rating route.
-  * @return string
+  * @return {string}
   */
 function getUpdateRatingRoute(): string {
   const updateRatingRoute = route.methods.route("fo.ratings.update");
@@ -325,7 +414,7 @@ function getUpdateRatingRoute(): string {
 
 /**
   * Update picture ratings.
-  * @return void
+  * @return {void}
   */
 function updatePictureRatings(pictureId: number): void {
   // Picture ratings button
@@ -341,7 +430,7 @@ function updatePictureRatings(pictureId: number): void {
 
 /**
   * Create the bootstrap toast from an id.
-  * @return void
+  * @return {void}
   */
 function createBoostrapToastFromId(toastId: string): void {
   const toast = document.getElementById(toastId) as HTMLDivElement|null;
@@ -356,8 +445,9 @@ function createBoostrapToastFromId(toastId: string): void {
 
 /**
   * Update a specific picture rating.
-  * @param id Picture's id.
-  * @return void
+  * @param {number} id
+  * @param {number} place
+  * @return {void}
   */
 function ajaxPictureRating(id: number, place: number): void {
   ratingLoading.value = true;
@@ -377,45 +467,109 @@ function ajaxPictureRating(id: number, place: number): void {
     .then(() => { ratingLoading.value = false; })
     .catch(errors.methods.ajaxErrorHandler);
 }
+
+/**
+  * Triggered when the user changes the sort order.
+  * @return {void}
+  */
+function onSortChange(): void {
+  setQueryParam("sort", currentSort.value, defaultSort.value);
+  broadcastPictureFilters();
+  gamePage.value = 1;
+  gameLoading.value = true;
+  gamePictures.value = [];
+  getPictures(true);
+}
+
+/**
+  * Triggered when the user changes the display grid.
+  * @return {void}
+  */
+function onGridChange(): void {
+  // Hack to force the dom to reorganize before displaying the new grid.
+  gridChanging.value = true;
+  setQueryParam("grid", currentGrid.value, defaultGrid.value);
+  broadcastPictureFilters();
+  setTimeout(() => {
+    gridChanging.value = false;
+    // Animation duration time.
+  }, 300);
+}
+
+/**
+  * Reset all filters (sort + grid) to their default values,
+  * clean the URL and reload the first page of pictures.
+  * @return {void}
+  */
+function resetFilters(): void {
+  tooltips.value?.refreshTooltips();
+  currentSort.value = defaultSort.value;
+  currentGrid.value = defaultGrid.value;
+  setQueryParam("sort", defaultSort.value, defaultSort.value);
+  setQueryParam("grid", defaultGrid.value, defaultGrid.value);
+  broadcastPictureFilters();
+  gamePage.value = 1;
+  gameLoading.value = true;
+  gamePictures.value = [];
+  getPictures(true);
+}
+
+/**
+  * Read a query param from the current URL.
+  * @param {string} key Query param name.
+  * @param {Array<string>} allowedValues Values considered valid.
+  * @param {string} fallback Value returned if absent/invalid.
+  * @return {string}
+  */
+function getValidQueryParam(key: string, allowedValues: Array<string>, fallback: string): string {
+  const value = new URLSearchParams(window.location.search).get(key);
+  return (value && allowedValues.includes(value)) ? value : fallback;
+}
+
+/**
+  * Update or remove a single query param in the current URL.
+  * @param {string} key Query param name.
+  * @param {string} value New value (if it equals defaultValue, the param is removed from the URL).
+  * @param {string} defaultValue Default value for this param.
+  * @return void
+  */
+function setQueryParam(key: string, value: string, defaultValue: string): void {
+  const searchParams = new URLSearchParams(window.location.search);
+  if (value === defaultValue) {
+    searchParams.delete(key);
+  } else {
+    searchParams.set(key, value);
+  }
+  const queryString = searchParams.toString();
+  const newUrl = window.location.pathname + (queryString ? `?${queryString}` : "") + window.location.hash;
+  history.replaceState(null, "", newUrl);
+}
+
+/**
+  * Broadcast current sort/grid filters.
+  * @return {void}
+  */
+function broadcastPictureFilters(): void {
+  window.dispatchEvent(
+    new CustomEvent("game-pictures:filters-changed", {
+      detail: {
+        sort: currentSort.value !== defaultSort.value ? currentSort.value : "",
+        grid: currentGrid.value !== defaultGrid.value ? currentGrid.value : "",
+      }
+    })
+  );
+}
+
+/**
+  * Initialise all tooltips in the component.
+  * @return {void}
+  */
+function initTooltips(): void {
+  setTimeout(() => {
+    tooltips.value = Tooltips.make({
+      type: "dom",
+      elements: gamePicturesRef.value!.querySelectorAll("[data-bs-toggle=\"tooltip\"]")
+    });
+  }, 500);
+}
 </script>
-
-<style lang="scss" scopped>
-.glightbox img,
-.card img {
-  transition: .3s;
-}
-.glightbox:hover img,
-.glightbox:focus img,
-.card:hover img,
-.card:focus img {
-  transform: scale(1.05) !important;
-}
-.picture-ratings {
-  width: fit-content;
-  min-width: 55px;
-  height: 40px;
-  border-radius: calc(var(--bs-border-radius-lg) - 0.2rem);
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 0;
-
-  svg {
-    transition: .3s;
-  }
-}
-.picture-ratings:has(> [data-prefix="far"]:not(.d-none)):hover,
-.picture-ratings:has(> [data-prefix="far"]:not(.d-none)):focus {
-  color: var(--bs-success) !important;
-
-  svg {
-    transform: translate(2px,-2px) rotate(-10deg);
-  }
-}
-.picture-ratings:has(> [data-prefix="fas"]:not(.d-none)):hover,
-.picture-ratings:has(> [data-prefix="fas"]:not(.d-none)):focus {
-  color: var(--bs-danger) !important;
-
-  svg {
-    transform: translate(2px,2px) rotate(10deg);
-  }
-}
-</style>

@@ -12,18 +12,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LaravelActivityLogs\Models\ActivityLog;
 
-// * AUTH
+// * AUTH.
 Breadcrumbs::for('bo.login', function ($trail) {
     $trail->parent('fo.games.index');
     $trail->push(trans('bo_other_back_office_login'), route('bo.login'));
 });
 
-// * HOMEPAGE
+// * HOMEPAGE.
 Breadcrumbs::for('bo.home', function (Generator $trail) {
     $trail->push(trans('bo_other_homepage'), route('bo.home'));
 });
 
-// * STATISTIQUES
+// * STATISTIQUES.
 Breadcrumbs::for('bo.statistics.index', function (Generator $trail) {
     $trail->push(Str::of(trans('models.statistic'))->plural()->ucfirst(), route('bo.statistics.index'));
 });
@@ -31,7 +31,7 @@ Breadcrumbs::for('bo.statistics.update', function (Generator $trail) {
     $trail->push(Str::of(trans('models.statistic'))->plural()->ucfirst(), route('bo.statistics.index'));
 });
 
-// * GAMES
+// * GAMES.
 Breadcrumbs::for('bo.games.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans_choice('models.game', \INF))->ucfirst(),
@@ -55,7 +55,7 @@ Breadcrumbs::for('bo.games.duplicate', function (Generator $trail) {
     $trail->push(Str::of(trans('crud.actions.duplicate'))->ucfirst());
 });
 
-// * FOLDERS
+// * FOLDERS.
 Breadcrumbs::for('bo.folders.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans('models.folder'))->plural()->ucfirst(),
@@ -79,7 +79,7 @@ Breadcrumbs::for('bo.folders.duplicate', function (Generator $trail) {
     $trail->push(Str::of(trans('crud.actions.duplicate'))->ucfirst());
 });
 
-// * TAGS
+// * TAGS.
 Breadcrumbs::for('bo.tags.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans('models.tag'))->plural()->ucfirst(),
@@ -103,7 +103,7 @@ Breadcrumbs::for('bo.tags.duplicate', function (Generator $trail) {
     $trail->push(Str::of(trans('crud.actions.duplicate'))->ucfirst());
 });
 
-// * RANKS
+// * RANKS.
 Breadcrumbs::for('bo.ranks.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans('models.rank'))->plural()->ucfirst(),
@@ -111,7 +111,7 @@ Breadcrumbs::for('bo.ranks.index', function (Generator $trail) {
     );
 });
 
-// * USERS
+// * USERS.
 Breadcrumbs::for('bo.users.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans('models.user'))->plural()->ucfirst(),
@@ -137,7 +137,7 @@ Breadcrumbs::for('bo.users.duplicate', function (Generator $trail) {
     $trail->push(Str::of(trans('crud.actions.duplicate'))->ucfirst());
 });
 
-// * ACTIVITY_LOGS
+// * ACTIVITY_LOGS.
 Breadcrumbs::for('bo.activity_logs.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans_choice('models.activity_log', \INF))->ucfirst(),
@@ -160,7 +160,7 @@ Breadcrumbs::for('bo.activity_logs.show', function (Generator $trail, ActivityLo
     $trail->push(Str::of(trans('crud.actions.show'))->ucfirst(), route('bo.activity_logs.show', $activity_log));
 });
 
-// * STATIC_PAGES
+// * STATIC_PAGES.
 Breadcrumbs::for('bo.static_pages.index', function (Generator $trail) {
     $trail->push(
         Str::of(trans_choice('models.static_page', \INF))->ucfirst(),

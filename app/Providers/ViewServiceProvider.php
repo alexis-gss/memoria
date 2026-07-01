@@ -54,7 +54,7 @@ class ViewServiceProvider extends ServiceProvider
                 View::share('globalStaticPages', StaticPage::query()->orderBy('title', 'ASC')->get());
             }
 
-            // * FORCE BOOTSTRAP PAGINATOR (or custom if in front)
+            // * FORCE BOOTSTRAP PAGINATOR (or custom if in front).
             (collect(explode('/', \request()->getPathInfo()))->get(1) === 'bo')
                 ? Paginator::defaultView('components.back.pagination')
                 : Paginator::useBootstrapFive();

@@ -24,7 +24,7 @@
                                 <a href="{{ route('fo.games.show', $gameLatestModel->slug) }}" class="m-0"
                                     data-bs-tooltip="tooltip" data-bs-placement="top"
                                     title="{{ __('fo_access_game', ['gameName' => $gameLatestModel->name]) }}">{{ $gameLatestModel->name }}</a>
-                                <span>{{ (!$loop->last) ? '/' : '...' }}</span>
+                                <span>{{ (!$loop->last) ? '/' : '…' }}</span>
                             @endforeach
                         </div>
                     </div>

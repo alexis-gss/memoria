@@ -3,6 +3,9 @@ const route = {
         /**
          * Define a route by the data given,
          * ex: route('name', { 'parameter': 'value' }).
+         * @param {string} routeName
+         * @param {Record<string, string | number>} parameters
+         * @return {string | null}
          */
         route(
             routeName: string,
@@ -60,6 +63,13 @@ const route = {
             return `${origin}${pathname}${search}${hash}`;
         },
     },
+    /**
+     * Recursively flattens a nested object into a single layer.
+     * @param {Record<PropertyKey, unknown>} obj
+     * @param {string | null} parent
+     * @param {Record<PropertyKey, unknown>} res
+     * @return
+     */
     flattenProperties(
         obj: Record<PropertyKey, unknown>,
         parent: string | null = null,
