@@ -1,0 +1,45 @@
+.games-search {
+    .loading-screen {
+        transition: .3s;
+    }
+
+    .form-control {
+        height: 40px;
+    }
+
+    .form-control::placeholder {
+        color: var(--bs-light);
+    }
+
+    .border-custom {
+        border-bottom: solid 1px var(--bs-secondary) !important;
+
+        @include media-breakpoint-up(md) {
+        border-right: solid 1px var(--bs-secondary) !important;
+        border-bottom: 0 !important;
+        }
+    }
+
+    .btn-clear {
+        border-top-right-radius: var(--bs-border-radius-lg) !important;
+    }
+
+    .no-result-icon {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    .placeholder-glow .placeholder {
+        height: 24px;
+    }
+
+    .os-scrollbar {
+        --os-size: 1rem;
+        --os-track-bg: #14171a;
+        --os-track-bg-hover: #14171a;
+        --os-track-bg-active: #14171a;
+        --os-handle-bg: var(--bs-primary);
+        --os-handle-bg-hover: #4d6075;
+        --os-handle-bg-active: #485a6e;
+    }
+}

@@ -19,6 +19,10 @@ Route::name('fo.')
             ->where('slug', '^[a-zA-Z0-9-]*$')
             ->name('games.related');
 
+        // * MUSIC
+        Route::post('/music/options', [GameController::class, 'saveMusicOptions'])
+            ->name('music.options');
+
         // * GAMES
         Route::post('/games/filtered', [GameController::class, 'getGamesFiltered'])
             ->name('games.filtered');

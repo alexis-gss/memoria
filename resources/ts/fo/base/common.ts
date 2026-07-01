@@ -1,10 +1,7 @@
 window.onload = function() {
+    let documentBody: HTMLBodyElement|null;
     let loadingScreen: HTMLDivElement|null;
-    let menuModal: HTMLDivElement|null;
-    let menuFilter: HTMLDivElement|null;
-    let btnGames: NodeListOf<HTMLSpanElement>;
     let btnScroll: HTMLButtonElement|null;
-    let breadcrumb: HTMLDivElement|null;
     let homeTextContent: HTMLDivElement|null;
 
     selectors();
@@ -18,6 +15,7 @@ window.onload = function() {
     function hideLoadingScreen() {
         // Wait for components to be mounted.
         setTimeout(() => {
+            documentBody?.classList.remove("overflow-hidden");
             loadingScreen?.classList.add("opacity-0");
             // Wait for the transition end.
             setTimeout(() => {
@@ -30,12 +28,9 @@ window.onload = function() {
      * Set all selectors on the page.
      */
     function selectors() {
+        documentBody = document.querySelector("body");
         loadingScreen = document.querySelector("#loading-screen");
-        menuModal = document.querySelector(".nav-modal");
-        menuFilter = document.querySelector(".nav-filter");
-        btnGames = document.querySelectorAll(".btn-games");
         btnScroll = document.querySelector(".btn-scroll");
-        breadcrumb = document.querySelector(".breadcrumb");
         homeTextContent = document.querySelector(".main-home-latest");
     }
 
@@ -43,12 +38,7 @@ window.onload = function() {
      * Set all events on the page.
      */
     function events() {
-        document.addEventListener("scroll", checkDistanceTop);
-        btnGames?.forEach((element) => {
-            element.addEventListener("click", displayMenuGames);
-        });
         btnScroll?.addEventListener("click", scrollToTheTop);
-        menuFilter?.addEventListener("click", displayMenuGames);
         window.addEventListener("resize", setLatestGamesWidth);
     }
 
@@ -67,30 +57,9 @@ window.onload = function() {
     }
 
     /**
-     * Show/hide games navigation.
-     */
-    function displayMenuGames() {
-        menuModal?.classList.toggle("nav-modal-hidden");
-        menuFilter?.classList.toggle("nav-filter-hidden");
-    }
-
-    /**
      * Scroll to the top of the page.
      */
     function scrollToTheTop() {
         window.scrollTo(0, 0);
-    }
-
-    /**
-     * Check the distance between two scroll specific position.
-     */
-    function checkDistanceTop() {
-        if (document.documentElement.scrollTop < 200) {
-            btnScroll?.classList.add("btn-scroll-hidden");
-            breadcrumb?.classList.remove("breadcrumb-resize-wrapper");
-        } else {
-            btnScroll?.classList.remove("btn-scroll-hidden");
-            breadcrumb?.classList.add("breadcrumb-resize-wrapper");
-        }
     }
 };

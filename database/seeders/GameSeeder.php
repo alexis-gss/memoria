@@ -25,8 +25,15 @@ class GameSeeder extends Seeder
                     '../database/factories/assets/games/default-picture.png'
                 ))
             );
+            $gameModel->music   = FileStorageHelper::storeFile(
+                $gameModel,
+                new \SplFileInfo(\resource_path(
+                    '../database/factories/assets/games/default-music.mp3'
+                ))
+            );
             $gameModel->order   = $key + 1;
             $gameModel->saveQuietly();
+
             $offset = rand(0, 15);
             $length = rand(1, 2);
             $gameModel->tags()->saveMany($tags->slice($offset, $length));

@@ -8,6 +8,7 @@
 @import '~/aos/src/sass/aos';
 @import '~/glightbox/dist/css/glightbox.css';
 @import '~/swiper/swiper-bundle.min.css';
+@import '~/overlayscrollbars/styles/overlayscrollbars.min.css';
 
 // * BASE.
 @import './base/common';
@@ -19,4 +20,6 @@
 // * PARTIALS.
 @import './partials/loading-screen';
 @import './partials/nav';
+@import './partials/search-list';
+@import './partials/music-player';
 @import './partials/footer';

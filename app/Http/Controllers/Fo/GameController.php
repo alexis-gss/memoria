@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Fo;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Fo\MusicOptionsRequest;
 use App\Lib\Helpers\ToolboxHelper;
 use App\Models\Game;
 use App\Models\Rating;
@@ -166,5 +167,63 @@ class GameController extends Controller
             ->through(function (Game $randomGameModel) {
                 return view('components.front.card-game', ['gameModel' => $randomGameModel])->render();
             });
+    }
+
+    /**
+     * Save music preferences to cookie.
+     *
+     * @param \App\Http\Requests\Fo\MusicOptionsRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function saveMusicOptions(MusicOptionsRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $validatedData = $request->validated();
+
+        $payload = json_encode([
+            'muted'  => $validatedData['muted'],
+            'volume' => $validatedData['volume'],
+            'loop'   => $validatedData['loop'],
+            'speed'  => $validatedData['speed'],
+        ]);
+
+        $cookie = cookie(
+            'music-options',
+            $payload,
+            10 * 365 * 24 * 60
+        );
+
+        return response()->json(['success' => true])->withCookie($cookie);
+    }
+
+    /**
+     * Get music data from mp3 file.
+     *
+     * @param \App\Models\Game $gameModel
+     * @return array|null
+     */
+    private function getMusicMetadataAttribute(Game $gameModel): ?array
+    {
+        if (!$gameModel->music) {
+            return null;
+        }
+
+        if (!file_exists($gameModel->music)) {
+            return null;
+        }
+
+        $getID3   = new \getID3();
+        $fileInfo = $getID3->analyze($gameModel->music);
+        $tags     = $fileInfo['tags']['id3v2'] ?? $fileInfo['tags']['id3v1'] ?? [];
+
+        return [
+            'src'      => asset($gameModel->music),
+            'title'    => $tags['title'][0] ?? pathinfo($gameModel->music, PATHINFO_FILENAME),
+            'artist'   => $tags['artist'][0] ?? null,
+            'duration' => $fileInfo['playtime_seconds'] ?? null,
+            'cover'    => !empty($fileInfo['comments']['picture'][0]['data'])
+                ? 'data:' . $fileInfo['comments']['picture'][0]['image_mime'] . ';base64,' .
+                base64_encode($fileInfo['comments']['picture'][0]['data'])
+                : null,
+        ];
     }
 }

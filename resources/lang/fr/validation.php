@@ -241,6 +241,7 @@ return [
         'order'             => 'ordre',
         'publishment'       => 'état de publication',
         'visits'            => ':count vues',
+        'music'             => 'musique',
     ],
     'rule'                 => [
         'color_label'         => 'Doît être une couleur au format hexadecimal.',
@@ -253,5 +254,6 @@ return [
         'select_multiple'     => 'Sélectionner un ou plusieurs :entity parmis la liste.',
         'select_single'       => 'Sélectionner un :entity parmis la liste.',
         'akora_exist'         => 'Doît être un id existant dans le site Akora.',
+        'music'               => 'Doît être un fichier de type MP3.',
     ],
 ];

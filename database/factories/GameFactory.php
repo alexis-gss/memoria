@@ -23,7 +23,8 @@ final class GameFactory extends Factory
         return [
             'name'         => $name,
             'slug'         => Str::of($name)->slug(),
-            'picture'      => '',
+            'picture'      => fake()->filePath(),
+            'music'        => fake()->filePath(),
             'published'    => $published,
             'published_at' => ($published) ? now() : null,
             'folder_id'    => fake()->randomElement(Folder::pluck('id'))

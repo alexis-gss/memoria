@@ -11,13 +11,16 @@
     <x-front.layouts.loading-screen />
 
     <main class="container overflow-hidden">
+        {{-- JAVASCRIPT REQUIRED WARNING --}}
         <x-noscript-warning />
+
+        {{-- BUTTONS --}}
         <x-front.btn-github />
 
         {{-- NAVIGATION --}}
         <x-front.layouts.nav :brParam="$brParam" :gameModel="isset($gameModel) ? $gameModel : null"
             :gameModels="isset($gameModels) ? $gameModels : []" :folderModels="isset($folderModels) ? $folderModels : []"
-            :tagModels="isset($tagModels) ? $tagModels : []" />
+            :tagModels="isset($tagModels) ? $tagModels : []" :music="isset($gameModel) && $gameModel->music ? $music : null" />
 
         {{-- MAIN CONTENT --}}
         @yield('content')

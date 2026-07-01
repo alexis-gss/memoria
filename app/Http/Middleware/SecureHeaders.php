@@ -50,7 +50,8 @@ class SecureHeaders
             "manifest-src 'self';",
             "connect-src 'self' blob:;",
             "img-src * data: blob:;",
-            'frame-src ;',
+            "frame-src ;",
+            "media-src 'self';",
             "font-src 'self' data: ;",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
             "script-src 'self' {$jsDev} ;"

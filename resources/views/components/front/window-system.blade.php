@@ -14,6 +14,9 @@
             related: "{{ route('fo.games.related', ['slug' => 'SLUG']) }}",
             filtered: "{{ route('fo.games.filtered') }}",
         },
+        music: {
+            options: "{{ route('fo.music.options') }}",
+        },
         ratings: {
             update: "{{ route('fo.ratings.update', ['picture_id' => 'PICTUREID', 'picture_place' => 'PICTUREPLACE']) }}",
         },

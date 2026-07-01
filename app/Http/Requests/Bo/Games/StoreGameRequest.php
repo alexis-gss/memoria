@@ -49,6 +49,7 @@ class StoreGameRequest extends FormRequest
             'folder_id'   => 'required|integer|exists:folders,id',
             'akora_id'    => 'required|integer|min:0',
             'published'   => 'required|boolean',
+            'music'       => 'sometimes|file|mimes:mp3,mpga|max:10240|unique:games,music',
             'tags'        => 'sometimes|array',
             'tags.*'      => 'required|array',
             'tags.*.id'   => 'required|numeric|exists:tags,id|distinct',
@@ -70,6 +71,7 @@ class StoreGameRequest extends FormRequest
             'folder_id'   => trans('validation.custom.folder_associated'),
             'akora_id'    => trans('validation.custom.akora_associated'),
             'published'   => trans('validation.custom.publishment'),
+            'music'       => trans('validation.custom.music'),
             'tags'        => trans('models.tag'),
             'tags.*'      => trans('models.tag'),
             'tags.*.id'   => trans(':field :inter:model', [

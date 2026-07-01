@@ -18,6 +18,7 @@ use Spatie\Sitemap\Tags\Url;
  * @property string                          $name         Name.
  * @property string                          $slug         Slug of the name.
  * @property string                          $picture      Path of the game's picture.
+ * @property string                          $music        Path of the game's music.
  * @property \App\Models\Folder              $folder_id    Folder associated.
  * @property integer                         $akora_id     Id of the game in akora.
  * @property integer                         $order        Order.
@@ -58,6 +59,7 @@ class Game extends Model implements Sitemapable
         'name',
         'slug',
         'picture',
+        'music',
         'folder_id',
         'akora_id',
         'order',
@@ -85,6 +87,7 @@ class Game extends Model implements Sitemapable
         static::creating(function (self $game) {
             self::setOrder($game);
             self::setImage($game);
+            self::setMusic($game);
             self::setPublishedDate($game);
             (new Picture())->renameFolderSavedPictures($game, "default_folder");
         });
@@ -93,6 +96,7 @@ class Game extends Model implements Sitemapable
         });
         static::updating(function (self $game) {
             self::setImage($game);
+            self::setMusic($game);
             self::setPublishedDate($game);
             (new Picture())->renameFolderSavedPictures($game, $game->getOriginal('slug'));
         });
@@ -136,6 +140,17 @@ class Game extends Model implements Sitemapable
     private static function setImage(self $game): void
     {
         $game->picture = FileStorageHelper::storeFile($game, $game->picture, true);
+    }
+
+    /**
+     * Set model's game's music.
+     *
+     * @param self $game
+     * @return void
+     */
+    private static function setMusic(self $game): void
+    {
+        $game->music = FileStorageHelper::storeFile($game, $game->music, true);
     }
 
     /**

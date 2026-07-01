@@ -1,7 +1,7 @@
 <template>
   <div
     ref="gamesSearch"
-    class="nav-games"
+    class="games-search"
   >
     <!-- Filters -->
     <div
@@ -25,7 +25,7 @@
           >
           <button
             @click="clearInputSearch()"
-            class="btn btn-primary btn-clear d-flex align-items-center border-0 rounded-3"
+            class="btn btn-primary btn-action btn-clear d-flex align-items-center border-0 rounded-3"
             type="button"
             :title="trans.methods.__('fo_clear_search')"
             data-bs-toggle="tooltip"
@@ -97,7 +97,7 @@
         class="loading-screen position-absolute top-0 start-0 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 w-100 h-100 z-1"
       >
         <div
-          class="spinner-border text-white"
+          class="spinner-border text-light"
           role="status"
         >
           <span class="visually-hidden">{{ trans.methods.__("global_text_loading") }}</span>
@@ -137,7 +137,16 @@
                   </template>
                   <p class="text-start m-0 pe-2 z-2">{{ game.name }}</p>
                 </div>
-                <span>{{ String((game.pictures as Array<Object>).length).padStart(2, '0') }}</span>
+                <div class="d-flex justify-content-end align-items-center small opacity-75 z-1">
+                  <template v-if="game.music">
+                    <FontAwesomeIcon
+                      icon="fa-solid fa-music"
+                      class="fa-sm"
+                    />
+                    <span class="mx-1">|</span>
+                  </template>
+                  <span>{{ String((game.pictures as Array<Object>).length).padStart(2, '0') }}</span>
+                </div>
               </a>
             </li>
           </ul>
@@ -175,7 +184,7 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { onMounted, ref, useAttrs, reactive } from "vue";
+import { onMounted, ref, useAttrs, reactive, watch, nextTick } from "vue";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
 import trans from "./../../modules/trans";
@@ -226,6 +235,10 @@ const paginationParameters = reactive<{
   loading: false,
 });
 
+const props = defineProps<{
+  isActive?: boolean;
+}>();
+
 // * LIFECYCLE
 onMounted((): void => {
   const json = String(attrs.json ?? "{}"),
@@ -251,6 +264,17 @@ onMounted((): void => {
 
   initTooltips();
   initButtons();
+});
+
+// * WATCHERS
+watch(() => props.isActive, (active) => {
+  if (active) {
+    nextTick(() => {
+      setTimeout(() => {
+        searchInput.value?.focus();
+      }, 50);
+    });
+  }
 });
 
 // * METHODS
@@ -293,12 +317,16 @@ function clearInputSearch(): void {
   * @return void
 */
 function initButtons(): void {
+  let breadcrumbs = document.querySelector(".btn-breadcrumbs");
+  breadcrumbs?.addEventListener("click", () => {
+    showNavigation();
+  });
   let folder = document.querySelector(".game-folder");
-  let tags = document.querySelectorAll(".game-tags");
   folder?.addEventListener("click", (e) => {
     setSelectedValue(e);
     showNavigation();
   });
+  let tags = document.querySelectorAll(".game-tags");
   tags.forEach(tag => {
     tag.addEventListener("click", (e) => {
       setSelectedValue(e);
@@ -312,10 +340,9 @@ function initButtons(): void {
   * @return void
   */
 function showNavigation(): void {
-  let menuModal = document.querySelector(".nav-modal");
-  let menuFilter = document.querySelector(".nav-filter");
-  menuModal?.classList.remove("nav-modal-hidden");
-  menuFilter?.classList.remove("nav-filter-hidden");
+  window.dispatchEvent(
+    new CustomEvent("nav:open-panel", { detail: { panel: "games" } })
+  );
 }
 
 /**
@@ -451,49 +478,3 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scopped>
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/placeholders";
-@import "overlayscrollbars/overlayscrollbars.css";
-
-.nav-games {
-  .loading-screen {
-    transition: .3s;
-  }
-  .form-control {
-    height: 40px;
-  }
-  .form-control::placeholder {
-    color: var(--bs-light);
-  }
-  .border-custom {
-    border-bottom: solid 1px var(--bs-secondary) !important;
-
-    @include media-breakpoint-up(md) {
-      border-right: solid 1px var(--bs-secondary) !important;
-      border-bottom: 0 !important;
-    }
-  }
-  .btn-clear {
-    border-top-right-radius: var(--bs-border-radius-lg) !important;
-  }
-  .no-result-icon {
-    width: 4rem;
-    height: 4rem;
-  }
-  .placeholder-glow .placeholder {
-    height: 24px;
-  }
-  .os-scrollbar {
-    --os-size: 1rem;
-    --os-track-bg: #14171a;
-    --os-track-bg-hover: #14171a;
-    --os-track-bg-active: #14171a;
-    --os-handle-bg: var(--bs-primary);
-    --os-handle-bg-hover: #4d6075;
-    --os-handle-bg-active: #485a6e;
-  }
-}
-</style>

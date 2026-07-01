@@ -211,6 +211,39 @@
         </div>
     </fieldset>
 </div>
+{{-- MUSIC --}}
+<div class="col-12 col-md-6 mb-3">
+    <fieldset class="bg-body-tertiary border rounded-3 p-3">
+        <legend class="fw-bold fst-italic">
+            <i class="fa-solid fa-music"></i>
+            {{ __('bo_title_music') }}
+        </legend>
+        <div class="row mb-3">
+            <div class="col-12 form-group">
+                <label class="col-form-label" for="music">
+                    <b>{{ __('bo_label_choose_music') }}</b>
+                    <span data-bs-tooltip="tooltip" data-bs-placement="top"
+                        title="{{ __('bo_tooltip_choose_file') }}">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </span>
+                </label>
+                @php
+                    $data = [
+                        'id'          => 'gameMusic',
+                        'name'        => 'music',
+                        'value'       => $gameModel->music ?? null,
+                        'accept'      => '.mp3,audio/mpeg',
+                        'required'    => false,
+                        'placeholder' => __('validation.custom.music'),
+                        'helper'      => __('validation.rule.music'),
+                    ];
+                @endphp
+                <div class="file-input" data-json='@json($data)'></div>
+                <x-back.input-error inputName="music"/>
+            </div>
+        </div>
+    </fieldset>
+</div>
 {{-- PUBLISHED --}}
 <div class="col-12 col-md-6 mb-3">
     <fieldset class="bg-body-tertiary border rounded-3 p-3">

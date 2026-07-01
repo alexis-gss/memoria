@@ -14,7 +14,7 @@
         >
           {{ trans.methods.__("bo_label_choose_picture") + ((parameters.required) ? ' *' : '') }}
           <span
-            :title="trans.methods.__('bo_tooltip_image_input_choose_file')"
+            :title="trans.methods.__('bo_tooltip_choose_file')"
             data-bs-tooltip="tooltip"
           >
             <FontAwesomeIcon icon="fa-solid fa-circle-info" />
@@ -23,7 +23,7 @@
         <div class="input-group">
           <button
             @click.prevent="chooseAFile"
-            class="btn btn-outline-secondary z-1"
+            class="btn btn-secondary z-1"
             type="button"
             data-bs-tooltip="tooltip"
             :title="trans.methods.__('bo_tooltip_image_input_modify_source')"
