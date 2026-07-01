@@ -397,5 +397,25 @@ function ajaxPictureRating(id: number, place: number): void {
   border-radius: calc(var(--bs-border-radius-lg) - 0.2rem);
   border-top-right-radius: 0;
   border-bottom-left-radius: 0;
+
+  svg {
+    transition: .3s;
+  }
+}
+.picture-ratings:has(> [data-prefix="far"]:not(.d-none)):hover,
+.picture-ratings:has(> [data-prefix="far"]:not(.d-none)):focus {
+  color: var(--bs-success) !important;
+
+  svg {
+    transform: translate(2px,-2px) rotate(-10deg);
+  }
+}
+.picture-ratings:has(> [data-prefix="fas"]:not(.d-none)):hover,
+.picture-ratings:has(> [data-prefix="fas"]:not(.d-none)):focus {
+  color: var(--bs-danger) !important;
+
+  svg {
+    transform: translate(2px,2px) rotate(10deg);
+  }
 }
 </style>
