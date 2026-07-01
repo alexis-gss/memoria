@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Fo;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Fo\GetGamesFilteredRequest;
 use App\Http\Requests\Fo\MusicOptionsRequest;
+use App\Http\Requests\Fo\NextRelatedGamesRequest;
+use App\Http\Requests\Fo\ShowGameRequest;
 use App\Lib\Helpers\ToolboxHelper;
 use App\Models\Game;
 use App\Models\Rating;
 use App\Models\Visit;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 
@@ -19,22 +20,20 @@ class GameController extends Controller
     /**
      * Show a specific game.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $slug
+     * @param \App\Http\Requests\Fo\ShowGameRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, string $slug): \Illuminate\Http\Response
+    public function show(ShowGameRequest $request): \Illuminate\Http\Response
     {
-        try {
-            $gameModel = Game::query()
-                ->where('published', true)
-                ->where('slug', $slug)
-                ->whereHas('folder', function (Builder $query) {
-                    $query->where('published', true);
-                })->firstOrFail();
-        } catch (Exception $exception) {
-            abort(404, $exception->getMessage());
-        }
+        $validatedData = $request->validated();
+
+        $gameModel = Game::query()
+            ->where('published', true)
+            ->where('slug', $validatedData['slug'])
+            ->whereHas('folder', function (Builder $query) {
+                $query->where('published', true);
+            })->firstOrFail();
+
         /** @var \Illuminate\Database\Eloquent\Collection $ratingModels */
         $ratingModels = Rating::query()
             ->where('uuid', $request->cookie('rating-uuid'))
@@ -45,6 +44,12 @@ class GameController extends Controller
 
         $cookie = (new Visit())->setVisit($request, $gameModel);
 
+        $musicOptions = json_decode($request->cookie('music-options'), true) ?? [
+            'volume' => 1,
+            'muted'  => true,
+            'loop'   => false,
+        ];
+
         return response(view('front.pages.game', [
             'gameModel'         => $gameModel,
             'pictureModels'     => $this->getPicturesOfGame($gameModel),
@@ -53,21 +58,28 @@ class GameController extends Controller
             'folderModels'      => $this->getFoldersPublished(),
             'tagModels'         => $this->getTagsPublished(),
             'relatedGamesViews' => $this->getRelatedGamesViews($gameModel),
+            'music'             => [
+                'options' => $musicOptions,
+                'data'    => $this->getMusicMetadataAttribute($gameModel),
+            ],
         ]))->withCookie($cookie);
     }
 
     /**
      * Return a list of games filtered.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Fo\GetGamesFilteredRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getGamesFiltered(Request $request): \Illuminate\Http\JsonResponse
+    public function getGamesFiltered(GetGamesFilteredRequest $request): \Illuminate\Http\JsonResponse
     {
+        $validatedData = $request->validated();
+
         /** @var array<string|null> $searchSelects Selected folder/tag id */
-        $searchSelects = $request->input('filters_id');
+        $searchSelects = $validatedData['filters_id'] ?? [];
         /** @var string|null $searchText Search text */
-        $searchText = $request->input('search');
+        $searchText = $validatedData['search'] ?? null;
+
         /** @var \Illuminate\Support\Collection $gamesFiltered */
         $gamesFiltered = Game::query()
             ->when(
@@ -86,7 +98,7 @@ class GameController extends Controller
                     });
                 }
             )
-            ->when(!is_null($request->search), function (Builder $query) use ($searchText) {
+            ->when(!is_null($searchText), function (Builder $query) use ($searchText) {
                 $query->where('name', 'LIKE', "%{$searchText}%");
             })
             ->with('pictures')
@@ -139,12 +151,14 @@ class GameController extends Controller
     /**
      * Return a list of games filtered.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Fo\NextRelatedGamesRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getNextRelatedGames(Request $request): \Illuminate\Http\JsonResponse
+    public function getNextRelatedGames(NextRelatedGamesRequest $request): \Illuminate\Http\JsonResponse
     {
-        $currentGameModel = Game::query()->where('slug', $request->slug)->firstOrFail();
+        $validatedData = $request->validated();
+
+        $currentGameModel = Game::query()->where('slug', $validatedData['slug'])->firstOrFail();
         return response()->json($this->getRelatedGamesViews($currentGameModel));
     }
 
