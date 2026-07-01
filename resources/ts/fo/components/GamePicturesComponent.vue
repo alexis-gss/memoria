@@ -25,10 +25,10 @@
                 <div class="shadow rounded-3">
                   <a
                     :href="getPicturePath(getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
-                    class="glightbox"
+                    class="btn btn-primary bg-transparent w-100 p-0 border-0 glightbox overflow-hidden"
                     data-gallery="games-pictures"
                   >
-                    <div class="ratio ratio-16x9 overflow-hidden rounded-3">
+                    <div class="ratio ratio-16x9 rounded-3">
                       <img
                         :src="getPicturePath(getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
                         :alt="'Picture n°' + (getPictureNumber(paginateIndex, templateIndex) + pictureIndex + 1) + ' from the game ' + gameName"
@@ -37,7 +37,7 @@
                         @load="gameImageLazyLoad"
                       >
                       <div class="picture-loader position-absolute top-0 start-0 w-100 h-100">
-                        <div class="d-flex justify-content-center align-items-center w-100 h-100 bg-primary">
+                        <div class="d-flex justify-content-center align-items-center w-100 h-100 bg-secondary">
                           <div
                             class="spinner-border text-light"
                             role="status"
@@ -51,7 +51,7 @@
                     </div>
                   </a>
                   <button
-                    :class="['picture-ratings btn btn-white position-absolute bottom-0 end-0 m-1 z-2', {disabled: ratingLoading}]"
+                    :class="['picture-ratings btn btn-primary text-dark bg-white border-0 position-absolute bottom-0 end-0 m-1 z-2', {disabled: ratingLoading}]"
                     :disabled="ratingLoading"
                     @click="ajaxPictureRating(pictureModels[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id, getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
                     :aria-label="trans.methods.__('Cliquez pour ajouter un like ou l\'enlever')"
@@ -284,9 +284,9 @@ function gameImageLazyLoad(e: Event): void {
 function displayImage(image: HTMLImageElement, parentClass: string): void {
   image.classList.remove("d-none");
   const nodeTargetParent = image.closest(parentClass);
-  nodeTargetParent?.querySelector(".picture-loader")?.classList.add("z-0");
-  nodeTargetParent?.querySelector(".picture-loader")?.classList.remove("z-3");
   nodeTargetParent?.querySelector(".btn.picture-ratings")?.classList.remove("d-none");
+  nodeTargetParent?.querySelector(".picture-loader")?.classList.remove("z-3");
+  nodeTargetParent?.querySelector(".picture-loader")?.classList.add("z-0");
 }
 
 /**
@@ -384,8 +384,8 @@ function ajaxPictureRating(id: number, place: number): void {
 .card img {
   transition: .3s;
 }
-.glightbox-wrapper:hover img,
-.glightbox-wrapper:focus img,
+.glightbox:hover img,
+.glightbox:focus img,
 .card:hover img,
 .card:focus img {
   transform: scale(1.05) !important;
@@ -394,7 +394,7 @@ function ajaxPictureRating(id: number, place: number): void {
   width: fit-content;
   min-width: 55px;
   height: 40px;
-  border-radius: calc(var(--bs-border-radius-lg) - 0.08rem);
+  border-radius: calc(var(--bs-border-radius-lg) - 0.2rem);
   border-top-right-radius: 0;
   border-bottom-left-radius: 0;
 }
