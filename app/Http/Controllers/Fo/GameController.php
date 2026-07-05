@@ -53,7 +53,7 @@ class GameController extends Controller
 
         return response(view('front.pages.game', [
             'gameModel'         => $gameModel,
-            'pictureModels'     => $this->getPicturesOfGame($gameModel, $request->query('sort', 'date')),
+            'pictureModels'     => $this->getPicturesOfGame($gameModel, $request->query('order', 'date')),
             'ratingModels'      => $ratingModels,
             'gameModels'        => $this->getGamesPublished(true, $this->gamesPerPage),
             'folderModels'      => $this->getFoldersPublished(),
@@ -80,6 +80,8 @@ class GameController extends Controller
         $searchSelects = $validatedData['filters_id'] ?? [];
         /** @var string|null $searchText Search text */
         $searchText = $validatedData['search'] ?? null;
+        /** @var string $sort Sort order */
+        $sort = $validatedData['sort'] ?? 'alphabetical';
 
         /** @var \Illuminate\Support\Collection $gamesFiltered */
         $gamesFiltered = Game::query()
@@ -107,8 +109,19 @@ class GameController extends Controller
             ->whereHas('folder', function (Builder $query) {
                 $query->where('published', true);
             })
-            ->orderBy('slug', 'ASC')
+            ->withCount('pictures')
+            ->when($sort === 'music', function (Builder $query) {
+                $query->orderByRaw('music IS NULL, music IS NOT NULL')
+                    ->orderBy('slug', 'ASC');
+            })
+            ->when($sort === 'pictures', function (Builder $query) {
+                $query->orderBy('pictures_count', 'DESC')->orderBy('slug', 'ASC');
+            })
+            ->when($sort === 'alphabetical' || !in_array($sort, ['music', 'pictures']), function (Builder $query) {
+                $query->orderBy('slug', 'ASC');
+            })
             ->paginate($this->gamesPerPage);
+
         return response()->json($gamesFiltered);
     }
 
@@ -124,19 +137,19 @@ class GameController extends Controller
         $validatedData = $request->validated();
 
         $currentGameModel = Game::query()->where('slug', $validatedData['slug'])->firstOrFail();
-        return response()->json($this->getPicturesOfGame($currentGameModel, $validatedData['sort']));
+        return response()->json($this->getPicturesOfGame($currentGameModel, $validatedData['order']));
     }
 
     /**
      * Return a list of games views render.
      *
      * @param \App\Models\Game $gameModel
-     * @param string           $sort
+     * @param string           $order
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function getPicturesOfGame(
         Game $gameModel,
-        string $sort = 'date',
+        string $order = 'date',
     ): \Illuminate\Pagination\LengthAwarePaginator {
         /** @var \Illuminate\Pagination\LengthAwarePaginator $pictureModels */
         $pictureModels = new LengthAwarePaginator([], 0, 12);
@@ -145,13 +158,13 @@ class GameController extends Controller
                 // @phpstan-ignore-next-line
                 $picture->ratings_count = $picture->ratings->count();
             });
-            $sortedPictures = match ($sort) {
+            $orderedPictures = match ($order) {
                 'likes'  => $gameModel->pictures->sortByDesc('ratings_count')->values(),
                 default  => $gameModel->pictures->values(),
             };
             $pictureModels = ToolboxHelper::customPaginate(
-                $sortedPictures,
-                ($sortedPictures->count() <= 12) ? $sortedPictures->count() : 12,
+                $orderedPictures,
+                ($orderedPictures->count() <= 12) ? $orderedPictures->count() : 12,
                 ['path' => Paginator::resolveCurrentPath()]
             );
         }

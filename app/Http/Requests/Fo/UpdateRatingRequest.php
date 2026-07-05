@@ -27,8 +27,8 @@ class UpdateRatingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'uuid'       => ['required', 'uuid', 'string'],
-            'picture_id' => ['required', 'numeric', 'exists:pictures,id'],
+            'uuid'       => 'required|uuid|string',
+            'picture_id' => 'required|numeric|exists:pictures,id',
         ];
     }
 

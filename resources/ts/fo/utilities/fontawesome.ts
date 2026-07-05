@@ -1,10 +1,12 @@
 import { config, dom, library } from "@fortawesome/fontawesome-svg-core";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import {
+    faArrowDownAZ,
     faArrowLeft,
     faArrowRight,
     faArrowUp,
     faArrowUpRightFromSquare,
+    faChevronDown,
     faChevronLeft,
     faChevronRight,
     faCircleCheck,
@@ -12,6 +14,7 @@ import {
     faDeleteLeft,
     faEraser,
     faGlobe,
+    faImages,
     faMusic,
     faPause,
     faPlay,
@@ -66,5 +69,8 @@ library.add(
     faRotateLeft,
     faEraser,
     faDeleteLeft,
+    faArrowDownAZ,
+    faImages,
+    faChevronDown,
 );
 dom.watch();

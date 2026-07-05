@@ -29,7 +29,7 @@ class ShowGameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'slug' => ['required', 'string', 'exists:games,slug'],
+            'slug' => 'required|string|exists:games,slug',
         ];
     }
 

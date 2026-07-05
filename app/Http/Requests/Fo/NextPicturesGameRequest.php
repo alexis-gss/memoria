@@ -28,7 +28,7 @@ class NextPicturesGameRequest extends FormRequest
         return [
             'slug' => 'required|string|exists:games,slug',
             'page' => 'required|numeric|min:1',
-            'sort' => 'required|string|in:likes,date',
+            'order' => 'required|string|in:likes,date',
         ];
     }
 
@@ -40,8 +40,9 @@ class NextPicturesGameRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'page' => trans('validation.custom.page'),
-            'sort' => trans('validation.custom.sort'),
+            'slug'  => trans('validation.custom.slug'),
+            'page'  => trans('validation.custom.page'),
+            'order' => trans('validation.custom.order'),
         ];
     }
 }

@@ -29,61 +29,100 @@
             type="button"
             :title="trans.methods.__('fo_clear_search')"
             data-bs-toggle="tooltip"
-            :disabled="!search.length && !selectedFolder.length && !selectedTag.length"
+            :disabled="!search.length && !selectedFolder.length && !selectedTag.length && !currentSort.length"
           >
             <FontAwesomeIcon icon="fa-solid fa-delete-left" />
           </button>
         </div>
       </div>
       <div class="col-12 gx-3">
-        <div class="row w-100 mx-auto">
-          <!-- Filter by folders -->
-          <div class="col-12 col-md-6 border-custom p-0 py-1 pe-md-1 pb-md-0">
-            <select
-              class="form-select border-0 rounded-3 bg-primary shadow-none text-bg-primary px-2 py-2 cursor-pointer"
-              name="folder"
-              :aria-label="trans.methods.__('fo_search_folder')"
-              @change="setSelectedValue($event)"
-            >
-              <option
-                value="0"
-                selected
+        <div class="d-flex justify-content-center align-items-stretch w-100 mx-auto">
+          <div class="d-flex flex-column flex-md-row justify-content-center align-items-center w-100">
+            <!-- Filter by folders -->
+            <div class="border-custom w-100 p-0 py-1 pe-1 pb-md-0">
+              <select
+                class="form-select border-0 rounded-3 bg-primary shadow-none text-bg-primary px-2 py-2 cursor-pointer"
+                name="folder"
+                :aria-label="trans.methods.__('fo_search_folder')"
+                @change="setSelectedValue($event)"
               >
-                {{ trans.methods.__("fo_search_folder") }}
-              </option>
-              <option
-                v-for="(folder, folderIndex) in modelsParameters.folders"
-                :key="folderIndex"
-                :value="folder.slug"
-                :selected="(selectedFolder.length && folder.slug === selectedFolder) ? true : false"
+                <option
+                  value="0"
+                  selected
+                >
+                  {{ trans.methods.__("fo_search_folder") }}
+                </option>
+                <option
+                  v-for="(folder, folderIndex) in modelsParameters.folders"
+                  :key="folderIndex"
+                  :value="folder.slug"
+                  :selected="(selectedFolder.length && folder.slug === selectedFolder) ? true : false"
+                >
+                  {{ folder.nameLocale }}
+                </option>
+              </select>
+            </div>
+            <!-- Filter by tags -->
+            <div class="border-custom w-100 p-0 pt-1 pe-1 px-md-1">
+              <select
+                class="form-select bg-primary rounded-3 border-0 shadow-none text-bg-primary px-2 py-2 cursor-pointer"
+                name="tag"
+                @change="setSelectedValue($event)"
+                :aria-label="trans.methods.__('fo_search_tag')"
               >
-                {{ folder.nameLocale }}
-              </option>
-            </select>
+                <option
+                  value="0"
+                  selected
+                >
+                  {{ trans.methods.__("fo_search_tag") }}
+                </option>
+                <option
+                  v-for="(tag, tagIndex) in modelsParameters.tags"
+                  :key="tagIndex"
+                  :value="tag.slug"
+                  :selected="(selectedTag.length && tag.slug === selectedTag) ? true : false"
+                >
+                  {{ tag.nameLocale }}
+                </option>
+              </select>
+            </div>
           </div>
-          <!-- Filter by tags -->
-          <div class="col-12 col-md-6 p-0 pt-1 ps-md-1">
-            <select
-              class="form-select bg-primary rounded-3 border-0 shadow-none text-bg-primary px-2 py-2 cursor-pointer"
-              name="tag"
-              @change="setSelectedValue($event)"
-              :aria-label="trans.methods.__('fo_search_tag')"
-            >
-              <option
-                value="0"
-                selected
+          <!-- Sort list -->
+          <div class="games-search-sort ps-1 pt-1">
+            <div class="position-relative w-100 h-100">
+              <select
+                v-model="currentSort"
+                @change="setSortValue($event)"
+                @mouseenter="isSortHovered = true"
+                @mouseleave="isSortHovered = false"
+                @focus="isSortHovered = true"
+                @blur="isSortHovered = false"
+                class="form-select bg-primary border-0 shadow-none text-bg-primary px-2 py-2 cursor-pointer position-absolute top-0 start-0 w-100 h-100 opacity-0 z-1"
+                name="sort"
+                :aria-label="trans.methods.__('fo_search_sort_aria_label')"
               >
-                {{ trans.methods.__("fo_search_tag") }}
-              </option>
-              <option
-                v-for="(tag, tagIndex) in modelsParameters.tags"
-                :key="tagIndex"
-                :value="tag.slug"
-                :selected="(selectedTag.length && tag.slug === selectedTag) ? true : false"
+                <option
+                  v-for="(sortKey, sortIndex) in validSorts"
+                  :key="sortIndex"
+                  :value="sortKey"
+                >
+                  {{ trans.methods.__(`fo_search_sort_${sortKey}`) }}
+                </option>
+              </select>
+              <button
+                :class="[
+                  'btn btn-primary btn-sort border-0 px-2 py-2 d-flex align-items-center justify-content-between w-100 h-100',
+                  { active: isSortHovered },
+                ]"
+                tabIndex="-1"
               >
-                {{ tag.nameLocale }}
-              </option>
-            </select>
+                <FontAwesomeIcon :icon="sortIcons[currentSort]" />
+                <FontAwesomeIcon
+                  icon="fa-solid fa-chevron-down"
+                  class="fa-xs opacity-75 text-secondary"
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -206,12 +245,23 @@ const searchInput = ref<HTMLInputElement|null>(null);
 const search = ref<string>("");
 const selectedTag = ref<string>("");
 const selectedFolder = ref<string>("");
-const externalSort = ref<string>("");
+const externalOrder = ref<string>("");
 const externalGrid = ref<string>("");
 const loading = ref<boolean>(false);
 const tooltips = ref<Tooltips|null>(null);
 const debounceDelay = ref<number>(300);
 let debounceTimer: ReturnType<typeof setTimeout>|null = null;
+
+/** Sort */
+const defaultSort = ref<string>("alphabetical");
+const currentSort = ref<string>(defaultSort.value);
+const validSorts: Array<string> = ["alphabetical", "pictures", "music"];
+const sortIcons: Record<string, Array<string>> = {
+  alphabetical: ["fa-solid", "fa-arrow-down-a-z"],
+  pictures: ["fa-solid", "fa-images"],
+  music: ["fa-solid", "fa-music"],
+};
+const isSortHovered = ref<boolean>(false);
 
 /** Models parameters. */
 const modelsParameters = reactive<{
@@ -262,14 +312,15 @@ onMounted((): void => {
   selectedTag.value = data.params.tag ? data.params.tag: "";
 
   /** Others */
+  currentSort.value = getValidQueryParam("sort", validSorts, defaultSort.value);
   searchInput.value?.focus();
 
-  /** Read sort/grid from URL directly. */
+  /** Read order/grid from URL directly. */
   const urlParams = new URLSearchParams(window.location.search);
-  externalSort.value = urlParams.get("sort") ?? "";
+  externalOrder.value = urlParams.get("order") ?? "";
   externalGrid.value = urlParams.get("grid") ?? "";
   window.addEventListener("game-pictures:filters-changed", ((event: CustomEvent) => {
-    externalSort.value = event.detail.sort ?? "";
+    externalOrder.value = event.detail.order ?? "";
     externalGrid.value = event.detail.grid ?? "";
   }) as EventListener);
 
@@ -313,6 +364,7 @@ function checkScroll(event: HTMLElement): void {
   * @return {void}
   */
 function clearInputSearch(): void {
+  currentSort.value = defaultSort.value;
   searchInput.value!.value = search.value = selectedFolder.value = selectedTag.value = "";
   paginationParameters.page = 1;
   gamesSearch.value?.querySelectorAll("select").forEach((element: HTMLSelectElement) => {
@@ -386,6 +438,18 @@ function setSelectedValue(event: Event): void {
 }
 
 /**
+  * Set the sort value and trigger the search.
+  * @param {Event} event
+  * @return {void}
+  */
+function setSortValue(event: Event): void {
+  const select = event.target as HTMLSelectElement;
+  currentSort.value = select.value;
+  paginationParameters.page = 1;
+  ajaxGamesFiltered([selectedTag.value, selectedFolder.value], false, search.value);
+}
+
+/**
   * Debounced search.
   * @param {string[]} filters Selected filters.
   * @param {string} searchText Search text.
@@ -424,7 +488,8 @@ function buildUrlParams(searchText: string = search.value): URLSearchParams {
   if (searchText.length) params.set("text", searchText);
   if (selectedFolder.value.length) params.set("folder", selectedFolder.value);
   if (selectedTag.value.length) params.set("tag", selectedTag.value);
-  if (externalSort.value.length) params.set("sort", externalSort.value);
+  if (currentSort.value !== defaultSort.value) params.set("sort", currentSort.value);
+  if (externalOrder.value.length) params.set("order", externalOrder.value);
   if (externalGrid.value.length) params.set("grid", externalGrid.value);
   return params;
 }
@@ -446,6 +511,7 @@ function ajaxGamesFiltered(filters: string[] = [], pagination: boolean = false, 
         filters_id: filters,
         page: paginationParameters.page,
         search: search,
+        sort: currentSort.value,
       }
     })
     .then((reponse) => {
@@ -490,6 +556,18 @@ function getRouteGameShow(slug: string): string {
   const url = new URL(routeGameShow);
   const queryString = params.toString();
   return url.origin + url.pathname + (queryString ? `?${queryString}` : "");
+}
+
+/**
+ * Get a valid query parameter from the URL.
+ * @param {string} key Key of the query parameter.
+ * @param {string[]} allowedValues Allowed values for the query parameter.
+ * @param {string} fallback Fallback value if the query parameter is not valid.
+ * @return {string}
+ */
+function getValidQueryParam(key: string, allowedValues: Array<string>, fallback: string): string {
+  const value = new URLSearchParams(window.location.search).get(key);
+  return (value && allowedValues.includes(value)) ? value : fallback;
 }
 
 /**

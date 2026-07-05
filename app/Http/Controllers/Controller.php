@@ -57,6 +57,8 @@ class Controller extends BaseController
         $searchText   = request()->text;
         $searchFolder = request()->folder;
         $searchTag    = request()->tag;
+        $sort         = request()->sort ?? 'alphabetical';
+
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Game::query()
             ->with('pictures')
@@ -74,10 +76,21 @@ class Controller extends BaseController
                 });
             })
             ->where('published', true)
-            ->orderBy('slug', 'ASC')
             ->whereHas('folder', function (Builder $query) {
                 $query->where('published', true);
+            })
+            ->withCount('pictures')
+            ->when($sort === 'music', function (Builder $query) {
+                $query->orderByRaw('music IS NULL, music IS NOT NULL')
+                    ->orderBy('slug', 'ASC');
+            })
+            ->when($sort === 'pictures', function (Builder $query) {
+                $query->orderBy('pictures_count', 'DESC')->orderBy('slug', 'ASC');
+            })
+            ->when($sort === 'alphabetical' || !in_array($sort, ['music', 'pictures']), function (Builder $query) {
+                $query->orderBy('slug', 'ASC');
             });
+
         return ($paginate) ? $query->paginate($nbrItemsPerPage) : $query->get();
     }
 

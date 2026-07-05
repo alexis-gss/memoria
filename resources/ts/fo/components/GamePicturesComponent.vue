@@ -10,17 +10,17 @@
         data-aos="fade-up"
       >
         <select
-          v-model="currentSort"
-          @change="onSortChange"
+          v-model="currentOrder"
+          @change="onOrderChange"
           class="form-select border-0 cursor-pointer w-auto"
-          :aria-label="trans.methods.__('fo_images_sort_aria_label')"
+          :aria-label="trans.methods.__('fo_images_order_aria_label')"
         >
           <option
-            v-for="(sortKey, sortIndex) in validSorts"
-            :key="sortIndex"
-            :value="sortKey"
+            v-for="(orderKey, orderIndex) in validOrders"
+            :key="orderIndex"
+            :value="orderKey"
           >
-            {{ trans.methods.__(`fo_images_sort_${sortKey}`) }}
+            {{ trans.methods.__(`fo_images_order_${orderKey}`) }}
           </option>
         </select>
         <select
@@ -202,7 +202,7 @@ const gamePictures = ref<Array<{
 }>>([]);
 
 /** Filters */
-const defaultSort = ref<string>("date");
+const defaultOrder = ref<string>("date");
 const defaultGrid = ref<string>("progressive");
 const gridPatterns: Record<string, Array<number>> = {
   "progressive": [4, 3, 2, 3],
@@ -211,9 +211,9 @@ const gridPatterns: Record<string, Array<number>> = {
   "3columns": [3, 3, 3, 3],
   "4columns": [4, 4, 4],
 };
-const currentSort = ref<string>(defaultSort.value);
+const currentOrder = ref<string>(defaultOrder.value);
 const currentGrid = ref<string>(defaultGrid.value);
-const validSorts: Array<string> = ["date", "likes"];
+const validOrders: Array<string> = ["date", "likes"];
 const validGrids: Array<string> = Object.keys(gridPatterns);
 
 /** Games related component variables */
@@ -243,7 +243,7 @@ onMounted((): void => {
   picturesRatings.value = data.ratingModels;
   relatedGamesViews.value = data.relatedGamesViews;
 
-  currentSort.value = getValidQueryParam("sort", validSorts, defaultSort.value);
+  currentOrder.value = getValidQueryParam("order", validOrders, defaultOrder.value);
   currentGrid.value = getValidQueryParam("grid", validGrids, defaultGrid.value);
 
   checkScroll();
@@ -263,11 +263,11 @@ const incrementNumber = computed<Array<number>>(() =>
     .filter((index) => index % gameItems.value === 0));
 
 /**
-  * Check if the current sort or grid is different from the default values.
+  * Check if the current order or grid is different from the default values.
   * @return {boolean}
   */
 const hasActiveFilters = computed<boolean>(() =>
-  currentSort.value !== defaultSort.value || currentGrid.value !== defaultGrid.value);
+  currentOrder.value !== defaultOrder.value || currentGrid.value !== defaultGrid.value);
 
 /** WATCHERS */
 
@@ -309,7 +309,7 @@ function checkScroll(): void {
   */
 function getPictures(replace: boolean = false): void {
   window.axios
-    .get(getGamePicturesRoute() + "?page=" + gamePage.value + "&sort=" + currentSort.value)
+    .get(getGamePicturesRoute() + "?page=" + gamePage.value + "&order=" + currentOrder.value)
     .then((response) => {
       if (response.data.data !== undefined) {
         gamePictures.value = replace
@@ -469,11 +469,11 @@ function ajaxPictureRating(id: number, place: number): void {
 }
 
 /**
-  * Triggered when the user changes the sort order.
+  * Triggered when the user changes the order order.
   * @return {void}
   */
-function onSortChange(): void {
-  setQueryParam("sort", currentSort.value, defaultSort.value);
+function onOrderChange(): void {
+  setQueryParam("order", currentOrder.value, defaultOrder.value);
   broadcastPictureFilters();
   gamePage.value = 1;
   gameLoading.value = true;
@@ -497,15 +497,15 @@ function onGridChange(): void {
 }
 
 /**
-  * Reset all filters (sort + grid) to their default values,
+  * Reset all filters (order + grid) to their default values,
   * clean the URL and reload the first page of pictures.
   * @return {void}
   */
 function resetFilters(): void {
   tooltips.value?.refreshTooltips();
-  currentSort.value = defaultSort.value;
+  currentOrder.value = defaultOrder.value;
   currentGrid.value = defaultGrid.value;
-  setQueryParam("sort", defaultSort.value, defaultSort.value);
+  setQueryParam("order", defaultOrder.value, defaultOrder.value);
   setQueryParam("grid", defaultGrid.value, defaultGrid.value);
   broadcastPictureFilters();
   gamePage.value = 1;
@@ -546,14 +546,14 @@ function setQueryParam(key: string, value: string, defaultValue: string): void {
 }
 
 /**
-  * Broadcast current sort/grid filters.
+  * Broadcast current order/grid filters.
   * @return {void}
   */
 function broadcastPictureFilters(): void {
   window.dispatchEvent(
     new CustomEvent("game-pictures:filters-changed", {
       detail: {
-        sort: currentSort.value !== defaultSort.value ? currentSort.value : "",
+        order: currentOrder.value !== defaultOrder.value ? currentOrder.value : "",
         grid: currentGrid.value !== defaultGrid.value ? currentGrid.value : "",
       }
     })

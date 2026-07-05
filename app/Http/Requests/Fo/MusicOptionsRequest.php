@@ -17,7 +17,7 @@ class MusicOptionsRequest extends FormRequest
             'muted'  => 'required|boolean',
             'volume' => 'required|numeric|between:0,1',
             'loop'   => 'required|boolean',
-            'speed'  => ['required', 'in:0.5,0.75,1,1.25,1.5,2'],
+            'speed'  => 'required|in:0.5,0.75,1,1.25,1.5,2',
         ];
     }
 
