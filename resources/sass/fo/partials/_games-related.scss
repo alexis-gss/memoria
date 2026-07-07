@@ -67,6 +67,28 @@
         justify-content: center;
     }
 
+    &-transition {
+        width: 1rem;
+
+        &:first-of-type {
+            left: 0;
+            background: linear-gradient(to right, #{$color-white} 0%, transparent 100%);
+
+            @include media-breakpoint-up(md) {
+                left: 3rem;
+            }
+        }
+
+        &:last-of-type {
+            right: 0;
+            background: linear-gradient(to left, #{$color-white} 0%, transparent 100%);
+
+            @include media-breakpoint-up(md) {
+                right: 3rem;
+            }
+        }
+    }
+
     .fa-animation {
         animation: translation 1.5s cubic-bezier(.17,.84,.44,1) infinite;
     }

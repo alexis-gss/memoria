@@ -10,9 +10,10 @@
         {{ trans.methods.__('fo_slide_title') }}
       </h2>
     </div>
-    <div :class="['col-12 position-relative px-1 px-md-5']">
+    <div class="col-12 position-relative px-0 px-md-5">
+      <div class="games-related-transition position-absolute top-0 h-100 z-2" />
       <button
-        class="swiper-button swiper-games-related-button-prev btn btn-primary position-absolute rounded-circle border-0 z-2"
+        class="swiper-button swiper-games-related-button-prev btn btn-primary position-absolute rounded-circle border-0 z-3"
         :title="trans.methods.__('fo_slide_target', {'target': trans.methods.__('fo_prev')})"
         :aria-label="trans.methods.__('fo_slide_target_aria', {'target': trans.methods.__('fo_prev')})"
         data-bs-tooltip="tooltip"
@@ -65,7 +66,7 @@
         </div>
       </div>
       <button
-        class="swiper-button swiper-games-related-button-next btn btn-primary position-absolute rounded-circle border-0 z-2"
+        class="swiper-button swiper-games-related-button-next btn btn-primary position-absolute rounded-circle border-0 z-3"
         :title="trans.methods.__('fo_slide_target', {'target': trans.methods.__('fo_next')})"
         :aria-label="trans.methods.__('fo_slide_target_aria', {'target': trans.methods.__('fo_next')})"
         data-bs-tooltip="tooltip"
@@ -77,6 +78,7 @@
         v-if="relatedGamesViews.length > 1"
         class="swiper-pagination swiper-games-related-pagination position-relative bottom-0"
       />
+      <div class="games-related-transition position-absolute top-0 h-100 z-2" />
     </div>
   </div>
 </template>
