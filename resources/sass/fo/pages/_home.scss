@@ -1,26 +1,31 @@
 .home-text {
-    &-label > p {
-        width: max-content;
-    }
+    &-content {
+        height: 24px;
 
-    &-content > :first-child {
-        display: inline-block;
-        padding-left: 100%;
-        animation: defilement 80s infinite linear;
-        white-space: nowrap;
+        &-transition {
+            z-index: 1;
+            width: 1rem;
 
-        &:hover {
-            animation-play-state: paused;
-        }
-    }
-
-    @keyframes defilement {
-        0% {
-            transform: translate3d(0,0,0);
+            &:last-of-type {
+                background: linear-gradient(to left, #{$color-white} 0%, transparent 100%),
+            }
         }
 
-        100% {
-            transform: translate3d(-100%,0,0);
+        p {
+            width: max-content;
+            transform: translate3d(0, 0, 0);
+            white-space: nowrap;
+
+            &.is-scrolling {
+                animation-duration: var(--scroll-duration);
+                animation-iteration-count: infinite;
+                animation-name: var(--scroll-anim-name);
+                animation-timing-function: linear;
+            }
+
+            &:hover {
+                animation-play-state: paused;
+            }
         }
     }
 }

@@ -15,17 +15,18 @@
             </div>
             <div class="col-12 d-flex flex-column flex-lg-row justify-content-between align-items-center pt-2">
                 <div class="main-home-latest d-flex justify-content-start align-items-center pb-lg-0 pb-2">
-                    <div class="home-text-label">
-                        <p class="fw-bold m-0">{{ __('fo_last_games_added') }}</p>
-                    </div>
-                    <div class="home-text-content w-100 overflow-hidden ms-1">
-                        <div class="position-relative">
-                            @foreach($gameLatestModels as $gameLatestModel)
-                                <a href="{{ route('fo.games.show', $gameLatestModel->slug) }}" class="m-0"
-                                    data-bs-tooltip="tooltip" data-bs-placement="top"
-                                    title="{{ __('fo_access_game', ['gameName' => $gameLatestModel->name]) }}">{{ $gameLatestModel->name }}</a>
-                                <span>{{ (!$loop->last) ? '/' : '…' }}</span>
-                            @endforeach
+                    <p class="fw-bold mw-100 m-0">{{ __('fo_last_games_added') }}</p>
+                    <div class="home-text-content position-relative w-100 overflow-hidden ms-1">
+                        <div class="position-relative w-100 h-100">
+                            <p class="d-inline-block opacity-1 mw-100 m-0">
+                                @foreach($gameLatestModels as $gameLatestModel)
+                                    <a href="{{ route('fo.games.show', $gameLatestModel->slug) }}"
+                                        data-bs-tooltip="tooltip" data-bs-placement="top"
+                                        title="{{ __('fo_access_game', ['gameName' => $gameLatestModel->name]) }}">{{ $gameLatestModel->name }}</a>
+                                    <span>{{ (!$loop->last) ? '/' : '…' }}</span>
+                                @endforeach
+                            </p>
+                            <div class="home-text-content-transition position-absolute top-0 end-0 h-100"></div>
                         </div>
                     </div>
                 </div>
