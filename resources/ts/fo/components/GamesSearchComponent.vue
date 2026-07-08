@@ -146,7 +146,7 @@
       <!-- List of games -->
       <OverlayScrollbarsComponent
         class="nav-games-list rounded-3"
-        @os-scroll="(event) => { checkScroll(event.elements().scrollOffsetElement); }"
+        @os-scroll="(instance: OverlayScrollbars) => { checkScroll(instance.elements().scrollOffsetElement); }"
       >
         <template v-if="modelsParameters.games.length > 0">
           <ul
@@ -223,6 +223,7 @@
 
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { onMounted, ref, useAttrs, reactive, watch, nextTick } from "vue";
 import errors from "./../../modules/errors";
