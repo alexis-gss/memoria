@@ -6,9 +6,30 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
-## **[v5.4.1] - 13.04.26**
+## **[v5.5.0] - 08.04.26**
+
+### Added
+-   feat: ✨ add music player in the front game page
+-   feat: ✨ set btn scroll in the footer
+-   feat: ✨ add filter order and grid on pictures
+-   feat: ✨ add filter alphabetical, images and music on search
 
 ### Changed
+-   refactor: ♻️ set request validations on front methods from controllers
+-   style: 💄 update background and sizing of pictures grid and card
+-   style: 💄 add animation on rating icon button
+-   style: 💄 add transition on each side of related games slider
+
+### Fixed
+-   fix: 🐛 update github actions
+-   fix: 🐛 update axios header of csrf token
+-   fix: 🚸 use music player title animation on home page latest added games
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.4.1...v5.5.0
+
+## **[v5.4.1] - 13.04.26**
+
+### Fixed
 -   fix: 🩹 use real static page data in blade pages/breadcrumbs
 
 Full changelog: https://github.com/alexis-gss/memoria/compare/v5.4.0...v5.4.1
