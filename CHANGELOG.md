@@ -6,6 +6,18 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.5.1] - 08.04.26**
+
+### Changed
+-   chore: ⬆️ upgrade husky config version to v1.1.0
+-   style: 💄 remove useless class because of ratio on picture
+
+### Fixed
+-   fix: 🐛 set nullable in game request instead of sometimes
+-   fix: 🌐 remove space in translation
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.0...v5.5.1
+
 ## **[v5.5.0] - 08.04.26**
 
 ### Added
