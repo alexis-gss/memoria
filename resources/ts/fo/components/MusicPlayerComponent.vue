@@ -8,7 +8,7 @@
       <div class="d-flex flex-row justify-content-between -align-items-center gap-2 h-100">
         <div class="d-flex flex-column justify-content-between align-items-center gap-1 w-100">
           <!-- Cover -->
-          <div class="position-relative ratio ratio-1x1 overflow-hidden rounded-3 h-100">
+          <div class="position-relative ratio ratio-1x1 overflow-hidden rounded-3">
             <img
               v-if="musicCover"
               :src="musicCover"
