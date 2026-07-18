@@ -49,7 +49,7 @@ class StoreGameRequest extends FormRequest
             'folder_id'   => 'required|integer|exists:folders,id',
             'akora_id'    => 'required|integer|min:0',
             'published'   => 'required|boolean',
-            'music'       => 'sometimes|file|mimes:mp3,mpga|max:10240|unique:games,music',
+            'music'       => 'nullable|file|mimes:mp3,mpga|max:10240|unique:games,music',
             'tags'        => 'sometimes|array',
             'tags.*'      => 'required|array',
             'tags.*.id'   => 'required|numeric|exists:tags,id|distinct',
