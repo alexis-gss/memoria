@@ -331,7 +331,7 @@ onMounted((): void => {
 
 // * WATCHERS
 watch(() => props.isActive, (active) => {
-  if (active) {
+  if (active && window.matchMedia("(min-width: 768px)").matches) {
     nextTick(() => {
       setTimeout(() => {
         searchInput.value?.focus();
