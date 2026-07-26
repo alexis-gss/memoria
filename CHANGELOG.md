@@ -8,6 +8,14 @@ All notable changes to `memoria` will be documented in this file.
 
 ## **[v5.5.1] - 08.04.26**
 
+### Fixed
+-   fix: 🐛 set search input focus only on tablet/desktop
+-   style: 💄 clean music player sass classes
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.1...v5.5.2
+
+## **[v5.5.1] - 08.04.26**
+
 ### Changed
 -   chore: ⬆️ upgrade husky config version to v1.1.0
 -   style: 💄 remove useless class because of ratio on picture
