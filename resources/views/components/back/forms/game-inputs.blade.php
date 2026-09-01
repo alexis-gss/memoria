@@ -64,30 +64,24 @@
             </div>
             <div class="col-12 col-md-6 form-group">
                 <label class="col-form-label" for="folder_id">
-                    <b>{{ __('bo_akora_identification') }}&nbsp;*</b>
-                    <span data-bs-tooltip="tooltip" data-bs-placement="top" title="{{ __('bo_tooltip_akora_game') }}">
+                    <b>{{ __('bo_igdb_identification') }}&nbsp;*</b>
+                    <span data-bs-tooltip="tooltip" data-bs-placement="top" title="{{ __('bo_tooltip_igdb_game') }}">
                         <i class="fa-solid fa-circle-info"></i>
                     </span>
                 </label>
                 <div class="input-group">
-                    <input class="form-control @error('akora_id') is-invalid @enderror" id="akora_id" name="akora_id"
-                        type="text" value="{{ old('akora_id', $gameModel->akora_id ?? '') }}"
-                        placeholder="{{ __('validation.custom.akora_associated') }}*" required>
-                    @php
-                        $url = config('app.akora_url');
-                        $scheme = parse_url($url, PHP_URL_SCHEME);
-                        $host = parse_url($url, PHP_URL_HOST);
-                        $akoraUrl = sprintf("%s://%s", $scheme, $host);
-                    @endphp
-                    <a class="btn btn-primary" href="{{ $akoraUrl }}" data-bs-tooltip="tooltip" data-bs-placement="top"
-                        title="{{ __('bo_tooltip_home_akora') }}" target="_blank">
+                    <input class="form-control @error('igdb_id') is-invalid @enderror" id="igdb_id" name="igdb_id"
+                        type="text" value="{{ old('igdb_id', $gameModel->igdb_id ?? '') }}"
+                        placeholder="{{ __('validation.custom.igdb_associated') }}*" required>
+                    <a class="btn btn-primary" href="https://www.igdb.com/" data-bs-tooltip="tooltip" data-bs-placement="top"
+                        title="{{ __('bo_tooltip_home_igdb') }}" target="_blank">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </a>
                 </div>
                 <small class="text-body-secondary">
                     {{ sprintf('%s %s', __('validation.numeric', [
-                        'attribute' => __('validation.custom.akora_associated'),
-                    ]), __('validation.rule.akora_exist')) }}
+                        'attribute' => __('validation.custom.igdb_associated'),
+                    ]), __('validation.rule.igdb_exist')) }}
                 </small>
                 <x-back.input-error inputName="name"/>
             </div>

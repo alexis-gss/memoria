@@ -223,9 +223,9 @@ return [
         'event'             => 'évènement',
         'folder_associated' => 'dossier associé',
         'folder_mandatory'  => 'dossier obligatoire',
-        'akora_associated'  => 'Akora identification associé',
+        'igdb_associated'   => 'IGDB identification associé',
         'id'                => 'identification',
-        'inter'            => [
+        'inter'             => [
             'male'   => 'du ',
             'female' => 'de la ',
             'vowel'  => 'de l\''
@@ -253,7 +253,7 @@ return [
         'password_empty'      => 'Laisser le champs vide pour garder le mot de passe actuel.',
         'select_multiple'     => 'Sélectionner un ou plusieurs :entity parmis la liste.',
         'select_single'       => 'Sélectionner un :entity parmis la liste.',
-        'akora_exist'         => 'Doît être un id existant dans le site Akora.',
+        'igdb_exist'          => 'Doît être un id existant dans le site IGDB.',
         'music'               => 'Doît être un fichier de type MP3.',
     ],
 ];

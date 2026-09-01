@@ -23,6 +23,7 @@ import {
     faRotateLeft,
     faRotateRight,
     faSearch,
+    faSpinner,
     faThumbsUp,
     faTriangleExclamation,
     faVolumeHigh,
@@ -72,5 +73,6 @@ library.add(
     faArrowDownAZ,
     faImages,
     faChevronDown,
+    faSpinner,
 );
 dom.watch();

@@ -14,9 +14,9 @@
                 <x-front.games-search :gameModels="$gameModels" :folderModels="$folderModels" :tagModels="$tagModels" />
             </div>
             <div class="col-12 d-flex flex-column flex-lg-row justify-content-between align-items-center pt-2">
-                <div class="main-home-latest d-flex justify-content-start align-items-center pb-lg-0 pb-2">
+                <div class="main-home-latest d-flex justify-content-start align-items-center">
                     <p class="fw-bold mw-100 m-0">{{ __('fo_last_games_added') }}</p>
-                    <div class="home-text-content position-relative w-100 overflow-hidden ms-1">
+                    <div class="home-text-content position-relative w-100 overflow-hidden">
                         <div class="position-relative w-100 h-100">
                             <p class="d-inline-block opacity-1 mw-100 m-0">
                                 @foreach($gameLatestModels as $gameLatestModel)

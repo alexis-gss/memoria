@@ -20,19 +20,9 @@
                     >
                         <i class="fa fa-arrow-left"></i>
                     </a>
-                    <span class="d-lg-none mx-1">-</span>
-                    <a
-                        href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
-                        target="_blank"
-                        class="d-lg-none btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                        data-bs-tooltip="tooltip" title="{{ __('fo_access_game_details', ['gameName' => $gameModel->name]) }}"
-                    >
-                        {{ __('fo_images_details') }}
-                        <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>
-                    </a>
                 </div>
                 <span class="d-none d-lg-block mx-1">-</span>
-                <div class="d-flex flex-row justify-content-center align-items-center">
+                <div class="d-flex flex-row justify-content-center align-items-center pb-2 pb-lg-0">
                     <button
                         class="game-folder btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
                         style="background-color:{{ $gameModel->folder->color }}"
@@ -56,16 +46,16 @@
                             @endif
                         @endforeach
                     @endif
-                    <span class="d-none d-lg-block mx-1">-</span>
-                    <a
-                        href="{{ sprintf('%s/%s', config('app.akora_url'), $gameModel->akora_id) }}"
-                        target="_blank"
-                        class="d-none d-lg-block btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                        data-bs-tooltip="tooltip" title="{{ __('fo_access_game_details', ['gameName' => $gameModel->name]) }}"
-                    >
-                        {{ __('fo_images_details') }}
-                        <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-1"></i>
-                    </a>
+                </div>
+                <span class="d-none d-lg-block mx-1">-</span>
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    @php
+                        $dataGame = [
+                            'gameId' => $gameModel->igdb_id,
+                            'gameName' => $gameModel->name,
+                        ];
+                    @endphp
+                    <div class="details-button" data-json='@json($dataGame)'></div>
                 </div>
             </div>
             <div class="d-flex flex-column flex-sm-row-reverse justify-content-center align-items-center w-100 mt-3 px-1">

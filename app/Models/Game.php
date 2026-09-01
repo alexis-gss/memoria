@@ -20,7 +20,7 @@ use Spatie\Sitemap\Tags\Url;
  * @property string                          $picture      Path of the game's picture.
  * @property string                          $music        Path of the game's music.
  * @property \App\Models\Folder              $folder_id    Folder associated.
- * @property integer                         $akora_id     Id of the game in akora.
+ * @property integer                         $igdb_id      Id of the game in IGDB.
  * @property integer                         $order        Order.
  * @property boolean                         $published    Published status.
  * @property \Illuminate\Support\Carbon|null $published_at Published date update.
@@ -61,7 +61,7 @@ class Game extends Model implements Sitemapable
         'picture',
         'music',
         'folder_id',
-        'akora_id',
+        'igdb_id',
         'order',
         'published',
         'published_at',
@@ -208,7 +208,6 @@ class Game extends Model implements Sitemapable
                         Schema::creativeWorkSeries()->name($this->folder->name)
                     )
                     ->relatedLink(route('fo.games.show', $this))
-                    ->significantLink(sprintf('%s/%s', config('app.akora_url'), $this->akora_id))
                     ->primaryImageOfPage(
                         Schema::imageObject()
                             ->url(asset($this->picture))

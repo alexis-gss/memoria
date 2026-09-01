@@ -44,15 +44,15 @@ class StoreGameRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'slug'        => 'required|string|unique:games,slug|max:255',
-            'name'        => 'required|string|min:3|max:255',
-            'folder_id'   => 'required|integer|exists:folders,id',
-            'akora_id'    => 'required|integer|min:0',
-            'published'   => 'required|boolean',
-            'music'       => 'nullable|file|mimes:mp3,mpga|max:10240|unique:games,music',
-            'tags'        => 'sometimes|array',
-            'tags.*'      => 'required|array',
-            'tags.*.id'   => 'required|numeric|exists:tags,id|distinct',
+            'slug'      => 'required|string|unique:games,slug|max:255',
+            'name'      => 'required|string|min:3|max:255',
+            'folder_id' => 'required|integer|exists:folders,id',
+            'igdb_id'   => 'required|integer|min:0',
+            'published' => 'required|boolean',
+            'music'     => 'nullable|file|mimes:mp3,mpga|max:10240|unique:games,music',
+            'tags'      => 'sometimes|array',
+            'tags.*'    => 'required|array',
+            'tags.*.id' => 'required|numeric|exists:tags,id|distinct',
         ];
         return \array_merge($rules, $this->pictureRules(minWidth: 400, minHeight: 225, maxWidth: 400, maxHeight: 225));
     }
@@ -65,16 +65,16 @@ class StoreGameRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'slug'        => trans('validation.custom.slug'),
-            'name'        => trans('validation.attributes.name'),
-            'picture'     => trans('validation.attributes.image'),
-            'folder_id'   => trans('validation.custom.folder_associated'),
-            'akora_id'    => trans('validation.custom.akora_associated'),
-            'published'   => trans('validation.custom.publishment'),
-            'music'       => trans('validation.custom.music'),
-            'tags'        => trans('models.tag'),
-            'tags.*'      => trans('models.tag'),
-            'tags.*.id'   => trans(':field :inter:model', [
+            'slug'      => trans('validation.custom.slug'),
+            'name'      => trans('validation.attributes.name'),
+            'picture'   => trans('validation.attributes.image'),
+            'folder_id' => trans('validation.custom.folder_associated'),
+            'igdb_id'   => trans('validation.custom.igdb_associated'),
+            'published' => trans('validation.custom.publishment'),
+            'music'     => trans('validation.custom.music'),
+            'tags'      => trans('models.tag'),
+            'tags.*'    => trans('models.tag'),
+            'tags.*.id' => trans(':field :inter:model', [
                 'field' => trans('validation.custom.identification'),
                 'inter' => trans('validation.custom.inter.vowel'),
                 'model' => trans('models.tag'),

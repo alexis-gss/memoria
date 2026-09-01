@@ -221,7 +221,7 @@ return [
         'event'             => 'event',
         'folder_associated' => 'folder associated',
         'folder_mandatory'  => 'mandatory folder',
-        'akora_associated'  => 'Akora identification associated',
+        'igdb_associated'   => 'IGDB identification associated',
         'id'                => 'identification',
         'inter'      => [
             'male'   => 'of the ',
@@ -251,7 +251,7 @@ return [
         'password_empty'      => 'Leave the field empty to keep the actual password.',
         'select_multiple'     => 'Choose one or multiple :entity among the list.',
         'select_single'       => 'Choose a :entity among the list.',
-        'akora_exist'         => 'Must be an existing id in Akora website.',
+        'igdb_exist'          => 'Must be an existing id in IGDB website.',
         'music'               => 'Must be a MP3 file.',
     ],
 ];

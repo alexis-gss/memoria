@@ -29,7 +29,7 @@ final class GameFactory extends Factory
             'published_at' => ($published) ? now() : null,
             'folder_id'    => fake()->randomElement(Folder::pluck('id'))
                 ?? Folder::factory()->createQuietly(['published' => true]),
-            'akora_id'     => fake()->numberBetween(1, 1000),
+            'igdb_id'      => fake()->numberBetween(1, 1000),
             'order'        => 1,
         ];
     }

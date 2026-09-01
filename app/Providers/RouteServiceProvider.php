@@ -36,6 +36,11 @@ class RouteServiceProvider extends ServiceProvider
         $this->cspReportRoute();
 
         $this->routes(function () {
+            Route::middleware('api')
+                ->prefix('api')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/api.php'));
+
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web-bo.php'));
@@ -60,18 +65,18 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(150)->by($request->user()?->getKey() ?: app('clientIp'));
+            return Limit::perMinute(150)->by($request->user()?->getKey() ?: $request->ip());
         });
         RateLimiter::for('web', function (Request $request) {
-            return Limit::perMinute(150)->by($request->user()?->getKey() ?: app('clientIp'));
+            return Limit::perMinute(150)->by($request->user()?->getKey() ?: $request->ip());
         });
         RateLimiter::for('credentials', function (Request $request) {
-            return Limit::perMinute(30)->by($request->user()?->getKey() ?: app('clientIp'));
+            return Limit::perMinute(30)->by($request->user()?->getKey() ?: $request->ip());
         });
     }
 
     /**
-     * * Register CSP report URI
+     * Register CSP report URI.
      *
      * Put this function inside RouteServiceProvider,
      * and call it in RouteServiceProvider::boot
