@@ -34,6 +34,20 @@ class Handler extends ExceptionHandler
     ];
 
     /**
+     * Register the exception handling callbacks for the application.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $this->reportable(function (Throwable $e) {
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+        });
+    }
+
+    /**
      * Change the path of the render an exception into an HTTP response.
      *
      * @param \Illuminate\Http\Request $request
