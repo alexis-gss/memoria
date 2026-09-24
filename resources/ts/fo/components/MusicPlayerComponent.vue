@@ -424,7 +424,7 @@ function updateScrollState(): void {
 
   const wrapperWidth = wrapperRef.value.clientWidth;
   const titleWidth = titleRef.value.scrollWidth;
-  const overflow = titleWidth - wrapperWidth;
+  const overflow = titleWidth - (wrapperWidth - 1);
 
   if (overflow > 0) {
     scrollDistance.value = overflow + MARGE;

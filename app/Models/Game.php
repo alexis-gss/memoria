@@ -18,7 +18,7 @@ use Spatie\Sitemap\Tags\Url;
  * @property string                          $name         Name.
  * @property string                          $slug         Slug of the name.
  * @property string                          $picture      Path of the game's picture.
- * @property string                          $music        Path of the game's music.
+ * @property string|null                     $music        Path of the game's music.
  * @property \App\Models\Folder              $folder_id    Folder associated.
  * @property integer                         $igdb_id      Id of the game in IGDB.
  * @property integer                         $order        Order.
@@ -103,6 +103,7 @@ class Game extends Model implements Sitemapable
         static::updated(function (self $game) {
             static::updateSitemap();
             FileStorageHelper::removeOldFile($game, 'picture');
+            FileStorageHelper::removeOldFile($game, 'music');
         });
         static::deleting(function (self $game) {
             (new Tag())->removeTags($game);
@@ -111,6 +112,7 @@ class Game extends Model implements Sitemapable
         static::deleted(function (self $game) {
             static::updateSitemap();
             FileStorageHelper::removeOldFile($game, 'picture');
+            FileStorageHelper::removeOldFile($game, 'music');
         });
     }
 
@@ -150,7 +152,7 @@ class Game extends Model implements Sitemapable
      */
     private static function setMusic(self $game): void
     {
-        $game->music = FileStorageHelper::storeFile($game, $game->music, true);
+        $game->music = is_null($game->music) ? null : FileStorageHelper::storeFile($game, $game->music, true);
     }
 
     /**

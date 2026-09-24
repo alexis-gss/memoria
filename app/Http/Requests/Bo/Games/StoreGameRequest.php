@@ -31,6 +31,7 @@ class StoreGameRequest extends FormRequest
     {
         $this->merge([
             'slug'      => Str::of(strip_tags($this->name))->slug()->value(),
+            'music'     => $this->input('music') === null ? null : $this->input('music'),
             'published' => $this->boolean('published'),
         ]);
         $this->mergePicture();
@@ -49,7 +50,9 @@ class StoreGameRequest extends FormRequest
             'folder_id' => 'required|integer|exists:folders,id',
             'igdb_id'   => 'required|integer|min:0',
             'published' => 'required|boolean',
-            'music'     => 'nullable|file|mimes:mp3,mpga|max:10240|unique:games,music',
+            'music'     => $this->hasFile('music')
+                ? 'file|mimes:mp3,mpga|max:10240|unique:games,music'
+                : 'nullable|string',
             'tags'      => 'sometimes|array',
             'tags.*'    => 'required|array',
             'tags.*.id' => 'required|numeric|exists:tags,id|distinct',
