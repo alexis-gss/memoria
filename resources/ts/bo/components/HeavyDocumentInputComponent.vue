@@ -41,7 +41,7 @@
             readonly
           >
           <button
-            v-if="chunkFileLoaded"
+            v-show="chunkFileLoaded"
             class="btn btn-sm btn-success"
             type="button"
             :title="trans.methods.__('bo_tooltip_image_input_saved')"
@@ -71,7 +71,7 @@
         </Transition>
       </div>
       <div
-        class="progress w-100 my-1"
+        class="progress rounded-1 w-100"
         :class="[{'d-none': !isUploading}]"
       >
         <div
@@ -393,3 +393,9 @@ function initTooltips(): void {
   }, 500);
 }
 </script>
+
+<style lang="scss" scopped>
+.progress {
+  height: 31px;
+}
+</style>
