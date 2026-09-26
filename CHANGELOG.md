@@ -6,7 +6,21 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
-## **[v5.5.1] - 08.04.26**
+## **[v5.5.3] - 25.09.26**
+
+### Changed
+-   chore: 📈 add sentry laravel
+
+### Fixed
+-   fix: 🐛 replace akora url by igdb link from api
+-   fix: 🐛 set null when there isn't game music
+-   fix: 🐛 resolve some warning in error page
+-   fix: 🚸 reorganize game buttons position in front
+-   style: 💄 set the height of the progress bar so that it matches the height of the input field
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.2...v5.5.3
+
+## **[v5.5.2] - 26.07.26**
 
 ### Fixed
 -   fix: 🐛 set search input focus only on tablet/desktop
@@ -14,7 +28,7 @@ All notable changes to `memoria` will be documented in this file.
 
 Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.1...v5.5.2
 
-## **[v5.5.1] - 08.04.26**
+## **[v5.5.1] - 18.07.26**
 
 ### Changed
 -   chore: ⬆️ upgrade husky config version to v1.1.0
@@ -26,7 +40,7 @@ Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.1...v5.5.2
 
 Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.0...v5.5.1
 
-## **[v5.5.0] - 08.04.26**
+## **[v5.5.0] - 08.07.26**
 
 ### Added
 -   feat: ✨ add music player in the front game page
