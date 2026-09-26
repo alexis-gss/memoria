@@ -1,5 +1,8 @@
 <template>
-  <div ref="detailsButton">
+  <div
+    ref="detailsButton"
+    class="d-inline-flex align-items-center"
+  >
     <a
       v-if="url !== null"
       :href="url"

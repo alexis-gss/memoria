@@ -4,6 +4,37 @@
 @section('description', __('fo_game_description', ['game' => $gameModel->name]))
 @section('breadcrumb', request()->route()->getName())
 
+@php
+    $publishedTags = $gameModel->tags
+        ->where('published', true)
+        ->sortBy('name')
+        ->values();
+
+    $dataGame = [
+        'gameId' => $gameModel->igdb_id,
+        'gameName' => $gameModel->name,
+    ];
+
+    $publicationLabel = $gameModel->published_at->lessThan(Carbon::now()->subDay())
+        ? sprintf('%s %s', str(__('validation.custom.published_at'))->ucFirst(), $gameModel->published_at->isoFormat('LL'))
+        : sprintf('%s %s', str(__('validation.custom.published'))->ucFirst(), $gameModel->published_at->diffForHumans());
+
+    $visitCount = $gameModel->visits->count();
+    $visitLabel = sprintf('%s %s', $visitCount, $visitCount === 1
+        ? __('models.visit')
+        : str(__('models.visit'))->plural()
+    );
+
+    $pictureData = [
+        'gameName' => $gameModel->name,
+        'gameSlug' => $gameModel->slug,
+        'pictureModels' => $pictureModels,
+        'ratingModels' => $ratingModels,
+        'routeName' => 'fo.games.pictures',
+        'relatedGamesViews' => $relatedGamesViews,
+    ];
+@endphp
+
 @section('content')
     <section class="main-page" data-aos="fade">
         <div class="col-12 py-5">
@@ -11,82 +42,41 @@
                 {{ $gameModel->name }}
                 <span class="d-none d-sm-block angles"></span>
             </h1>
-            <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center user-select-none w-100 text-center">
-                <div class="d-flex flex-row justify-content-center align-items-center pb-2 pb-lg-0">
-                    <a
-                        href="{{ route('fo.games.index') }}"
-                        class="btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                        data-bs-tooltip="tooltip" title="{{ __('fo_other_back_home') }}"
-                    >
-                        <i class="fa fa-arrow-left"></i>
-                    </a>
-                </div>
-                <span class="d-none d-lg-block mx-1">-</span>
-                <div class="d-flex flex-row justify-content-center align-items-center pb-2 pb-lg-0">
-                    <button
-                        class="game-folder btn btn-primary text-decoration-none text-white border-0 rounded-2 px-2 py-0"
-                        style="background-color:{{ $gameModel->folder->color }}"
-                        name="folder"
-                        value="{{ $gameModel->folder->slug }}"
-                        data-bs-tooltip="tooltip" title="{{ __('fo_search_filter_by_folder', ['folder' => $gameModel->folder->name]) }}"
-                    >
-                        {{ $gameModel->folder->name }}
-                    </button>
-                    @if ($gameModel->tags->isNotEmpty() && $gameModel->tags->contains('published', true))
-                        <span class="ms-1">-</span>
-                        @foreach ($gameModel->tags->sortBy('name') as $tag)
-                            @if ($tag->published)
-                                <button
-                                    class="game-tags btn btn-secondary text-decoration-none text-white border-0 rounded-2 px-2 py-0 ms-1"
-                                    name="tag" value="{{ $tag->slug }}"
-                                    data-bs-tooltip="tooltip" title="{{ __('fo_search_filter_by_tag', ['tag' => $tag->name]) }}"
-                                >
-                                    {{ $tag->name }}
-                                </button>
-                            @endif
-                        @endforeach
-                    @endif
-                </div>
-                <span class="d-none d-lg-block mx-1">-</span>
-                <div class="d-flex flex-row justify-content-center align-items-center">
-                    @php
-                        $dataGame = [
-                            'gameId' => $gameModel->igdb_id,
-                            'gameName' => $gameModel->name,
-                        ];
-                    @endphp
+            {{-- MOBILE --}}
+            <div class="d-flex d-lg-none flex-column align-items-center user-select-none w-100 text-center">
+                <div class="d-flex flex-row justify-content-center align-items-center mb-2">
+                    <x-front.back-button />
+                    <span class="mx-1">-</span>
                     <div class="details-button" data-json='@json($dataGame)'></div>
                 </div>
+                <div class="d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <x-front.game-filters :folder="$gameModel->folder" :publishedTags="$publishedTags" />
+                </div>
+            </div>
+            {{-- DESKTOP --}}
+            <div class="d-none d-lg-flex flex-row justify-content-center align-items-center user-select-none w-100 text-center">
+                <x-front.back-button />
+                <span class="mx-1">-</span>
+                <x-front.game-filters :folder="$gameModel->folder" :publishedTags="$publishedTags" />
+                <span class="mx-1">-</span>
+                <div class="details-button" data-json='@json($dataGame)'></div>
             </div>
             <div class="d-flex flex-column flex-sm-row-reverse justify-content-center align-items-center w-100 mt-3 px-1">
                 <p class="text-secondary mb-3 ms-sm-5 m-sm-0">
                     <i class="fa-regular fa-eye"></i>
-                    {{ sprintf(
-                        '%s %s',
-                        $gameModel->visits->count(),
-                        $gameModel->visits->isNotEmpty() ? str(__('models.visit'))->plural() : __('models.visit'),
-                    ) }}
+                    {{ $visitLabel }}
                 </p>
                 <p class="text-secondary m-0">
                     <i class="fa-regular fa-clock"></i>
-                    {{ $gameModel->published_at->lessThan(Carbon::now()->sub(1, 'day'))
-                        ? sprintf('%s %s', str(__('validation.custom.published_at'))->ucFirst(), $gameModel->published_at->isoFormat('LL'))
-                        : sprintf('%s %s', str(__('validation.custom.published'))->ucFirst(), $gameModel->published_at->diffForHumans()) }}
+                    {{ $publicationLabel }}
                 </p>
             </div>
         </div>
         <div class="col-12">
-            @php
-                $dataGame = [
-                    'gameName' => $gameModel->name,
-                    'gameSlug' => $gameModel->slug,
-                    'pictureModels' => $pictureModels,
-                    'ratingModels' => $ratingModels,
-                    'routeName' => 'fo.games.pictures',
-                    'relatedGamesViews' => $relatedGamesViews,
-                ];
-            @endphp
-            <div class="game-pictures" data-json='@json($dataGame)'></div>
+            <div
+                class="game-pictures"
+                data-json='@json($pictureData)'
+            ></div>
         </div>
     </section>
 @endsection
