@@ -28,7 +28,7 @@ class RedirectIfAuthenticated
                         return \redirect()->route('fo.games.index');
                     case 'backend':
                         if (!$request->routeIs('bo.*')) {
-                            continue;
+                            continue 2;
                         }
                         return \redirect()->route('bo.home');
                     default:
