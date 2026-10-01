@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a26724d4e7e709d3d5d3e7f89449776d",
+    "content-hash": "52a4125688ce02360db0282df0980e2f",
     "packages": [
         {
             "name": "alexis-gss/laravel-activity-logs",

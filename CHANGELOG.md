@@ -6,6 +6,19 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.5.4] - 01.10.26**
+
+### Changed
+-   refactor: ♻️ set new marquee scroll module
+-   chore: ⬆️ update dependencies
+
+### Fixed
+-   fix: 🚸 update icon when the music cannot be played
+-   fix: 🐛 open the modal navigation when clicking on any of the filter buttons
+-   fix: 🐛 fix corrupted and partial chunk uploads
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.3...v5.5.4
+
 ## **[v5.5.3] - 25.09.26**
 
 ### Changed
