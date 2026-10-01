@@ -379,17 +379,18 @@ function clearInputSearch(): void {
   * @return {void}
 */
 function initButtons(): void {
-  let breadcrumbs = document.querySelector(".btn-breadcrumbs");
-  breadcrumbs?.addEventListener("click", () => {
+  document.querySelector(".btn-breadcrumbs")?.addEventListener("click", () => {
     showNavigation();
   });
-  let folder = document.querySelector(".game-folder");
-  folder?.addEventListener("click", (event) => {
-    setSelectedValue(event);
-    showNavigation();
+
+  document.querySelectorAll(".game-folder").forEach((folder) => {
+    folder.addEventListener("click", (event) => {
+      setSelectedValue(event);
+      showNavigation();
+    });
   });
-  let tags = document.querySelectorAll(".game-tags");
-  tags.forEach(tag => {
+
+  document.querySelectorAll(".game-tags").forEach((tag) => {
     tag.addEventListener("click", (event) => {
       setSelectedValue(event);
       showNavigation();
