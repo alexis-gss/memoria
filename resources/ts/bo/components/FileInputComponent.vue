@@ -312,7 +312,7 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .file-input-vue {
   input.form-control {
     direction: ltr;

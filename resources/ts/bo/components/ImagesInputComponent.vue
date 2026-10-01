@@ -289,7 +289,7 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 .image-input,
 .images-input {
   .right-aligned {

@@ -253,19 +253,20 @@ onMounted((): void => {
   * @return void
   */
 function initResumable(): void {
-  resumableJS.value = new Resumable({
-    chunkSize: 8 * 1024 * 1024, // 8MB.
-    simultaneousUploads: 5,
+  const config = {
+    chunkSize: 2 * 1024 * 1024,
+    simultaneousUploads: 1,
+    maxChunkRetries: 5,
+    chunkRetryInterval: 1000,
+    permanentErrors: [400, 404, 415, 422, 501],
     maxFiles: 75,
     testChunks: false,
     target: getUploadDocumentRoute(),
-    query: {
-      gameSlug: gameSlug.value,
-    },
-    headers: {
-      "X-CSRF-TOKEN": csrf.value,
-    },
-  });
+    query: { gameSlug: gameSlug.value },
+    headers: { "X-CSRF-TOKEN": csrf.value },
+  };
+
+  resumableJS.value = new Resumable(config);
   resumableJS.value.on("fileAdded", fileAdded);
   resumableJS.value.on("fileSuccess", fileSuccess);
   resumableJS.value.on("fileError", fileError);
@@ -333,8 +334,13 @@ function fileSuccess(file: { file: File }, message: string): void {
   * Set a new error message.
   * @return void
   */
-function fileError(): void {
-  message.value = trans.methods.__("bo_other_chunk_failed");
+function fileError(file: unknown, msg: string): void {
+  try {
+    message.value = JSON.parse(msg).error ?? trans.methods.__("bo_other_chunk_failed");
+  } catch {
+    message.value = trans.methods.__("bo_other_chunk_failed");
+  }
+  isUploading.value = false;
 }
 
 /**
@@ -394,7 +400,7 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 .progress {
   height: 31px;
 }

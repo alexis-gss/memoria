@@ -280,7 +280,7 @@ function deleteRank(e: Event, model: RankObject): void|boolean {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 .ranks-games {
   .loading {
     z-index: 5;

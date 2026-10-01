@@ -203,7 +203,7 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";

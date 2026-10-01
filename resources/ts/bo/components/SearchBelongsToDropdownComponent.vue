@@ -372,7 +372,7 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 @import "vue-select/dist/vue-select.css";
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";

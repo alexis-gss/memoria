@@ -36,8 +36,8 @@ class PictureController extends Controller
             // If you are not using move, you need to manually delete the file: unlink($save->getFile()->getPathname()).
             return $this->store(
                 $save->getFile(),
-                (isset($request->uuid)) ? $request->uuid : false,
-                (isset($request->gameSlug)) ? $request->gameSlug : false
+                $request->input('uuid', false),
+                $request->input('gameSlug', false)
             );
         }
         // We are in chunk mode, lets send the current progress.
@@ -50,50 +50,61 @@ class PictureController extends Controller
     }
 
     /**
-     * Store the uploaded image on .webp format in storage.
+     * Validate the assembled upload and store it as a .webp image.
      *
      * @param \Illuminate\Http\UploadedFile $file
      * @param mixed                         $uuid
-     * @param string                        $gameSlug
+     * @param string|false                  $gameSlug
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException Bla.
      */
-    protected function store(UploadedFile $file, mixed $uuid, string $gameSlug): \Illuminate\Http\JsonResponse
+    protected function store(UploadedFile $file, mixed $uuid, string|false $gameSlug): \Illuminate\Http\JsonResponse
     {
+        // Generate a new UUID if none was provided.
         if ($uuid === false) {
             $uuid = Str::uuid();
         }
 
-        /** @var string $currentImageName Current name of the uploaded image */
-        $currentImageName = $uuid . "." . $file->getClientOriginalExtension();
-
-        /** @var string $finalImageName Finale name of the uploaded image */
-        $finalImageName = $uuid . ".webp";
-
-        /** @var string $finalPath Image storage folder path */
-        $finalPath = Storage::disk("public")->path(sprintf("pictures/%s/", $gameSlug));
-
-        // Save image on default format.
-        $file->move($finalPath, $currentImageName);
-
-        // Change the image format at webp.
-        /** @var resource|\GdImage|false $image */
-        $image = false;
-        switch ($file->getClientOriginalExtension()) {
-            case 'jpg':
-                $image = imagecreatefromjpeg($finalPath . $currentImageName);
-                break;
-            case 'jpeg':
-                $image = imagecreatefromjpeg($finalPath . $currentImageName);
-                break;
-            case 'png':
-                $image = imagecreatefrompng($finalPath . $currentImageName);
-                break;
+        // The game slug is required to build the storage path.
+        if ($gameSlug === false) {
+            abort(422, 'Missing parameter gameSlug');
         }
-        imagewebp($image, $finalPath . $finalImageName);
 
-        // Delete uploaded image with old extension.
-        unlink($finalPath . $currentImageName);
+        // Build the destination folder and create it if it doesn't exist yet.
+        $finalPath = Storage::disk("public")->path(sprintf("pictures/%s/", $gameSlug));
+        if (!is_dir($finalPath)) {
+            mkdir($finalPath, 0755, true);
+        }
+
+        // Path of the temporary file assembled from the chunks.
+        $tmpPath = $file->getPathname();
+
+        // Check the file is a real image based on its content, not its extension.
+        // Fails for corrupted, truncated or non-image files.
+        // @phpcs:disabled Generic.PHP.NoSilencedErrors.Discouraged
+        if (@getimagesize($tmpPath) === false) {
+            unlink($tmpPath);
+            return response()->json(['error' => 'Invalid or corrupted image file'], 422);
+        }
+
+        // Decode the image with automatic format detection (JPEG, PNG, GIF, WebP…).
+        $image = @imagecreatefromstring(file_get_contents($tmpPath));
+        // @phpcs:enable
+        if ($image === false) {
+            unlink($tmpPath);
+            return response()->json(['error' => 'Image format not supported'], 422);
+        }
+
+        // Convert palette images to true color and preserve PNG transparency.
+        imagepalettetotruecolor($image);
+        imagealphablending($image, true);
+        imagesavealpha($image, true);
+
+        // Save as .webp and free the memory used by the image.
+        imagewebp($image, $finalPath . $uuid . ".webp", IMG_WEBP_LOSSLESS);
+        imagedestroy($image);
+
+        // Remove the temporary assembled file.
+        unlink($tmpPath);
 
         return response()->json([
             'uid' => $uuid,

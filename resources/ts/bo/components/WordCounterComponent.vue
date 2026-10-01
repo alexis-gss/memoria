@@ -100,7 +100,7 @@ function calculateValues(string: string): Array<number> {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 #word-counter + input[type="text"],
 .word-counter + input[type="text"],
 #word-counter + textarea,

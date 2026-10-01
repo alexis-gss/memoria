@@ -1029,7 +1029,7 @@ function initTooltips(): void {
 }
 </script>
 
-<style lang="scss" scopped>
+<style lang="scss">
 @import "cropperjs/dist/cropper.css";
 
 .image-input-vue {
