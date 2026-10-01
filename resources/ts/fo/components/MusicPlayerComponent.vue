@@ -64,7 +64,7 @@
                 shouldScroll ? 'position-absolute top-0 start-0' : 'position-relative',
                 { 'is-scrolling': isScrollActive }
               ]"
-              :style="{ '--scroll-duration': scrollDuration + 's', '--scroll-anim-name': animationName }"
+              :style="{ '--scroll-duration': scrollDuration + 's' }"
             >
               <span>{{ musicTitle }}</span>
               <span
@@ -229,6 +229,7 @@ import trans from "../../modules/trans";
 import route from "../../modules/route";
 import errors from "../../modules/errors";
 import { Tooltips } from "../../modules/tooltips";
+import { MarqueeScroll } from "../../modules/marqueeScroll";
 
 defineOptions({
   name: "MusicPlayerComponent",
@@ -246,11 +247,6 @@ const emit = defineEmits<{
 // * CONSTANTS
 const PLAYBACK_RATES = [1, 1.25, 1.5, 2, 0.5, 0.75] as const;
 const SKIP_SECONDS = 10;
-const PX_PER_SECOND = 40;
-const PAUSE_START = 2;
-const PAUSE_END = 2;
-const FADE_DURATION = 0.3;
-const MARGE = 16;
 
 const _data = parseAttrsJson();
 const _meta = _data.data ?? {};
@@ -261,7 +257,6 @@ const musicPlayer = ref<HTMLDivElement | null>(null);
 const audioEl = ref<HTMLAudioElement | null>(null);
 const wrapperRef = ref<HTMLDivElement | null>(null);
 const titleRef = ref<HTMLParagraphElement | null>(null);
-const scrollDistance = ref<number>(0);
 const scrollDuration = ref<number>(8);
 const shouldScroll = ref<boolean>(false);
 const isAudioLoading = ref<boolean>(Boolean(_meta.src));
@@ -271,6 +266,10 @@ const props = defineProps<{
   isActive?: boolean;
 }>();
 
+/**
+ * Parse the JSON passed through the "json" attribute.
+ * @return {Record<string, any>}
+ */
 function parseAttrsJson(): Record<string, any> {
   try {
     return JSON.parse(String(attrs.json ?? "{}"));
@@ -280,9 +279,6 @@ function parseAttrsJson(): Record<string, any> {
 }
 
 // Music metadata (issues des tags ID3 extraits côté backend).
-// On garde des fallbacks défensifs : _meta peut être incomplet
-// si le fichier n'a pas tous les tags, voire absent si le morceau
-// n'a pas pu être analysé côté serveur.
 const musicTitle = ref<string>(_meta.title ?? "");
 const musicArtist = ref<string>(_meta.artist ?? "");
 const musicSrc = ref<string>(_meta.src ?? "");
@@ -300,11 +296,9 @@ const hasError = ref<boolean>(false);
 const playbackRate = ref<number>(Number(_opts.speed) || 1);
 
 // Other.
-const animationName = `music-title-scroll-${Math.random().toString(36).slice(2, 8)}`;
-let styleEl: HTMLStyleElement | null = null;
-let resizeObserver: ResizeObserver | null = null;
 const tooltips = ref<Tooltips | null>(null);
 const isSeeking = ref<boolean>(false);
+let marquee: MarqueeScroll | null = null;
 
 // * LIFECYCLE
 onMounted((): void => {
@@ -319,18 +313,26 @@ onMounted((): void => {
     play();
   }
 
-  updateScrollState();
-  if (wrapperRef.value) {
-    resizeObserver = new ResizeObserver(updateScrollState);
-    resizeObserver.observe(wrapperRef.value);
+  if (wrapperRef.value && titleRef.value) {
+    marquee = new MarqueeScroll({
+      wrapper: wrapperRef.value,
+      title: titleRef.value,
+      pauseStart: 4,
+      startOffset: 16,
+      tolerance: 1,
+      onChange: ({ shouldScroll: scroll, duration }) => {
+        shouldScroll.value = scroll;
+        scrollDuration.value = duration;
+      },
+    });
+    marquee.start();
   }
   initTooltips();
 });
 
 onBeforeUnmount((): void => {
   audioEl.value?.pause();
-  resizeObserver?.disconnect();
-  styleEl?.remove();
+  marquee?.destroy();
 });
 
 // * COMPUTED
@@ -372,13 +374,11 @@ watch(isPlaying, (val) => {
 });
 
 watch([() => musicTitle.value, () => musicArtist.value], () => {
-  nextTick(updateScrollState);
+  nextTick(() => marquee?.update());
 });
 
 watch(() => props.isActive, (active) => {
-  if (active) {
-    nextTick(updateScrollState);
-  }
+  if (active) nextTick(() => marquee?.update());
 });
 
 watch([isMuted, isPlaying], () => {
@@ -386,55 +386,6 @@ watch([isMuted, isPlaying], () => {
 });
 
 // * METHODS
-function ensureStyleEl(): HTMLStyleElement {
-  if (!styleEl) {
-    styleEl = document.createElement("style");
-    document.head.appendChild(styleEl);
-  }
-  return styleEl;
-}
-
-function buildKeyframes(distance: number): void {
-  const scrollPhase = Math.max(distance / PX_PER_SECOND, 0.5);
-  const total = PAUSE_START + scrollPhase + PAUSE_END + FADE_DURATION * 2;
-
-  const p1 = (PAUSE_START / total) * 100;
-  const p2 = ((PAUSE_START + scrollPhase) / total) * 100;
-  const p3 = ((PAUSE_START + scrollPhase + PAUSE_END) / total) * 100;
-  const p4 = ((PAUSE_START + scrollPhase + PAUSE_END + FADE_DURATION) / total) * 100;
-  const p4Snap = Math.min(p4 + 0.05, 99.99);
-
-  scrollDuration.value = total;
-
-  ensureStyleEl().textContent = `
-    @keyframes ${animationName} {
-      0% { transform: translate3d(${MARGE}px,0,0); opacity: 1; }
-      ${p1.toFixed(3)}% { transform: translate3d(${MARGE}px,0,0); opacity: 1; }
-      ${p2.toFixed(3)}% { transform: translate3d(-${distance}px,0,0); opacity: 1; }
-      ${p3.toFixed(3)}% { transform: translate3d(-${distance}px,0,0); opacity: 1; }
-      ${p4.toFixed(3)}% { transform: translate3d(-${distance}px,0,0); opacity: 0; }
-      ${p4Snap.toFixed(3)}% { transform: translate3d(${MARGE}px,0,0); opacity: 0; }
-      100% { transform: translate3d(${MARGE}px,0,0); opacity: 1; }
-    }
-  `;
-}
-
-function updateScrollState(): void {
-  if (!wrapperRef.value || !titleRef.value) return;
-
-  const wrapperWidth = wrapperRef.value.clientWidth;
-  const titleWidth = titleRef.value.scrollWidth;
-  const overflow = titleWidth - (wrapperWidth - 1);
-
-  if (overflow > 0) {
-    scrollDistance.value = overflow + MARGE;
-    buildKeyframes(scrollDistance.value);
-    shouldScroll.value = true;
-  } else {
-    scrollDistance.value = 0;
-    shouldScroll.value = false;
-  }
-}
 
 /**
  * Ajax call to save options in cookie.
@@ -497,11 +448,19 @@ function pause(): void {
   isPlaying.value = false;
 }
 
+/**
+ * Toggle loop mode and save the preference.
+ * @return {void}
+ */
 function toggleLoop(): void {
   isLooping.value = !isLooping.value;
   saveCookiePreferences();
 }
 
+/**
+ * Toggle mute and save the preference.
+ * @return {void}
+ */
 function toggleMute(): void {
   if (!audioEl.value) return;
   isMuted.value = !isMuted.value;
@@ -509,20 +468,38 @@ function toggleMute(): void {
   saveCookiePreferences();
 }
 
+/**
+ * Save the preferences when the volume slider is released.
+ * @return {void}
+ */
 function onVolumeChange(): void {
   saveCookiePreferences();
 }
 
+/**
+ * Flag the progress bar as being dragged.
+ * Prevents timeupdate from overwriting the slider value.
+ * @return {void}
+ */
 function onSeekInput(): void {
   isSeeking.value = true;
 }
 
+/**
+ * Apply the chosen position to the audio when the progress bar is released.
+ * @return {void}
+ */
 function onSeekEnd(): void {
   if (!audioEl.value) return;
   audioEl.value.currentTime = currentTime.value;
   isSeeking.value = false;
 }
 
+/**
+ * Skip forward or backward in the track, clamped between 0 and the duration.
+ * @param {number} seconds Seconds to skip (negative to go back).
+ * @return {void}
+ */
 function skip(seconds: number): void {
   if (!audioEl.value) return;
   const next = Math.min(Math.max(audioEl.value.currentTime + seconds, 0), duration.value || 0);
@@ -530,6 +507,10 @@ function skip(seconds: number): void {
   currentTime.value = next;
 }
 
+/**
+ * Switch to the next playback speed and save the preference.
+ * @return {void}
+ */
 function cyclePlaybackRate(): void {
   if (!audioEl.value) return;
   const idx = PLAYBACK_RATES.indexOf(playbackRate.value as typeof PLAYBACK_RATES[number]);
@@ -539,17 +520,29 @@ function cyclePlaybackRate(): void {
   saveCookiePreferences();
 }
 
+/**
+ * Sync the current time with the audio element (unless the user is seeking).
+ * @return {void}
+ */
 function onTimeUpdate(): void {
   if (!audioEl.value || isSeeking.value) return;
   currentTime.value = audioEl.value.currentTime;
 }
 
+/**
+ * Store the track duration once the metadata is loaded.
+ * @return {void}
+ */
 function onLoadedMetadata(): void {
   if (!audioEl.value) return;
   duration.value = audioEl.value.duration;
   hasError.value = false;
 }
 
+/**
+ * Reset the playback state when the track ends (unless looping).
+ * @return {void}
+ */
 function onEnded(): void {
   if (!isLooping.value) {
     isPlaying.value = false;
@@ -557,16 +550,29 @@ function onEnded(): void {
   }
 }
 
+/**
+ * Clear the error state when playback actually starts.
+ * @return {void}
+ */
 function onPlayingEvent(): void {
   hasError.value = false;
 }
 
+/**
+ * Handle an audio loading/playback error.
+ * @return {void}
+ */
 function onAudioError(): void {
   hasError.value = true;
   isPlaying.value = false;
   isAudioLoading.value = false;
 }
 
+/**
+ * Format a time in seconds as mm:ss.
+ * @param {number} time Time in seconds.
+ * @return {string}
+ */
 function formatTime(time: number): string {
   if (isNaN(time)) return "00:00";
   const minutes = Math.floor(time / 60);
@@ -574,18 +580,34 @@ function formatTime(time: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(secondes).padStart(2, "0")}`;
 }
 
+/**
+ * Show the loader when the audio starts loading.
+ * @return {void}
+ */
 function onAudioLoadStart(): void {
   isAudioLoading.value = true;
 }
 
+/**
+ * Hide the audio loader once the audio can be played.
+ * @return {void}
+ */
 function onAudioCanPlay(): void {
   isAudioLoading.value = false;
 }
 
+/**
+ * Hide the image loader once the cover is loaded.
+ * @return {void}
+ */
 function onImageLoad(): void {
   isImageLoading.value = false;
 }
 
+/**
+ * Hide the image loader if the cover failed to load.
+ * @return {void}
+ */
 function onImageError(): void {
   isImageLoading.value = false;
 }
