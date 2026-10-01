@@ -18,12 +18,6 @@
               @load="onImageLoad"
               @error="onImageError"
             >
-            <div
-              v-else
-              class="music-panel__artwork-placeholder"
-            >
-              <FontAwesomeIcon icon="fa-solid fa-music" />
-            </div>
             <!-- Loader overlay -->
             <Transition name="now-playing">
               <div
@@ -46,8 +40,15 @@
                 v-if="hasError"
                 class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-75 text-white small gap-1"
               >
-                <FontAwesomeIcon icon="fa-solid fa-triangle-exclamation" />
-                <span>{{ trans.methods.__('fo_music_error') }}</span>
+                <span class="no-result-icon">
+                  <FontAwesomeIcon
+                    icon="fa-solid fa-triangle-exclamation"
+                    class="w-100 h-100"
+                  />
+                </span>
+                <p class="text-center m-0 pt-2">
+                  {{ trans.methods.__('fo_music_error') }}
+                </p>
               </div>
             </Transition>
           </div>

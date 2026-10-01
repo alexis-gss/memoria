@@ -205,7 +205,7 @@
     "fo_next": "Next",
     "fo_access_game": "Access to the game page :gameName",
     "fo_access_game_details": "Access to the detailed IGDB game page :gameName",
-    "fo_music_error": "Unable to play this track",
+    "fo_music_error": "Unable to play this track.",
     "fo_music_seek": "Seek through the track",
     "fo_music_volume": "Volume",
     "fo_music_unmute": "Unmute",

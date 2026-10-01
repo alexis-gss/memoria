@@ -204,7 +204,7 @@
     "fo_next": "suivante",
     "fo_access_game": "Accéder à la page du jeu :gameName",
     "fo_access_game_details": "Accéder à la page détaillée IGDB du jeu :gameName",
-    "fo_music_error": "Impossible de lire ce morceau",
+    "fo_music_error": "Impossible de lire ce morceau.",
     "fo_music_seek": "Avancer ou reculer dans le morceau",
     "fo_music_volume": "Volume",
     "fo_music_unmute": "Réactiver le son",
