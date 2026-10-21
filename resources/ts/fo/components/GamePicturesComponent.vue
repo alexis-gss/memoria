@@ -74,6 +74,7 @@
                 <div class="shadow rounded-3">
                   <a
                     :href="getPicturePath(getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
+                    :data-picture-id="gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id"
                     class="btn btn-primary bg-transparent w-100 p-0 border-0 glightbox overflow-hidden"
                     data-gallery="games-pictures"
                   >
@@ -100,18 +101,17 @@
                     </div>
                   </a>
                   <button
-                    :class="['picture-ratings btn btn-primary text-dark bg-white border-0 position-absolute bottom-0 end-0 m-1 z-2', {disabled: ratingLoading}]"
+                    :class="['picture-ratings btn btn-primary text-dark bg-white border-0 position-absolute bottom-0 end-0 m-1 z-2', { disabled: ratingLoading }]"
                     :disabled="ratingLoading"
-                    @click="ajaxPictureRating(gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id, getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
-                    :aria-label="trans.methods.__('Cliquez pour ajouter un like ou l\'enlever')"
+                    @click="ajaxPictureRating(
+                      gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id,
+                      $event,
+                    )"
+                    :aria-label="trans.methods.__('fo_image_like')"
                     type="button"
                   >
-                    <span
-                      :id="`ratings-${gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].id}`"
-                      :data-picture-id="getPictureNumber(paginateIndex, templateIndex) + pictureIndex"
-                      class="me-1"
-                    >
-                      {{ (gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].ratings_count) }}
+                    <span class="me-1">
+                      {{ gamePictures[getPictureNumber(paginateIndex, templateIndex) + pictureIndex].ratings_count }}
                     </span>
                     <FontAwesomeIcon
                       icon="fa-regular fa-thumbs-up"
@@ -172,8 +172,8 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Toast } from "bootstrap";
-import GLightbox from "glightbox";
 import { computed, onMounted, ref, useAttrs, watch } from "vue";
+import { useGlightbox } from "./../utilities/glightbox";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
 import trans from "./../../modules/trans";
@@ -194,7 +194,6 @@ const gamePage = ref<number>(0);
 const gameLastPage = ref<number>(0);
 const gameItems = ref<number>(0);
 const gameLoading = ref<boolean>(false);
-const gameViewer = ref<GLightbox|null>(null);
 const gamePictures = ref<Array<{
   id: number,
   uuid: string,
@@ -228,6 +227,21 @@ const routeName = ref<string>("");
 const ratingLoading = ref<boolean>(false);
 const tooltips = ref<Tooltips|null>(null);
 const gridChanging = ref<boolean>(false);
+
+/** Glightbox */
+const lightbox = useGlightbox({
+  selector: ".glightbox",
+  labels: {
+    like: trans.methods.__("fo_image_like"),
+    fullscreen: trans.methods.__("fo_images_fullscreen"),
+  },
+  likes: {
+    isLiked: (pictureId) => picturesRatings.value.includes(pictureId),
+    count: (pictureId) => gamePictures.value.find((picture) => picture.id === pictureId)?.ratings_count ?? 0,
+    isBusy: () => ratingLoading.value,
+    toggle: (pictureId) => ajaxPictureRating(pictureId),
+  },
+});
 
 // * LIFECYCLE
 onMounted((): void => {
@@ -392,12 +406,7 @@ function getPicturePath(number: number): string {
   * @return {void}
   */
 function updateGlightbox(): void {
-  setTimeout(() => {
-    gameViewer.value?.destroy();
-    gameViewer.value = new GLightbox({
-      selector: ".glightbox",
-    });
-  }, 800);
+  setTimeout(lightbox.init, 800);
 }
 
 /**
@@ -413,19 +422,24 @@ function getUpdateRatingRoute(): string {
 }
 
 /**
-  * Update picture ratings.
+  * Toggle the like of a picture in the reactive state:
+  * the grid and the lightbox both react to it.
+  * @param {number} pictureId
   * @return {void}
   */
 function updatePictureRatings(pictureId: number): void {
-  // Picture ratings button
-  (picturesRatings.value.includes(pictureId)) ?
-    picturesRatings.value.splice(picturesRatings.value.indexOf(pictureId), 1) :
+  const picture = gamePictures.value.find((item) => item.id === pictureId);
+  const likedIndex = picturesRatings.value.indexOf(pictureId);
+  const isNowLiked = likedIndex === -1;
+
+  if (isNowLiked) {
     picturesRatings.value.push(pictureId);
-  // Picture ratings count
-  const pictureRatingNode = document.getElementById(`ratings-${pictureId}`);
-  pictureRatingNode!.textContent = String(
-    Number(pictureRatingNode?.textContent) +
-      ((picturesRatings.value.includes(pictureId)) ? +1 : -1));
+  } else {
+    picturesRatings.value.splice(likedIndex, 1);
+  }
+  if (picture) {
+    picture.ratings_count += isNowLiked ? 1 : -1;
+  }
 }
 
 /**
@@ -444,28 +458,35 @@ function createBoostrapToastFromId(toastId: string): void {
 }
 
 /**
-  * Update a specific picture rating.
+  * Like / unlike a picture (from the grid or from the lightbox).
   * @param {number} id
-  * @param {number} place
+  * @param {Event} event
   * @return {void}
   */
-function ajaxPictureRating(id: number, place: number): void {
+function ajaxPictureRating(id: number, event?: Event): void {
+  if (ratingLoading.value) {
+    return;
+  }
+  const button = event?.currentTarget as HTMLButtonElement | null;
+  const place = gamePictures.value.findIndex((picture) => picture.id === id);
   ratingLoading.value = true;
   window.axios
     .post(getUpdateRatingRoute(), { picture_id: id, picture_place: place })
     .then((reponse) => {
-      let toastContainer = document.querySelector(".toast-container") as HTMLDivElement|null;
-      if (toastContainer) {
-        // Add the view to the toast wrapper.
-        toastContainer!.innerHTML += reponse.data.view;
-        updatePictureRatings(reponse.data.pictureId);
-        createBoostrapToastFromId(reponse.data.toastId);
-      } else {
+      const toastContainer = document.querySelector(".toast-container") as HTMLDivElement|null;
+      if (!toastContainer) {
         throw new Error("Toast wrapper is not present");
       }
+      // Add the view to the toast wrapper.
+      toastContainer.innerHTML += reponse.data.view;
+      updatePictureRatings(reponse.data.pictureId);
+      createBoostrapToastFromId(reponse.data.toastId);
     })
-    .then(() => { ratingLoading.value = false; })
-    .catch(errors.methods.ajaxErrorHandler);
+    .catch(errors.methods.ajaxErrorHandler)
+    .finally(() => {
+      ratingLoading.value = false;
+      button?.blur();
+    });
 }
 
 /**
@@ -492,6 +513,7 @@ function onGridChange(): void {
   broadcastPictureFilters();
   setTimeout(() => {
     gridChanging.value = false;
+    updateGlightbox();
     // Animation duration time.
   }, 300);
 }

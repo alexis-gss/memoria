@@ -119,10 +119,3 @@ function initTooltips(): void {
   });
 }
 </script>
-
-<style lang="scss">
-.icon-loader {
-  width: 1em;
-  height: 1em;
-}
-</style>
