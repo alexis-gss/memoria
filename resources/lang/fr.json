@@ -173,6 +173,7 @@
     "fo_search_filter_by_folder": "Filtrer la recherche par le dossier :folder",
     "fo_search_filter_by_tag": "Filtrer la recherche par l'étiquette :tag",
     "fo_search_sort_aria_label": "Trier les résultats",
+    "fo_search_sort_latest": "Derniers ajouts",
     "fo_search_sort_alphabetical": "Ordre alphabétique",
     "fo_search_sort_pictures": "Nombre d'images",
     "fo_search_sort_music": "Avec musique",

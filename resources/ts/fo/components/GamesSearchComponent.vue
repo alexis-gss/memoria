@@ -256,9 +256,10 @@ let debounceTimer: ReturnType<typeof setTimeout>|null = null;
 /** Sort */
 const defaultSort = ref<string>("alphabetical");
 const currentSort = ref<string>(defaultSort.value);
-const validSorts: Array<string> = ["alphabetical", "pictures", "music"];
+const validSorts: Array<string> = ["alphabetical", "latest", "pictures", "music"];
 const sortIcons: Record<string, Array<string>> = {
   alphabetical: ["fa-solid", "fa-arrow-down-a-z"],
+  latest: ["fa-solid", "fa-clock"],
   pictures: ["fa-solid", "fa-images"],
   music: ["fa-solid", "fa-music"],
 };

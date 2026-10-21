@@ -117,7 +117,10 @@ class GameController extends Controller
             ->when($sort === 'pictures', function (Builder $query) {
                 $query->orderBy('pictures_count', 'DESC')->orderBy('slug', 'ASC');
             })
-            ->when($sort === 'alphabetical' || !in_array($sort, ['music', 'pictures']), function (Builder $query) {
+            ->when($sort === 'latest', function (Builder $query) {
+                $query->orderBy('created_at', 'DESC')->orderBy('slug', 'ASC');
+            })
+            ->when($sort === 'alphabetical', function (Builder $query) {
                 $query->orderBy('slug', 'ASC');
             })
             ->paginate($this->gamesPerPage);

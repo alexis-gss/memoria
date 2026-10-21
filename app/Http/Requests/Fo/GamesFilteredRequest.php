@@ -18,7 +18,7 @@ class GamesFilteredRequest extends FormRequest
             'filters_id.0' => 'nullable|string|exists:tags,slug',
             'filters_id.1' => 'nullable|string|exists:folders,slug',
             'search'       => 'nullable|string|max:255',
-            'sort'         => 'required|string|in:alphabetical,pictures,music',
+            'sort'         => 'required|string|in:alphabetical,latest,pictures,music',
         ];
     }
 
