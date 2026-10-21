@@ -63,6 +63,7 @@
         "eslint-plugin-vue": "^9.26.0",
         "glightbox": "^3.3.0",
         "laravel-vite-plugin": "^1.0.4",
+        "meow": "^9.0.0",
         "overlayscrollbars-vue": "^0.5.9",
         "postcss-discard-comments": "^7.0.1",
         "prettier": "^3.3.2",
