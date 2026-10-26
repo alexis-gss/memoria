@@ -11,18 +11,29 @@ interface GlightboxOptions {
     isBusy: () => boolean,
     toggle: (pictureId: number) => void,
   };
+  getPictureId: (slideIndex: number) => number | null;
+  pagination: {
+    hasMore: () => boolean,
+    loadMore: (loadedCount: number) => Promise<Array<string>>,
+    threshold?: number,
+  };
 }
 
 interface SlideEvent {
-  current: { trigger: HTMLElement | null };
+  current: { index: number };
 }
 
-export function useGlightbox({ selector, labels, likes }: GlightboxOptions) {
+export function useGlightbox({ selector, labels, likes, getPictureId, pagination }: GlightboxOptions) {
     const currentPictureId = ref<number | null>(null);
     const isFullscreen = ref<boolean>(false);
+    const threshold = pagination.threshold ?? 2;
     let viewer: GLightbox | null = null;
     let toolbarApp: App | null = null;
     let toolbarHost: HTMLElement | null = null;
+    let isOpen = false;
+    let slideCount = 0;
+    let loadingMore = false;
+    let needsRebuild = false;
 
     /**
     * Toggle the browser fullscreen mode.
@@ -80,22 +91,64 @@ export function useGlightbox({ selector, labels, likes }: GlightboxOptions) {
     }
 
     /**
+    * Load the next pictures and append them as new slides.
+    * @return {Promise<void>}
+    */
+    async function loadMoreSlides(): Promise<void> {
+        const instance = viewer;
+        if (!instance || loadingMore || !pagination.hasMore()) {
+            return;
+        }
+        loadingMore = true;
+        try {
+            const hrefs = await pagination.loadMore(slideCount);
+            if (viewer !== instance) {
+                return;
+            }
+            hrefs.forEach((href) => instance.insertSlide({ href, type: "image" }));
+            slideCount += hrefs.length;
+            if (hrefs.length > 0) {
+                needsRebuild = true;
+            }
+        } finally {
+            loadingMore = false;
+        }
+    }
+
+    /**
     * Recreate the lightbox instance.
+    * If the viewer is currently open, the rebuild is deferred until it closes.
     * @return {void}
     */
     function init(): void {
+        if (isOpen) {
+            needsRebuild = true;
+            return;
+        }
         destroy();
+        needsRebuild = false;
         viewer = new GLightbox({ selector });
-        viewer.on("open", mountToolbar);
+        slideCount = document.querySelectorAll(selector).length;
+
+        viewer.on("open", () => {
+            isOpen = true;
+            mountToolbar();
+        });
         viewer.on("slide_changed", ({ current }: SlideEvent) => {
-            const pictureId = current.trigger?.dataset.pictureId;
-            currentPictureId.value = pictureId ? Number(pictureId) : null;
+            currentPictureId.value = getPictureId(current.index);
+            if (current.index >= slideCount - threshold) {
+                void loadMoreSlides();
+            }
         });
         viewer.on("close", () => {
+            isOpen = false;
             unmountToolbar();
             currentPictureId.value = null;
             if (document.fullscreenElement) {
                 void document.exitFullscreen();
+            }
+            if (needsRebuild) {
+                setTimeout(init, 400);
             }
         });
     }
@@ -108,6 +161,7 @@ export function useGlightbox({ selector, labels, likes }: GlightboxOptions) {
         unmountToolbar();
         viewer?.destroy();
         viewer = null;
+        isOpen = false;
     }
 
     function onFullscreenChange(): void {

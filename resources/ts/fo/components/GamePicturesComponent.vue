@@ -225,6 +225,7 @@ const picturesTemplate = computed<Array<number>>(() => gridPatterns[currentGrid.
 const picturesRatings = ref<Array<number>>([]);
 const routeName = ref<string>("");
 const ratingLoading = ref<boolean>(false);
+const loadingPromise = ref<Promise<void> | null>(null);
 const tooltips = ref<Tooltips|null>(null);
 const gridChanging = ref<boolean>(false);
 
@@ -240,6 +241,11 @@ const lightbox = useGlightbox({
     count: (pictureId) => gamePictures.value.find((picture) => picture.id === pictureId)?.ratings_count ?? 0,
     isBusy: () => ratingLoading.value,
     toggle: (pictureId) => ajaxPictureRating(pictureId),
+  },
+  getPictureId: (index) => gamePictures.value[index]?.id ?? null,
+  pagination: {
+    hasMore: () => gamePage.value < gameLastPage.value || loadingPromise.value !== null,
+    loadMore: loadMoreForLightbox,
   },
 });
 
@@ -321,8 +327,8 @@ function checkScroll(): void {
   * @param {boolean} replace If true, replace gamePictures instead of appending.
   * @return {void}
   */
-function getPictures(replace: boolean = false): void {
-  window.axios
+function getPictures(replace: boolean = false, refreshLightbox: boolean = true): Promise<void> {
+  loadingPromise.value = window.axios
     .get(getGamePicturesRoute() + "?page=" + gamePage.value + "&order=" + currentOrder.value)
     .then((response) => {
       if (response.data.data !== undefined) {
@@ -330,10 +336,35 @@ function getPictures(replace: boolean = false): void {
           ? Object.values(response.data.data)
           : gamePictures.value.concat(Object.values(response.data.data));
       }
-      gameLoading.value = false;
-      updateGlightbox();
+      if (refreshLightbox) {
+        updateGlightbox();
+      }
     })
-    .catch(errors.methods.ajaxErrorHandler);
+    .catch(errors.methods.ajaxErrorHandler)
+    .finally(() => {
+      gameLoading.value = false;
+      loadingPromise.value = null;
+    });
+  return loadingPromise.value;
+}
+
+/**
+  * Load the next page from the glightbox and return the href
+  * of every picture not yet known by the viewer.
+  * @param {number} loadedCount
+  * @return {Promise<Array<string>>}
+  */
+async function loadMoreForLightbox(loadedCount: number): Promise<Array<string>> {
+  if (loadingPromise.value) {
+    await loadingPromise.value;
+  } else if (gamePage.value < gameLastPage.value) {
+    gamePage.value++;
+    gameLoading.value = true;
+    await getPictures(false, false);
+  }
+  return gamePictures.value
+    .slice(loadedCount)
+    .map((_, offset) => getPicturePath(loadedCount + offset));
 }
 
 /**
