@@ -5,45 +5,66 @@ import autoprefixer from "autoprefixer";
 import laravel from "laravel-vite-plugin";
 import path from "path";
 import postcssDiscard from "postcss-discard-comments";
-import copy from "rollup-plugin-copy";
-import { ConfigEnv, UserConfig, defineConfig } from "vite";
+import { type ConfigEnv, type UserConfig, defineConfig } from "vite";
 import babel from "vite-plugin-babel";
 import checker from "vite-plugin-checker";
-import eslint from "vite-plugin-eslint";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 import stylelint from "vite-plugin-stylelint";
-import { sassSafelist } from "./resources/ts/utilities/sass-safelist";
+import { sassSafelist } from "./resources/ts/utilities/sass-safelist.ts";
 
 const purgePlugin = purge({
-    templates: ["blade"],
-    paths: ["resources/{js,ts,views}/**/*.{ts,js,vue}"],
+    paths: [
+        "resources/views/**/*.blade.php",
+        "resources/{js,ts,views}/**/*.{ts,js,vue}",
+    ],
     safelist: sassSafelist,
 });
 
 const debugMode = ["development"].find((mod) => process.env.NODE_ENV === mod) !== undefined;
 
-// @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 purgePlugin.apply = (config: UserConfig, env: ConfigEnv) => !debugMode;
 
+const faviconFiles = [
+    "android-icon-36x36.png",
+    "android-icon-48x48.png",
+    "android-icon-72x72.png",
+    "android-icon-96x96.png",
+    "android-icon-144x144.png",
+    "android-icon-192x192.png",
+    "apple-icon-57x57.png",
+    "apple-icon-60x60.png",
+    "apple-icon-72x72.png",
+    "apple-icon-76x76.png",
+    "apple-icon-114x114.png",
+    "apple-icon-120x120.png",
+    "apple-icon-144x144.png",
+    "apple-icon-152x152.png",
+    "apple-icon-180x180.png",
+    "browserconfig.xml",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon-96x96.png",
+    "favicon.ico",
+    "webmanifest",
+    "ms-icon-70x70.png",
+    "ms-icon-144x144.png",
+    "ms-icon-150x150.png",
+    "ms-icon-310x310.png",
+].map((file) => path.normalize(`resources/favicon/${file}`));
+
 export default defineConfig({
     build: {
-        rollupOptions: {
+        rolldownOptions: {
             output: {
-                entryFileNames: `assets/${
-                    debugMode ? "[name]-" : ""
-                }[hash].js`,
-                chunkFileNames: `assets/${
-                    debugMode ? "[name]-" : ""
-                }[hash].js`,
-                assetFileNames: (chunk) => {
-                    if (
-                        String(chunk.name).endsWith("mail-theme.scss") ||
-                        chunk.name === "mail-theme.css"
-                    ) {
+                entryFileNames: `assets/${debugMode ? "[name]-" : ""}[hash].js`,
+                chunkFileNames: `assets/${debugMode ? "[name]-" : ""}[hash].js`,
+                assetFileNames: (asset) => {
+                    const name = asset.names?.[0] ?? "";
+                    if (name.endsWith("mail-theme.scss") || name === "mail-theme.css") {
                         return "vendor/mail/html/themes/default.[ext]";
                     }
-                    return `assets/${debugMode ? "[name]-" : ""
-                    }[hash].[ext]`;
+                    return `assets/${debugMode ? "[name]-" : ""}[hash].[ext]`;
                 },
             },
         },
@@ -54,10 +75,11 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                quietDeps: true
-            }
+                quietDeps: true,
+                silenceDeprecations: ["import"],
+            },
         },
-        devSourcemap: debugMode ? true : false,
+        devSourcemap: debugMode,
         postcss: {
             map: {
                 inline: true,
@@ -83,12 +105,10 @@ export default defineConfig({
                 tsconfigPath: "tsconfig.json",
             },
             eslint: {
-                lintCommand:
-                    "eslint --fix --quiet -c .eslintrc.json \"./resources\"",
+                lintCommand: "eslint --fix --quiet \"./resources\"",
             },
             stylelint: {
-                lintCommand:
-                    "stylelint -q --config \"./.stylelintrc.json\" --fix \"**/resources/**/*.scss\"",
+                lintCommand: "stylelint -q --fix \"**/resources/**/*.scss\"",
             },
         }),
         laravel({
@@ -103,7 +123,6 @@ export default defineConfig({
             dev: false,
             build: true,
             cache: false,
-            chokidar: true,
             quiet: false,
             include: ["**/resources/**/*.scss", "**/resources/**/*.css"],
             exclude: ["node_modules", "vendor"],
@@ -113,63 +132,24 @@ export default defineConfig({
             emitErrorAsWarning: false,
             emitWarningAsError: true,
         }),
-        eslint({
-            cache: false,
-            extensions: ["js", "ts"],
-            exclude: ["node_modules", "vendor"],
-            include: "**/*.ts",
-            lintOnStart: true,
-            emitWarning: true,
-            emitError: true,
-            failOnWarning: false,
-            failOnError: true,
-        }),
         babel(),
         vue({
             isProduction: !debugMode,
             exclude: ["node_modules", "vendor"],
         }),
-        copy({
+        viteStaticCopy({
             targets: [
                 {
-                    src: [
-                        // * Engine copy (Default favicon)
-                        path.normalize("resources/favicon/android-icon-36x36.png"),
-                        path.normalize("resources/favicon/android-icon-48x48.png"),
-                        path.normalize("resources/favicon/android-icon-72x72.png"),
-                        path.normalize("resources/favicon/android-icon-96x96.png"),
-                        path.normalize("resources/favicon/android-icon-144x144.png"),
-                        path.normalize("resources/favicon/android-icon-192x192.png"),
-                        path.normalize("resources/favicon/apple-icon-57x57.png"),
-                        path.normalize("resources/favicon/apple-icon-60x60.png"),
-                        path.normalize("resources/favicon/apple-icon-72x72.png"),
-                        path.normalize("resources/favicon/apple-icon-76x76.png"),
-                        path.normalize("resources/favicon/apple-icon-114x114.png"),
-                        path.normalize("resources/favicon/apple-icon-120x120.png"),
-                        path.normalize("resources/favicon/apple-icon-144x144.png"),
-                        path.normalize("resources/favicon/apple-icon-152x152.png"),
-                        path.normalize("resources/favicon/apple-icon-180x180.png"),
-                        path.normalize("resources/favicon/browserconfig.xml"),
-                        path.normalize("resources/favicon/favicon-16x16.png"),
-                        path.normalize("resources/favicon/favicon-32x32.png"),
-                        path.normalize("resources/favicon/favicon-96x96.png"),
-                        path.normalize("resources/favicon/favicon.ico"),
-                        path.normalize("resources/favicon/webmanifest"),
-                        path.normalize("resources/favicon/ms-icon-70x70.png"),
-                        path.normalize("resources/favicon/ms-icon-144x144.png"),
-                        path.normalize("resources/favicon/ms-icon-150x150.png"),
-                        path.normalize("resources/favicon/ms-icon-310x310.png"),
-                    ],
-                    dest: path.normalize("public")
+                    src: faviconFiles,
+                    dest: path.normalize(".."),
+                    rename: { stripBase: true },
                 },
             ],
-            copyOnce: true,
-            verbose: true
         }),
-        purgePlugin
+        purgePlugin,
     ],
     resolve: {
-        extensions: ["*", ".js", ".ts", ".vue"],
+        extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json", ".vue"],
         alias: [
             {
                 find: "vue",
@@ -181,7 +161,7 @@ export default defineConfig({
             },
             {
                 find: "~",
-                replacement: path.resolve(__dirname, "./node_modules"),
+                replacement: path.resolve(import.meta.dirname, "./node_modules"),
             },
         ],
     },

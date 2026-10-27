@@ -1,14 +1,24 @@
 {
     "extends": "@vue/tsconfig/tsconfig.dom.json",
-    "sourceMap": true,
     "compilerOptions": {
-        "lib": ["ESNEXT", "DOM", "DOM.Iterable"],
-        "baseUrl": ".",
+        "types": [
+            "node",
+            "vite/client"
+        ],
         "paths": {
-            "~/*": ["node_modules/*", "node_modules/@types/*"],
-            "@/*": ["resources/assets/*"]
+            "~/*": [
+                "./node_modules/*",
+                "./node_modules/@types/*"
+            ],
+            "@/*": [
+                "./resources/assets/*"
+            ]
         }
     },
-    "include": ["resources/**/*.js", "resources/**/*.ts", "resources/**/*.vue"],
+    "include": [
+        "resources/**/*.ts",
+        "resources/**/*.vue",
+        "vite.config.ts"
+    ],
     "exclude": ["node_modules"]
 }
