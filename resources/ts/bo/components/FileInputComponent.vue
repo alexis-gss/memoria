@@ -315,11 +315,11 @@ function initTooltips(): void {
 <style lang="scss">
 .file-input-vue {
   input.form-control {
-    direction: ltr;
     overflow: hidden;
+    cursor: pointer;
+    direction: ltr;
     text-overflow: ellipsis;
     white-space: nowrap;
-    cursor: pointer;
   }
 }
 </style>

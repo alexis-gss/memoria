@@ -101,7 +101,7 @@ class PictureController extends Controller
 
         // Save as .webp and free the memory used by the image.
         imagewebp($image, $finalPath . $uuid . ".webp", IMG_WEBP_LOSSLESS);
-        imagedestroy($image);
+        unset($image);
 
         // Remove the temporary assembled file.
         unlink($tmpPath);

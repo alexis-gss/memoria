@@ -1,4 +1,3 @@
-// SweetAlert
 import type { SweetAlertOptions, SweetAlertResult } from "sweetalert2";
 import Swal from "sweetalert2";
 import * as trans from "../modules/trans";
@@ -8,7 +7,7 @@ export default {
         /**
          * Show a confirm sweetalert popup.
          * @param {Object} self
-         * @param {() => void} after
+         * @param {(response: SweetAlertResult<unknown>) => void} after
          * @param {SweetAlertOptions} options
          * @param {string} title
          * @param {string} text
@@ -18,11 +17,8 @@ export default {
          * @return {boolean}
          */
         confirm(
-            self: Object,
-            after: (response: SweetAlertResult<any>) => void = (
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                response: SweetAlertResult<any>
-            ) => {},
+            self: object,
+            after: (response: SweetAlertResult<unknown>) => void = () => {},
             options: SweetAlertOptions = {},
             title: string = trans.default.methods.__("crud.sweetalert.are_you_sure"),
             text: string = trans.default.methods.__("crud.sweetalert.data_lost"),
@@ -55,7 +51,7 @@ export default {
                 },
                 buttonsStyling: false,
                 background: getComputedStyle(document.body).getPropertyValue("--bs-body-bg"),
-            }).then((result: SweetAlertResult) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     after.apply(self, [result]);
                 }
@@ -69,7 +65,7 @@ export default {
          * @param {SweetAlertOptions} options
          * @return {boolean}
          */
-        message(title = "", self: Object, options: SweetAlertOptions = {}): boolean {
+        message(title = "", self: object, options: SweetAlertOptions = {}): boolean {
             if (!self) {
                 throw Error("Self is needed to set \"this\" on callback");
             }

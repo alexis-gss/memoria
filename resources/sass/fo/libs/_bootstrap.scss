@@ -1,5 +1,7 @@
 // Include new custom variables
-@import './../utilities/bootstrap-variables';
+@use 'sass:list';
+@use './../utilities/variables' as *;
+@use './../utilities/bootstrap-variables' as *;
 
 // Include functions first (so you can manipulate colors, SVGs, calc, etc)
 @import 'bootstrap/scss/functions';

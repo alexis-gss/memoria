@@ -236,11 +236,30 @@ defineOptions({
   name: "MusicPlayerComponent",
 });
 
+// * TYPES
+interface MusicPlayerMeta {
+  title?: string;
+  artist?: string;
+  src?: string;
+  cover?: string;
+}
+
+interface MusicPlayerOptions {
+  loop?: boolean;
+  muted?: boolean;
+  play?: boolean;
+  volume?: number;
+  speed?: number | string;
+}
+
+interface MusicPlayerAttrs {
+  data?: MusicPlayerMeta;
+  options?: MusicPlayerOptions;
+}
+
 // * ATTRIBUTES
 const attrs = useAttrs();
 
-// Émet l'état de lecture vers le parent (NavBarComponent) pour piloter
-// l'icône du bouton music sans dupliquer l'état de lecture.
 const emit = defineEmits<{
   (e: "playing-change", isPlaying: boolean): void;
 }>();
@@ -269,11 +288,11 @@ const props = defineProps<{
 
 /**
  * Parse the JSON passed through the "json" attribute.
- * @return {Record<string, any>}
+ * @return {MusicPlayerAttrs}
  */
-function parseAttrsJson(): Record<string, any> {
+function parseAttrsJson(): MusicPlayerAttrs {
   try {
-    return JSON.parse(String(attrs.json ?? "{}"));
+    return JSON.parse(String(attrs.json ?? "{}")) as MusicPlayerAttrs;
   } catch {
     return {};
   }

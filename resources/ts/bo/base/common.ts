@@ -1,4 +1,3 @@
-import type { SweetAlertResult } from "sweetalert2";
 import errors from "../../modules/errors";
 import route from "../../modules/route";
 import sweetalert from "../../modules/sweetalert";
@@ -19,8 +18,7 @@ window.addEventListener("DOMContentLoaded", () => {
             }
             sweetalert.methods.confirm(
                 el,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                function (response: SweetAlertResult<any>) {
+                function () {
                     el.submit();
                 },
                 { icon: "warning" },

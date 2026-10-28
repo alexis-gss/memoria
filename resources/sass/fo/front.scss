@@ -1,27 +1,27 @@
 @charset "UTF-8";
 
 // * UTILITIES
-@import './utilities/variables';
+@use './utilities/variables';
 
 // * LIBS.
-@import './libs/bootstrap';
-@import '~/aos/src/sass/aos';
-@import '~/glightbox/dist/css/glightbox.css';
-@import '~/swiper/swiper-bundle.min.css';
-@import '~/overlayscrollbars/styles/overlayscrollbars.min.css';
+@use './libs/bootstrap';
+@use '~/aos/src/sass/aos';
+@use '~/glightbox/dist/css/glightbox.css' as glightbox-lib;
+@use '~/swiper/swiper-bundle.min.css';
+@use '~/overlayscrollbars/styles/overlayscrollbars.min.css';
 
 // * BASE.
-@import './base/common';
-@import './base/fonts';
+@use './base/common';
+@use './base/fonts';
 
 // * PAGES.
-@import './pages/home';
+@use './pages/home';
 
 // * PARTIALS.
-@import './partials/nav';
-@import './partials/game-pictures';
-@import './partials/games-related';
-@import './partials/search-list';
-@import './partials/glightbox';
-@import './partials/music-player';
-@import './partials/footer';
+@use './partials/nav';
+@use './partials/game-pictures';
+@use './partials/games-related';
+@use './partials/search-list';
+@use './partials/glightbox';
+@use './partials/music-player';
+@use './partials/footer';

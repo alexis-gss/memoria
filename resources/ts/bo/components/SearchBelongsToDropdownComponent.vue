@@ -131,7 +131,7 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { PropType } from "vue";
-import { computed, nextTick, onMounted, reactive, ref, useAttrs } from "vue";
+import { computed, nextTick, onMounted, reactive, ref, shallowRef, useAttrs } from "vue";
 import VueSelect from "vue-select";
 import errors from "../../modules/errors";
 import route from "../../modules/route";
@@ -207,7 +207,7 @@ const message = ref<string>("");
 const loading = ref<boolean>(false);
 const roundedBorderBs = ref<boolean>(props.roundedBorder);
 const searchText = ref<string|null>(null);
-const tooltips = ref<Tooltips|null>(null);
+const tooltips = shallowRef<Tooltips|null>(null);
 
 /** Model parameters. */
 const modelParameters = reactive<{
@@ -279,8 +279,8 @@ onMounted(() => {
     pageParameters.page = data.modelListPaginate.current_page;
     pageParameters.totalPage = data.modelListPaginate.last_page;
     pageParameters.itemPerPage = data.modelListPaginate.per_page;
-    pageParameters.hasPrevPage = false,
-    pageParameters.hasNextPage = false,
+    pageParameters.hasPrevPage = false;
+    pageParameters.hasNextPage = false;
     pageParameters.routeName = String(data.routeName);
   }
   customNodes();
@@ -308,7 +308,9 @@ function customNodes(): void {
   btnClear?.setAttribute("title", trans.methods.__("bo_delete_selection"));
   btnClear?.setAttribute("aria-label", trans.methods.__("bo_delete_selection"));
   btnClear?.setAttribute("data-bs-toggle", "tooltip");
-  (!roundedBorderBs.value) ? searchBelongsToDropdown.value?.querySelector(".vs__dropdown-toggle")?.classList.add("rounded-0") : "";
+  if (!roundedBorderBs.value) {
+    searchBelongsToDropdown.value?.querySelector(".vs__dropdown-toggle")?.classList.add("rounded-0");
+  }
 }
 
 /**
@@ -373,93 +375,128 @@ function initTooltips(): void {
 </script>
 
 <style lang="scss">
-@import "vue-select/dist/vue-select.css";
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/helpers";
-@import "bootstrap/scss/close";
-@import "bootstrap/scss/spinners";
-@import "bootstrap/scss/badge";
+@import 'vue-select/dist/vue-select.css';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/helpers';
+@import 'bootstrap/scss/close';
+@import 'bootstrap/scss/spinners';
+@import 'bootstrap/scss/badge';
 
 :root {
   --vs-dropdown-max-height: 30rem;
+  /* stylelint-disable-next-line custom-property-pattern */
   --vs-dropdown-option--active-bg: var(--bs-primary);
 }
-.vs__dropdown-toggle, .vs__dropdown-option, .vs__no-options {
-  padding: .375rem .75rem;
+
+/* stylelint-disable selector-class-pattern, scss/at-extend-no-missing-placeholder */
+.vs__dropdown-toggle,
+.vs__dropdown-option,
+.vs__no-options {
+  padding: 0.375rem 0.75rem;
 }
+
 .vs__no-options .no-result-icon {
   width: 4rem;
 }
+
 .vs__dropdown-toggle {
+  padding-top: 0 !important;
   border: var(--bs-border-width) solid var(--bs-border-color);
   border-radius: 0.375rem;
-  padding-top: 0 !important;
   background-color: var(--bs-body-bg);
 }
-.vs__selected-options, .vs__search, .vs--single .vs__selected {
+
+.vs__selected-options,
+.vs__search,
+.vs--single .vs__selected {
   padding: 0 !important;
   margin: 0 !important;
 }
+
 .vs__open-indicator {
   display: none;
 }
-.vs__actions, .vs__dropdown-menu {
+
+.vs__actions,
+.vs__dropdown-menu {
   padding: 0;
 }
-.vs__actions, .vs__search, .vs--single .vs__selected {
-  margin: .375rem 0 0 0 !important;
+
+.vs__actions,
+.vs__search,
+.vs--single .vs__selected {
+  margin: 0.375rem 0 0 !important;
 }
-.vs__dropdown-menu, .vs__search, .vs--single .vs__selected {
+
+.vs__dropdown-menu,
+.vs__search,
+.vs--single .vs__selected {
   color: var(--bs-body-color);
 }
+
 .vs__search {
   border: 0 !important;
 }
+
 .vs__dropdown-menu {
   border-color: var(--bs-primary-border-subtle);
   background-color: var(--bs-body-bg);
 }
+
 .vs__dropdown-toggle:has(.vs__search:focus) {
   border-color: var(--bs-primary-border-subtle) !important;
+  box-shadow: 0 0 0 0.25rem rgb(var(--bs-primary-rgb), var(--bs-focus-ring-opacity));
   outline: 0;
-  box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), var(--bs-focus-ring-opacity));
-  transition: .15s;
+  transition: 0.15s;
 }
-.vs__dropdown-option--selected, .vs__dropdown-option--disabled {
+
+.vs__dropdown-option--selected,
+.vs__dropdown-option--disabled {
   background-color: var(--bs-tertiary-bg);
   color: var(--bs-secondary);
   cursor: not-allowed;
 }
+
 .vs--multiple .vs__selected {
   @extend .badge;
   @extend .text-bg-secondary;
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 0.19rem 0.25rem !important;
+  margin: 0.375rem 0.5rem 0 0 !important;
   font-size: 1em !important;
   font-weight: initial;
-  margin: .375rem .5rem 0 0 !important;
-  padding: .19rem .25rem !important;
 }
-.vs__clear, .vs--multiple .vs__selected .vs__deselect {
+
+.vs__clear,
+.vs--multiple .vs__selected .vs__deselect {
   @extend .btn-close;
+
   padding: 0;
 }
-.vs__clear svg, .vs--multiple .vs__selected .vs__deselect svg {
+
+.vs__clear svg,
+.vs--multiple .vs__selected .vs__deselect svg {
   display: none;
 }
+
 .spinner-border {
   width: 1.25rem;
   height: 1.25rem;
 }
+
 .vs__fade-enter-active,
 .vs__fade-leave-active {
   transition: none;
 }
+
 .vs--open .vs__dropdown-toggle {
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
+/* stylelint-enable selector-class-pattern, scss/at-extend-no-missing-placeholder */
 </style>

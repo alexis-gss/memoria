@@ -1,35 +1,35 @@
 .glightbox-container {
-    .glightbox-toolbar {
-        position: absolute;
-        z-index: 99999;
-        top: 15px;
-        right: 63px;
+  .glightbox-toolbar {
+    position: absolute;
+    z-index: 99999;
+    top: 15px;
+    right: 63px;
 
-        button {
-            position: initial;
-        }
+    button {
+      position: initial;
+    }
+  }
+
+  .icon-loader {
+    color: #fff;
+    cursor: default;
+
+    &:hover {
+      background-color: #00000052;
+      opacity: 0.7;
     }
 
-    .icon-loader {
-        color: #FFF;
-        cursor: default;
-
-        &:hover {
-            background-color: #00000052;
-            opacity: 0.7;
-        }
-
-        .spinner-border {
-            width: 1em;
-            height: 1em;
-        }
+    .spinner-border {
+      width: 1em;
+      height: 1em;
     }
+  }
 
-    .gbtn {
-        transition: .3s;
+  .gbtn {
+    transition: 0.3s;
 
-        span {
-            color: #FFF !important;
-        }
+    span {
+      color: #fff !important;
     }
+  }
 }

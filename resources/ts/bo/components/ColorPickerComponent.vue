@@ -48,7 +48,7 @@ import type { Payload } from "@ckpack/vue-color";
 import { Sketch } from "@ckpack/vue-color";
 import type { ColorInput } from "@ctrl/tinycolor";
 import type { PropType } from "vue";
-import { computed, onMounted, ref, useAttrs, watch } from "vue";
+import { computed, onMounted, ref, shallowRef, useAttrs, watch } from "vue";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
 
@@ -111,7 +111,7 @@ const displayPicker = ref<boolean>(false);
 const nullable = ref<boolean>(props.nullable);
 const disabled = ref<boolean>(props.disabled);
 const isNull = ref<boolean>(false);
-const tooltips = ref<Tooltips|null>(null);
+const tooltips = shallowRef<Tooltips|null>(null);
 
 // * COMPUTED
 const isUsedWithProps = computed<boolean>(() => attrs.json === undefined);
@@ -126,7 +126,9 @@ onMounted((): void => {
     internalColor.value = String(data.value);
     nullable.value = Boolean(data.nullable);
     disabled.value = Boolean(data.disabled);
-    (data.presetColors) ? presetColors.value = data.presetColors : "";
+    if (data.presetColors) {
+      presetColors.value = data.presetColors;
+    }
   }
   initTooltips();
 });
@@ -176,7 +178,11 @@ watch(displayPicker, (): void => {
   */
 function togglePicker(): void {
   displayPicker.value = !displayPicker.value;
-  (displayPicker.value) ? document.addEventListener("click", displayPickerColor) : document.removeEventListener("click", displayPickerColor);
+  if (displayPicker.value) {
+    document.addEventListener("click", displayPickerColor);
+  } else {
+    document.removeEventListener("click", displayPickerColor);
+  }
 }
 
 /**
@@ -204,77 +210,102 @@ function initTooltips(): void {
 </script>
 
 <style lang="scss">
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
 
+/* stylelint-disable selector-class-pattern */
 .color-picker-component {
   position: relative;
+
   .vc-sketch {
     background-color: var(--bs-tertiary-bg);
   }
-  .vc-sketch-sliders, .vc-sketch-field {
-    margin-top: 10px;
+
+  .vc-sketch-sliders,
+  .vc-sketch-field {
     padding: 0;
+    margin-top: 10px;
   }
+
   .vc-sketch-sliders {
-    justify-content: center;
-    align-items: center;
     display: flex;
     height: 16px;
+    align-items: center;
+    justify-content: center;
   }
+
   .vc-sketch-hue-wrap {
     width: 100%;
   }
-  .vc-sketch-alpha-wrap, .vc-sketch-color-wrap, .vc-sketch-field--single {
+
+  .vc-sketch-alpha-wrap,
+  .vc-sketch-color-wrap,
+  .vc-sketch-field--single {
     display: none;
   }
+
   .vc-sketch-color-wrap .vc-checkerboard {
     background-image: none !important;
   }
-  .vc-sketch-active-color, .vc-sketch-saturation-wrap {
+
+  .vc-sketch-active-color,
+  .vc-sketch-saturation-wrap {
     border-radius: 3px;
   }
-  .vc-sketch-hue-wrap, .vc-hue-pointer, .vc-hue-picker {
+
+  .vc-sketch-hue-wrap,
+  .vc-hue-pointer,
+  .vc-hue-picker {
     height: 100%;
   }
+
   .vc-hue-picker {
     margin: 0;
   }
+
   .vc-saturation-circle {
-    box-shadow: 0 0 0 1.2px #fff,inset 0 0 1px 1px rgba(0,0,0,.3),0 0 1px 2px rgba(0,0,0,.4)
+    box-shadow: 0 0 0 1.2px #fff,inset 0 0 1px 1px rgb(0 0 0 / 30%),0 0 1px 2px rgb(0 0 0 / 40%);
   }
+
   .vc-editable-input {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
     justify-content: center;
   }
-  .vc-input__label, .vc-input__input {
+
+  .vc-input__label,
+  .vc-input__input {
     font-size: 1rem !important;
   }
+
   .vc-input__label {
     color: var(--bs-body-color) !important;
   }
+
   .vc-input__input {
-    padding: .375rem .75rem !important;
-    margin-left: 0.5rem;
-    color: var(--bs-body-color);
-    background-color: var(--bs-body-bg);
+    padding: 0.375rem 0.75rem !important;
     border: var(--bs-border-width) solid var(--bs-border-color) !important;
     border-radius: var(--bs-border-radius);
-    box-shadow: none !important;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out !important;
-  }
-  .vc-input__input:focus {
-    color: var(--bs-body-color);
+    margin-left: 0.5rem;
     background-color: var(--bs-body-bg);
-    border-color: var(--bs-primary-border-subtle) !important;
-    outline: 0;
-    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), var(--bs-focus-ring-opacity)) !important;
+    box-shadow: none !important;
+    color: var(--bs-body-color);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
   }
+
+  .vc-input__input:focus {
+    border-color: var(--bs-primary-border-subtle) !important;
+    background-color: var(--bs-body-bg);
+    box-shadow: 0 0 0 0.25rem rgb(var(--bs-primary-rgb), var(--bs-focus-ring-opacity)) !important;
+    color: var(--bs-body-color);
+    outline: 0;
+  }
+
   .vc-sketch-presets {
-    border: none !important;
+    border: 0 !important;
   }
 }
+/* stylelint-enable selector-class-pattern */
 </style>

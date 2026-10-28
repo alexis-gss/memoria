@@ -1,3 +1,6 @@
+/** Arbre de traductions PHP (fichiers de langue Laravel, clés imbriquées). */
+type TranslationNode = string | { [key: string]: TranslationNode };
+
 export default {
     data() {
         return {
@@ -9,42 +12,26 @@ export default {
          * Translate the given key,
          * ex: __('name', { 'parameter': 'value' }).
          */
-        __(key: string, replace: Record<PropertyKey, string> = {}): string {
-            let translation: string,
-                translationNotFound = true;
+        __(key: string, replace: Record<string, string> = {}): string {
+            const phpTranslation = key
+                .split(".")
+                .reduce<TranslationNode | null>(
+                    (node, segment) =>
+                        node !== null && typeof node === "object"
+                            ? node[segment] ?? null
+                            : null,
+                    window.__SYSTEM._translations.php
+                );
 
-            try {
-                translation = key
-                    .split(".")
-                    .reduce(
-                        (t, i) => t[i as any] ?? null,
-                        window.__SYSTEM._translations.php
-                    ) as string;
-                if (translation) {
-                    translationNotFound = false;
-                }
-            } catch (e) {
-                translation = key;
-            }
+            const translation =
+                typeof phpTranslation === "string" && phpTranslation !== ""
+                    ? phpTranslation
+                    : window.__SYSTEM._translations.json[key] ?? key;
 
-            if (translationNotFound) {
-                translation = (window.__SYSTEM._translations.json[key as any] ??
-                    key) as string;
-            }
-            const vars = translation.match(/:[0-9A-Za-z_]+/g);
-            if (vars) {
-                for (const match of vars) {
-                    try {
-                        translation = translation.replace(
-                            new RegExp(match, "g"),
-                            replace[match.substring(1)]
-                        );
-                    } catch (e) {
-                        console.error("String replace failed ", e);
-                    }
-                }
-            }
-            return translation;
+            return translation.replace(
+                /:([0-9A-Za-z_]+)/g,
+                (placeholder, name: string) => replace[name] ?? placeholder
+            );
         },
     },
 };

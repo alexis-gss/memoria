@@ -1,31 +1,33 @@
+@use '../utilities/variables' as *;
+
 .home-text {
-    &-content {
-        height: 24px;
+  &-content {
+    height: 24px;
 
-        &-transition {
-            z-index: 1;
-            width: 1rem;
+    &-transition {
+      z-index: 1;
+      width: 1rem;
 
-            &:last-of-type {
-                background: linear-gradient(to left, #{$color-white} 0%, transparent 100%),
-            }
-        }
-
-        p {
-            width: max-content;
-            transform: translate3d(0, 0, 0);
-            white-space: nowrap;
-
-            &.is-scrolling {
-                animation-duration: var(--scroll-duration);
-                animation-iteration-count: infinite;
-                animation-name: var(--scroll-anim-name);
-                animation-timing-function: linear;
-            }
-
-            &:hover {
-                animation-play-state: paused;
-            }
-        }
+      &:last-of-type {
+        background: linear-gradient(to left, #{$color-white} 0%, transparent 100%),;
+      }
     }
+
+    p {
+      width: max-content;
+      transform: translate3d(0, 0, 0);
+      white-space: nowrap;
+
+      &.is-scrolling {
+        animation-duration: var(--scroll-duration);
+        animation-iteration-count: infinite;
+        animation-name: var(--scroll-anim-name);
+        animation-timing-function: linear;
+      }
+
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+  }
 }

@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { onMounted, ref, useAttrs, nextTick } from "vue";
+import { onMounted, ref, useAttrs, nextTick, shallowRef } from "vue";
 import { VueNestable, VueNestableHandle } from "vue3-nestable";
 import route from "./../../modules/route";
 import { Tooltips } from "./../../modules/tooltips";
@@ -124,7 +124,7 @@ const id = ref<string>("");
 const ranks = ref<Array<RankObject>>([]);
 const message = ref<string>("");
 const loading = ref<boolean>(false);
-const tooltips = ref<Tooltips|null>(null);
+const tooltips = shallowRef<Tooltips|null>(null);
 
 // * LIFECYCLE
 onMounted((): void => {
@@ -286,44 +286,56 @@ function deleteRank(e: Event, model: RankObject): void|boolean {
     z-index: 5;
     background-color: rgb(0 0 0 / 15%);
   }
+
   .badge {
     color: var(--bs-body-bg);
   }
+
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.5s ease;
   }
+
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
   }
+
   .nestable-list {
     padding: 0;
     list-style: none;
   }
+
   .nestable {
     position: relative;
-    [draggable="true"] {
+
+    [draggable='true'] {
       cursor: move;
     }
+
     .nestable-rtl {
       direction: rtl;
     }
+
     .nestable .nestable-list {
       padding: 0 0 0 23px;
       margin: 0;
       list-style-type: none;
     }
+
     .nestable-rtl .nestable-list {
       padding: 0 40px 0 0;
     }
+
     .nestable > .nestable-list {
       padding: 0;
     }
+
     .nestable-item .nestable-list,
     .nestable-item-copy .nestable-list {
       margin: 10px 0 0 20px;
     }
+
     .nestable-drag-layer > .nestable-list {
       position: absolute;
       top: 0;
@@ -331,34 +343,42 @@ function deleteRank(e: Event, model: RankObject): void|boolean {
       padding: 0;
       background-color: rgb(106 127 233 / 27.4%);
     }
+
     .nestable-item,
     .nestable-item-copy {
       margin: 10px 0 0;
     }
+
     .nestable-item {
       position: relative;
+
       .nestable-content {
         border-radius: var(--bs-border-radius) !important;
       }
     }
+
     .nestable-item:first-child,
     .nestable-item-copy:first-child {
       margin-top: 0;
     }
+
     .nestable-item.is-dragging .nestable-list {
       pointer-events: none;
     }
+
     .nestable-item.is-dragging * {
       opacity: 0;
     }
+
     .nestable-item.is-dragging::before {
       position: absolute;
       border: 1px dashed rgb(73 100 241);
       border-radius: 5px;
       background-color: rgb(106 127 233 / 27.4%);
-      content: " ";
+      content: ' ';
       inset: 0;
     }
+
     .nestable-drag-layer {
       position: fixed;
       z-index: 100;
@@ -366,13 +386,16 @@ function deleteRank(e: Event, model: RankObject): void|boolean {
       left: 0;
       pointer-events: none;
     }
+
     .nestable-rtl .nestable-drag-layer {
       right: 0;
       left: auto;
     }
+
     .nestable-rtl .nestable-drag-layer > .nestable-list {
       padding: 0;
     }
+
     .nestable-handle {
       display: inline-block;
       width: 100%;

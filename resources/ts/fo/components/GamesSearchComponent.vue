@@ -185,7 +185,7 @@
                     />
                     <span class="mx-1">|</span>
                   </template>
-                  <span>{{ String((game.pictures as Array<Object>).length).padStart(2, '0') }}</span>
+                  <span>{{ String((game.pictures as Array<unknown>).length).padStart(2, '0') }}</span>
                 </div>
               </a>
             </li>
@@ -222,10 +222,11 @@
 </template>
 
 <script lang="ts" setup>
+import type { AxiosResponse } from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { onMounted, ref, useAttrs, reactive, watch, nextTick } from "vue";
+import { onMounted, ref, useAttrs, reactive, watch, nextTick, shallowRef } from "vue";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
 import trans from "./../../modules/trans";
@@ -249,8 +250,8 @@ const selectedFolder = ref<string>("");
 const externalOrder = ref<string>("");
 const externalGrid = ref<string>("");
 const loading = ref<boolean>(false);
-const tooltips = ref<Tooltips|null>(null);
 const debounceDelay = ref<number>(300);
+const tooltips = shallowRef<Tooltips|null>(null);
 let debounceTimer: ReturnType<typeof setTimeout>|null = null;
 
 /** Sort */
@@ -507,7 +508,11 @@ function buildUrlParams(searchText: string = search.value): URLSearchParams {
 function ajaxGamesFiltered(filters: string[] = [], pagination: boolean = false, search: string|null = null): void {
   const urlParams = buildUrlParams(search ?? "");
   history.replaceState("Object", "", location.pathname + (urlParams.toString().length ? "?" + urlParams.toString() : ""));
-  (pagination) ? paginationParameters.loading = true : loading.value = true;
+  if (pagination) {
+    paginationParameters.loading = true;
+  } else {
+    loading.value = true;
+  }
   window.axios
     .get(getRouteGamesFiltered(), {
       params: {
@@ -517,15 +522,17 @@ function ajaxGamesFiltered(filters: string[] = [], pagination: boolean = false, 
         sort: currentSort.value,
       }
     })
-    .then((reponse) => {
-      paginationParameters.total = reponse.data.total;
-      paginationParameters.lastPage = reponse.data.last_page;
-      (pagination)
-        ? modelsParameters.games = modelsParameters.games?.concat(reponse.data.data)
-        : modelsParameters.games = reponse.data.data;
+    .then((response: AxiosResponse<LaravelPaginator>) => {
+      paginationParameters.total = response.data.total;
+      paginationParameters.lastPage = response.data.last_page;
+      modelsParameters.games = (pagination) ? modelsParameters.games?.concat(response.data.data) : response.data.data;
     })
     .then(() => {
-      (pagination) ? paginationParameters.loading = false : loading.value = false;
+      if (pagination) {
+        paginationParameters.loading = false;
+      } else {
+        loading.value = false;
+      }
     })
     .catch(errors.methods.ajaxErrorHandler);
 }

@@ -9,9 +9,9 @@ declare module "glightbox" {
     export default class GLightbox {
         constructor(options: { [key: string]: unknown });
 
-        on(
+        on<TArgs extends unknown[] = []>(
             event: string,
-            callback: (...args: any[]) => void
+            callback: (...args: TArgs) => void
         ): GLightbox;
 
         insertSlide(slide: GLightboxSlide, index?: number): void;

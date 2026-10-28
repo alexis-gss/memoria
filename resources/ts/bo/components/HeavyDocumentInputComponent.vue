@@ -160,7 +160,7 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Resumable from "resumablejs";
 import type { PropType } from "vue";
-import { computed, onMounted, ref, useAttrs, nextTick } from "vue";
+import { computed, onMounted, ref, useAttrs, nextTick, shallowRef } from "vue";
 import route from "./../../modules/route";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
@@ -217,7 +217,7 @@ const gameSlug = ref<string>(props.gameslug);
 const viewerLoadImage = ref<boolean>(false);
 const inputUuid = ref<HTMLInputElement|null>(null);
 const inputLabel = ref<HTMLInputElement|null>(null);
-const tooltips = ref<Tooltips|null>(null);
+const tooltips = shallowRef<Tooltips|null>(null);
 
 // * COMPUTED
 const isUsedWithProps = computed<boolean>(() => attrs.json === undefined);
@@ -313,7 +313,7 @@ function fileAdded(): void {
   * @return void
   */
 function fileSuccess(file: { file: File }, message: string): void {
-  let result = JSON.parse(message);
+  const result = JSON.parse(message);
   chunkFile.value = file.file as unknown as ChunkFile;
   chunkFile.value.uuid = result.uid;
   chunkFile.value.label = file.file.name.replace(/\.[^/.]+$/, "");

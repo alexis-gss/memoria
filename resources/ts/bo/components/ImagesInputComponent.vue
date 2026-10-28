@@ -123,7 +123,7 @@
 
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { onMounted, ref, useAttrs, nextTick } from "vue";
+import { onMounted, ref, useAttrs, nextTick, shallowRef } from "vue";
 import errors from "./../../modules/errors";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
@@ -153,7 +153,7 @@ const itemLimit = ref<Array<number>>([0, 0]);
 const csrf = ref<string>("");
 const message = ref<string|null>("");
 const allErrors = ref<Record<string, Array<string>>>({});
-const tooltips = ref<Tooltips|null>(null);
+const tooltips = shallowRef<Tooltips|null>(null);
 
 // * LIFECYCLE
 onMounted((): void => {
@@ -181,7 +181,7 @@ onMounted((): void => {
   */
 function initImagesSaved(models: LaravelModelList): void {
   models.forEach((model: LaravelModel, modelIndex: number) => {
-    let oldValue = {} as ChunkFile;
+    const oldValue = {} as ChunkFile;
     oldValue.uuid = String(model.uuid);
     oldValue.label = String(model.label);
     oldValue.published = model.published ? true : false;
@@ -195,8 +195,9 @@ function initImagesSaved(models: LaravelModelList): void {
   * @return void
   */
 function initComponent(): void {
-  (values.value.length > 0) ?
-    btnCollapse.value = document.querySelector("[data-bs-target=\"#multiple-images\"]") : "";
+  if (values.value.length > 0) {
+    btnCollapse.value = document.querySelector("[data-bs-target=\"#multiple-images\"]");
+  }
   hasImages.value = (values.value.length > 0) ? true : false;
 }
 
@@ -206,9 +207,7 @@ function initComponent(): void {
   */
 function removeFiles(): void {
   values.value.length = itemLimit.value[0];
-  itemLimit.value[0] > 0
-    ? (hasImages.value = true)
-    : (hasImages.value = false);
+  hasImages.value = itemLimit.value[0] > 0 ? true : false;
   allErrors.value = {};
   tooltips.value?.refreshTooltips();
 }
@@ -243,11 +242,11 @@ function changedImages(e: Event): void {
 function loadImages(files: Array<File>): void {
   if (files.length > 0) {
     if (values.value.length + files.length <= itemLimit.value[1]) {
-      let actualFile = files.shift() as unknown as ChunkFile;
+      const actualFile = files.shift() as unknown as ChunkFile;
       actualFile.published = false;
       actualFile.uniqueIdentifier = String(loopLoadImages.value + "-" + Date.now());
       values.value.push(actualFile);
-      var dt = new DataTransfer();
+      const dt = new DataTransfer();
       dt.items.add(actualFile as unknown as File);
       actualImages.value!.files = dt.files;
       loopLoadImages.value++;
@@ -296,19 +295,23 @@ function initTooltips(): void {
     overflow: hidden !important;
     direction: ltr !important;
   }
+
   .right-aligned:not(:focus) {
     text-align: left !important;
     text-overflow: ellipsis !important;
   }
+
   .btn-collapse svg {
     transform: rotate(180deg);
     transition: 0.3s;
   }
+
   .collapsed {
     svg {
       transform: rotate(0deg);
     }
   }
+
   #multiple-images .row {
     overflow-y: auto;
   }

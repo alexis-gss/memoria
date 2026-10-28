@@ -1,115 +1,118 @@
+@use '../utilities/variables' as *;
+@use '../libs/bootstrap' as *;
+
 .games-related {
-    .swiper {
-        &-wrapper {
-            height: 100% !important;
-        }
-
-        &-button-disabled {
-            visibility: hidden;
-        }
-
-        &-slide {
-            height: auto;
-
-            .placeholder-text {
-                height: 24px;
-            }
-        }
+  .swiper {
+    &-wrapper {
+      height: 100% !important;
     }
 
-    .swiper-pagination {
-        &-bullet {
-            opacity: 1 !important;
-        }
-
-        &-bullet-active {
-            background-color: rgb(var(--bs-secondary-rgb)) !important;
-        }
-
-        button {
-            width: 1rem;
-            height: 1rem;
-
-            &:hover {
-            background-color: rgb(var(--bs-primary-rgb)) !important;
-            }
-        }
+    &-button-disabled {
+      visibility: hidden;
     }
 
-    .swiper-button {
-        width: 36px;
-        height: fit-content !important;
+    &-slide {
+      height: auto;
 
-        &:first-of-type,
-        &:last-of-type {
-            bottom: -0.6rem;
+      .placeholder-text {
+        height: 24px;
+      }
+    }
+  }
 
-            @include media-breakpoint-up(md) {
-                top: 50%;
-                transform: translateY(-50%);
-            }
-        }
-
-        &:first-of-type {
-            left: calc(var(--bs-gutter-x) * .1);
-        }
-
-        &:last-of-type {
-            right: calc(var(--bs-gutter-x) * .1);
-        }
+  .swiper-pagination {
+    &-bullet {
+      opacity: 1 !important;
     }
 
-    #swiper-games-related .ratio {
-        max-width: 366px;
+    &-bullet-active {
+      background-color: rgb(var(--bs-primary-rgb)) !important;
     }
 
-    .swiper-wrapper.centered-few-slides {
-        justify-content: center;
+    button {
+      width: 1rem;
+      height: 1rem;
+
+      &:hover {
+        background-color: rgb(var(--bs-primary-rgb)) !important;
+      }
+    }
+  }
+
+  .swiper-button {
+    width: 36px;
+    height: 36px;
+
+    &:first-of-type,
+    &:last-of-type {
+      bottom: -0.6rem;
+
+      @include media-breakpoint-up(md) {
+        top: 50%;
+        transform: translateY(-50%);
+      }
     }
 
-    &-transition {
-        width: 1rem;
-
-        &:first-of-type {
-            left: 0;
-            background: linear-gradient(to right, #{$color-white} 0%, transparent 100%);
-
-            @include media-breakpoint-up(md) {
-                left: 3rem;
-            }
-        }
-
-        &:last-of-type {
-            right: 0;
-            background: linear-gradient(to left, #{$color-white} 0%, transparent 100%);
-
-            @include media-breakpoint-up(md) {
-                right: 3rem;
-            }
-        }
+    &:first-of-type {
+      left: calc(var(--bs-gutter-x) * 0.1);
     }
 
-    .fa-animation {
-        animation: translation 1.5s cubic-bezier(.17,.84,.44,1) infinite;
+    &:last-of-type {
+      right: calc(var(--bs-gutter-x) * 0.1);
+    }
+  }
+
+  #swiper-games-related .ratio {
+    max-width: 366px;
+  }
+
+  .swiper-wrapper.centered-few-slides {
+    justify-content: center;
+  }
+
+  &-transition {
+    width: 1rem;
+
+    &:first-of-type {
+      left: 0;
+      background: linear-gradient(to right, #{$color-white} 0%, transparent 100%);
+
+      @include media-breakpoint-up(md) {
+        left: 3rem;
+      }
     }
 
-    @keyframes translation {
-        0% {
-            left: 0%;
-            opacity: 0;
-        }
+    &:last-of-type {
+      right: 0;
+      background: linear-gradient(to left, #{$color-white} 0%, transparent 100%);
 
-        30% {
-            opacity: 1;
-        }
-
-        70% {
-            opacity: 1;
-        }
-
-        100% {
-            left: calc(100% - 20.5px);
-            opacity: 0;
-        }
+      @include media-breakpoint-up(md) {
+        right: 3rem;
+      }
     }
+  }
+
+  .fa-animation {
+    animation: translation 1.5s cubic-bezier(0.17, 0.84, 0.44, 1) infinite;
+  }
+
+  @keyframes translation {
+    0% {
+      left: 0%;
+      opacity: 0;
+    }
+
+    30% {
+      opacity: 1;
+    }
+
+    70% {
+      opacity: 1;
+    }
+
+    100% {
+      left: calc(100% - 20.5px);
+      opacity: 0;
+    }
+  }
 }

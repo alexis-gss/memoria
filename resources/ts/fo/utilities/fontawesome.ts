@@ -39,8 +39,6 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 
 config.autoReplaceSvg = false;
-
-// @ts-ignore
 library.add(
     faArrowDownAZ,
     faArrowLeft,

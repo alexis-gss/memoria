@@ -1,5 +1,7 @@
 // Include new custom variables
-@import './../utilities/bootstrap-variables';
+@use 'sass:list';
+@use './../utilities/variables' as *;
+@use './../utilities/bootstrap-variables' as *;
 
 // Include functions first (so you can manipulate colors, SVGs, calc, etc)
 @import 'bootstrap/scss/functions';
@@ -40,7 +42,7 @@
 @import 'bootstrap/scss/progress';
 @import 'bootstrap/scss/card';
 @import 'bootstrap/scss/badge';
-@import "bootstrap/scss/offcanvas";
+@import 'bootstrap/scss/offcanvas';
 
 // Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
 @import 'bootstrap/scss/utilities/api';

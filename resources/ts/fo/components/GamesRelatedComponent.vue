@@ -13,7 +13,7 @@
     <div class="col-12 position-relative px-0 px-md-5">
       <div class="games-related-transition position-absolute top-0 h-100 z-2" />
       <button
-        class="swiper-button swiper-games-related-button-prev btn btn-primary position-absolute rounded-circle border-0 z-3"
+        class="swiper-button swiper-games-related-button-prev btn btn-primary position-absolute rounded-circle border-0 d-flex justify-content-center align-items-center z-3"
         :title="trans.methods.__('fo_slide_target', {'target': trans.methods.__('fo_prev')})"
         :aria-label="trans.methods.__('fo_slide_target_aria', {'target': trans.methods.__('fo_prev')})"
         data-bs-tooltip="tooltip"
@@ -66,7 +66,7 @@
         </div>
       </div>
       <button
-        class="swiper-button swiper-games-related-button-next btn btn-primary position-absolute rounded-circle border-0 z-3"
+        class="swiper-button swiper-games-related-button-next btn btn-primary position-absolute rounded-circle border-0 d-flex justify-content-center align-items-center z-3"
         :title="trans.methods.__('fo_slide_target', {'target': trans.methods.__('fo_next')})"
         :aria-label="trans.methods.__('fo_slide_target_aria', {'target': trans.methods.__('fo_next')})"
         data-bs-tooltip="tooltip"
@@ -84,8 +84,9 @@
 </template>
 
 <script lang="ts" setup>
+import type { AxiosResponse } from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, shallowRef, reactive, onMounted, nextTick } from "vue";
 import type { PropType } from "vue";
 import Swiper from "swiper";
 import { Keyboard, Navigation, Pagination } from "swiper/modules";
@@ -93,7 +94,6 @@ import errors from "./../../modules/errors";
 import trans from "./../../modules/trans";
 import route from "./../../modules/route";
 import { Tooltips } from "./../../modules/tooltips";
-import type { AxiosResponse } from "~/axios";
 
 defineOptions({
   name: "GamesRelatedComponent"
@@ -111,8 +111,8 @@ const props = defineProps({
     default: "",
   },
   relatedGamesViews: {
-    type: Array as unknown as PropType<LaravelPaginator>,
-    default: () => { return []; }
+    type: Object as PropType<LaravelPaginator<string>>,
+    required: true,
   },
 });
 
@@ -122,8 +122,8 @@ const gamesRelated = ref<HTMLDivElement|null>(null);
 // * DATA
 const gameSlug = ref<string>(props.gameSlug);
 const relatedGamesViews = ref<Array<string>>(props.relatedGamesViews.data);
-const slider = ref<Swiper|null>(null);
-const tooltips = ref<Tooltips|null>(null);
+const slider = shallowRef<Swiper | null>(null);
+const tooltips = shallowRef<Tooltips | null>(null);
 
 /** Pagination parameters. */
 const paginationParameters = reactive<{
@@ -264,12 +264,12 @@ function getGamesRelatedRoute(): string {
 function getNextRelatedGamesViews(): void {
   paginationParameters.loading = true;
   window.axios
-    .get(getGamesRelatedRoute(), {
+    .get<LaravelPaginator<string>>(getGamesRelatedRoute(), {
       params: {
         page: paginationParameters.page + 1
       }
     })
-    .then((response: AxiosResponse<any, any>) => {
+    .then((response: AxiosResponse<LaravelPaginator<string>>) => {
       relatedGamesViews.value = relatedGamesViews.value.concat(response.data.data);
       paginationParameters.page = response.data.current_page;
       paginationParameters.lastPage = response.data.last_page;

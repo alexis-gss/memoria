@@ -156,7 +156,11 @@ onMounted(() => {
  * @return void
  */
 function togglePanel(panel: Panel): void {
-  activePanel.value === panel ? closeMenu() : openTo(panel);
+  if (activePanel.value === panel) {
+    closeMenu();
+  } else {
+    openTo(panel);
+  }
 }
 
 /**

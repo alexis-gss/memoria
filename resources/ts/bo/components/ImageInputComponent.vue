@@ -147,6 +147,7 @@
 
     <!-- CROP MODAL -->
     <div
+      ref="cropModal"
       :id="`Modal${parameters.id}`"
       class="modal"
       tabindex="-1"
@@ -194,7 +195,7 @@
                       class="btn btn-primary"
                       :title="trans.methods.__('bo_tooltip_image_input_zoom_in')"
                       data-bs-tooltip="tooltip"
-                      @click.prevent="cropperInstance?.zoom(0.1)"
+                      @click.prevent="cropperZoom(0.1)"
                     >
                       <FontAwesomeIcon icon="fa-solid fa-search-plus" />
                     </button>
@@ -202,7 +203,7 @@
                       class="btn btn-primary"
                       :title="trans.methods.__('bo_tooltip_image_input_zoom_out')"
                       data-bs-tooltip="tooltip"
-                      @click.prevent="cropperInstance?.zoom(-0.1)"
+                      @click.prevent="cropperZoom(-0.1)"
                     >
                       <FontAwesomeIcon icon="fa-solid fa-search-minus" />
                     </a>
@@ -212,7 +213,7 @@
                       class="btn btn-primary"
                       :title="trans.methods.__('bo_tooltip_image_input_move_left')"
                       data-bs-tooltip="tooltip"
-                      @click.prevent="cropperInstance?.move(-10, 0)"
+                      @click.prevent="cropperMove(-10, 0)"
                     >
                       <FontAwesomeIcon icon="fa-solid fa-arrow-left" />
                     </a>
@@ -220,7 +221,7 @@
                       class="btn btn-primary"
                       :title="trans.methods.__('bo_tooltip_image_input_move_right')"
                       data-bs-tooltip="tooltip"
-                      @click.prevent="cropperInstance?.move(10, 0)"
+                      @click.prevent="cropperMove(10, 0)"
                     >
                       <FontAwesomeIcon icon="fa-solid fa-arrow-right" />
                     </a>
@@ -228,7 +229,7 @@
                       class="btn btn-primary"
                       :title="trans.methods.__('bo_tooltip_image_input_move_up')"
                       data-bs-tooltip="tooltip"
-                      @click.prevent="cropperInstance?.move(0, -10)"
+                      @click.prevent="cropperMove(0, -10)"
                     >
                       <FontAwesomeIcon icon="fa-solid fa-arrow-up" />
                     </a>
@@ -236,7 +237,7 @@
                       class="btn btn-primary"
                       :title="trans.methods.__('bo_tooltip_image_input_move_down')"
                       data-bs-tooltip="tooltip"
-                      @click.prevent="cropperInstance?.move(0, 10)"
+                      @click.prevent="cropperMove(0, 10)"
                     >
                       <FontAwesomeIcon icon="fa-solid fa-arrow-down" />
                     </a>
@@ -312,6 +313,7 @@
               </div>
               <div class="row mt-3">
                 <div class="col-12 col-md-6 p-0 mb-3">
+                  <!-- Hidden by Cropper.js, which inserts its <cropper-canvas> right after it. -->
                   <img
                     class="image-modification"
                     ref="imgEditor"
@@ -323,6 +325,7 @@
                   class="col-12 col-md-6 p-0 preview-img"
                 >
                   <div
+                    ref="previewHost"
                     :id="`Preview${parameters.id}`"
                     :style="previewStyle"
                   />
@@ -420,7 +423,8 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Cropper from "cropperjs";
-import { computed, nextTick, onMounted, reactive, ref, useAttrs, watch } from "vue";
+import type { CropperImage } from "cropperjs";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, useAttrs, watch } from "vue";
 import { Tooltips } from "./../../modules/tooltips";
 import trans from "./../../modules/trans";
 
@@ -436,6 +440,21 @@ type CropperParameters = {
   /** The scaling factor applies to the ordinate of the image. */
   scaleY: MirrorScale
 };
+
+/** Content of the JSON passed through the "json" attribute. */
+interface ImageInputAttrs {
+  id: string;
+  name: string;
+  helper?: string | null;
+  width: number | string;
+  height: number | string;
+  preview?: boolean;
+  required?: boolean;
+  showLabels?: boolean;
+  browseEvent?: boolean;
+  value?: string | null;
+  placeholder?: string | null;
+}
 
 // * CONSTANTS
 const UNITS = [
@@ -464,6 +483,9 @@ const attrs = useAttrs();
 // * REFS
 const imageInput = ref<HTMLDivElement|null>(null);
 const previewBox = ref<HTMLDivElement|null>(null);
+/** Host of the <cropper-viewer> element (live preview of the crop). */
+const previewHost = ref<HTMLDivElement|null>(null);
+const cropModal = ref<HTMLDivElement|null>(null);
 /** The inputfile to select a picture and send in form. */
 const inputFileImage = ref<HTMLInputElement|null>(null);
 const imgEditor = ref<HTMLImageElement|null>(null);
@@ -472,7 +494,7 @@ const imgEditor = ref<HTMLImageElement|null>(null);
 const props = defineProps({
   id: {
     type: String,
-    default: String(Math.pow(10, 16) / Math.random())
+    default: () => String(Math.pow(10, 16) / Math.random())
   },
   name: {
     type: String,
@@ -517,7 +539,7 @@ const props = defineProps({
 });
 
 // * DATA
-const tooltips = ref<Tooltips | null>(null);
+const tooltips = shallowRef<Tooltips | null>(null);
 /** If there is an actual picture file. */
 const hasPicture = ref<boolean>(false);
 const hasCroppedPicture = ref<boolean>(false);
@@ -588,40 +610,23 @@ const cropperParameters = reactive<CropperParameters>({
   scaleX: 1,
   scaleY: 1,
 });
-const cropperInstance = ref<Cropper|null>(null);
+const cropperInstance = shallowRef<Cropper|null>(null);
+/** Rotation (in degrees) currently applied on the cropped image. */
+let appliedRotation = 0;
+/** Unique key used by the <cropper-viewer> to find its <cropper-selection>. */
+const cropperSelectionKey = `image-input-${Math.random().toString(36).slice(2)}`;
 
 /** Keep previous prop value in order to detect changes. */
 const previousPropValue = ref<string>(props.value);
 
 // * COMPUTED
-const cropperOptions = computed<Cropper.Options>(() => {
-  return {
-    autoCrop: true,
-    background: true,
-    autoCropArea: 1,
-    viewMode: 0,
-    dragMode: "move",
-    movable: true,
-    rotatable: true,
-    scalable: true,
-    zoomable: true,
-    zoomOnTouch: false,
-    zoomOnWheel: false,
-    cropBoxMovable: true,
-    cropBoxResizable: false,
-    toggleDragModeOnDblclick: false,
-    aspectRatio: parameters.dimensions.width / parameters.dimensions.height,
-    preview: `#Preview${parameters.id}`
-  };
-});
 const isUsedWithProps = computed<boolean>(() => attrs.json === undefined);
 const fileParamIsFile = computed<boolean>(() => fileParameters.file instanceof File);
 
 // * LIFECYCLE
 onMounted((): void => {
-  const json = String(attrs.json ?? "{}"),
-        data = JSON.parse(json);
   if (!isUsedWithProps.value) {
+    const data = JSON.parse(String(attrs.json)) as ImageInputAttrs;
     parameters.id = data.id;
     parameters.name = data.name;
     parameters.helper = data.helper ?? "";
@@ -631,7 +636,7 @@ onMounted((): void => {
     parameters.required = Boolean(data.required);
     parameters.showLabels = Boolean(data.showLabels);
     parameters.browseEvent = Boolean(data.browseEvent);
-    let value = data.value;
+    const value = data.value;
     if(typeof value === "string" && value.length) {
       fileParameters.filePath = value.replace(/^\/|^/, "");
       fileParameters.fileName = value.replace(/^\/|^/, "");
@@ -642,8 +647,15 @@ onMounted((): void => {
   } else {
     assignFromProps();
   }
+  // The cropper is created once the modal is fully displayed (it needs real dimensions).
+  cropModal.value?.addEventListener("shown.bs.modal", onCropModalShown);
   fetchPictureFromPath(fileParameters.filePath);
   initTooltips();
+});
+
+onBeforeUnmount((): void => {
+  cropModal.value?.removeEventListener("shown.bs.modal", onCropModalShown);
+  destroyCropper();
 });
 
 // * WATCHERS
@@ -672,7 +684,7 @@ watch(previousPropValue, (): void => {
   }
   cropperReset();
   hasCroppedPicture.value = false;
-  fetchPictureFromPath(fileParameters.filePath)!.then((file) => useThis(file));
+  fetchPictureFromPath(fileParameters.filePath)?.then((file) => useThis(file));
 });
 
 /**
@@ -680,10 +692,7 @@ watch(previousPropValue, (): void => {
   * @return void
   */
 watch(cropperParameters, (newValue: CropperParameters): void => {
-  if (cropperInstance.value === null) {
-    return;
-  }
-  cropperInstance.value.rotateTo(newValue.rotation);
+  rotateImageTo(newValue.rotation);
 }, { deep: true });
 
 /**
@@ -742,16 +751,49 @@ function assignFromProps(): void {
 }
 
 /**
+  * Get the <cropper-image> element of the current cropper.
+  * @return {CropperImage|null}
+  */
+function getCropperImage(): CropperImage | null {
+  return cropperInstance.value?.getCropperImage() ?? null;
+}
+
+/**
+  * Zoom the image (positive to zoom in, negative to zoom out).
+  * @param {number} ratio Zoom ratio.
+  * @return void
+  */
+function cropperZoom(ratio: number): void {
+  getCropperImage()?.$zoom(ratio);
+}
+
+/**
+  * Move the image in the viewport (in pixels, relative to the screen).
+  * @param {number} x Horizontal distance.
+  * @param {number} y Vertical distance.
+  * @return void
+  */
+function cropperMove(x: number, y: number): void {
+  getCropperImage()?.$move(x, y);
+}
+
+/**
   * Vertical or Horizontal scale cropped file from cropper.
   * @return void
   */
 function cropperScale(direction: "H"|"V"): void {
-  if (cropperInstance.value === null) {
+  const image = getCropperImage();
+  if (image === null) {
     return;
   }
   const dir: "X"|"Y" = direction === "H" ? "X" : "Y";
   cropperParameters[`scale${dir}`] = (-1 / cropperParameters[`scale${dir}`]) as MirrorScale;
-  cropperInstance.value[`scale${dir}`](cropperParameters[`scale${dir}`]);
+  // $scale is relative to the current transform, so it flips the image on each call.
+  if (direction === "H") {
+    image.$scale(-1, 1);
+  } else {
+    image.$scale(1, -1);
+  }
 }
 
 /**
@@ -764,11 +806,37 @@ function cropperRotate(deg: number): void {
 }
 
 /**
+  * Rotate the image to an absolute angle (Cropper.js 2 only rotates relatively).
+  * @param {number} degrees Absolute angle in degrees.
+  * @return void
+  */
+function rotateImageTo(degrees: number): void {
+  const image = getCropperImage();
+  if (image === null) {
+    return;
+  }
+  const delta = degrees - appliedRotation;
+  if (delta === 0) {
+    return;
+  }
+  // A mirrored axis reverses the direction of a rotation applied after it.
+  const direction = cropperParameters.scaleX * cropperParameters.scaleY;
+  image.$rotate(`${delta * direction}deg`);
+  appliedRotation = degrees;
+}
+
+/**
   * Reset cropped file from cropper.
   * @return void
   */
 function cropperReset(): void {
-  cropperInstance.value?.reset();
+  const image = getCropperImage();
+  if (image !== null) {
+    image.$resetTransform();
+    image.$center("contain");
+    cropperInstance.value?.getCropperSelection()?.$reset();
+  }
+  appliedRotation = 0;
   cropperParameters.rotation = 0;
   cropperParameters.scaleX = 1;
   cropperParameters.scaleY = 1;
@@ -776,21 +844,37 @@ function cropperReset(): void {
 
 /**
   * Export cropped file from cropper.
-  * @return void
+  * @return Promise<void>
   */
-function exportCropperFile(): void {
-  if (!cropperInstance.value) {
+async function exportCropperFile(): Promise<void> {
+  const selection = cropperInstance.value?.getCropperSelection();
+  if (!selection) {
     return;
   }
+  const { width, height } = parameters.dimensions;
+
+  const cropped = await selection.$toCanvas({
+    width,
+    height,
+    beforeDraw: (context) => {
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
+    },
+  });
+
+  const output = document.createElement("canvas");
+  output.width = width;
+  output.height = height;
+  const context = output.getContext("2d");
+  if (!context) {
+    return;
+  }
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(cropped, 0, 0, width, height);
+
   hasCroppedPicture.value = true;
-  fileDataUrl.value =
-    cropperInstance.value.getCroppedCanvas({
-      fillColor: "rgba(0, 0, 0, 0)",
-      width: parameters.dimensions.width,
-      height: parameters.dimensions.height,
-      imageSmoothingEnabled: true,
-      imageSmoothingQuality: "high",
-    }).toDataURL("image/png");
+  fileDataUrl.value = output.toDataURL("image/png");
   const file = new File(
     [dataUrltoBlob(fileDataUrl.value)],
     fileParameters.fileName,
@@ -841,15 +925,21 @@ function fetchPictureFromPath(filePath: string): Promise<File>|void {
           stringFileName: string = prefixedFilePath.substring(prefixedFilePath.lastIndexOf("/")).replace(/^\/|^/, "");
 
     fetch(prefixedFilePath)
-      .then((response) => response.blob())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.blob();
+      })
       .then((blob: Blob) => {
         const file = new File([blob], stringFileName, {
-          type: "image/png",
-          lastModified: new Date().getTime(),
+          type: blob.type || "image/png",
+          lastModified: Date.now(),
         });
         setFileAsDataUrl(file);
         accept(file);
-      }).catch(() => deny("Failed to fetch picture"));
+      })
+      .catch(() => deny("Failed to fetch picture"));
   }));
 }
 
@@ -890,32 +980,111 @@ function setFileAsDataUrl(file: File): void
 }
 
 /**
-  * Init Cropper.
+  * Prepare the image of the editor, the cropper itself is created
+  * when the modal is displayed (see onCropModalShown).
   * @return void
   */
 function prepareImageEditor(): void {
-  const createCropper = () => {
-    const imgEditorEl = imgEditor.value;
-    if (!imgEditorEl) {
-      throw new Error("imgEditor required");
-    }
-    if (cropperInstance.value) {
-      cropperInstance.value.destroy();
-    }
-    cropperInstance.value = new Cropper(imgEditorEl, cropperOptions.value);
-  };
+  if (fileParameters.file === null || fileDataUrl.value === null) {
+    throw new Error("File must not be null");
+  }
+  if (!imgEditor.value) {
+    throw new Error("imgEditor required");
+  }
+  imgEditor.value.src = fileDataUrl.value;
+}
 
-  if (fileParameters.file === null) {
-    throw new Error("File nust not be null");
+/**
+  * Build the Cropper.js 2 template: a fixed-ratio selection, the image
+  * is moved/zoomed/rotated below it.
+  * @return {string}
+  */
+function buildCropperTemplate(): string {
+  const ratio = parameters.dimensions.width / parameters.dimensions.height;
+  const aspectRatio = Number.isFinite(ratio) && ratio > 0 ? ` aspect-ratio="${ratio}"` : "";
+  return (
+    "<cropper-canvas background>"
+    + "<cropper-image rotatable scalable translatable></cropper-image>"
+    + "<cropper-shade></cropper-shade>"
+    // Drag the image from anywhere outside the selection.
+    + "<cropper-handle action=\"move\" plain></cropper-handle>"
+    + `<cropper-selection data-cropper-selection="${cropperSelectionKey}" initial-coverage="1"${aspectRatio}>`
+    + "<cropper-grid role=\"grid\" bordered covered></cropper-grid>"
+    + "<cropper-crosshair centered></cropper-crosshair>"
+    // The selection is neither movable nor resizable, so dragging it moves the image.
+    + "<cropper-handle action=\"move\" theme-color=\"rgba(255, 255, 255, 0.35)\"></cropper-handle>"
+    + "</cropper-selection>"
+    + "</cropper-canvas>"
+  );
+}
+
+/**
+  * Modal of the editor is displayed.
+  * @return Promise<void>
+  */
+async function onCropModalShown(): Promise<void> {
+  const img = imgEditor.value;
+  if (!img || !fileDataUrl.value) {
+    return;
+  }
+  destroyCropper();
+
+  // Remet la src et attend qu'elle soit réellement chargée.
+  img.src = fileDataUrl.value;
+  try {
+    await img.decode();
+  } catch {
+    console.error("Image illisible pour le cropper", img.src.slice(0, 50));
+    return;
   }
 
-  imgEditor.value!.src = URL.createObjectURL(fileParameters.file);
+  createCropper();
+  previewStyleCompute();
+}
 
-  nextTick(() => {
-    createCropper();
-    previewStyleCompute();
-  });
-  return;
+/**
+  * Init Cropper.
+  * @return void
+  */
+function createCropper(): void {
+  const imgEditorEl = imgEditor.value;
+  if (!imgEditorEl) {
+    throw new Error("imgEditor required");
+  }
+  destroyCropper();
+  appliedRotation = 0;
+  cropperParameters.rotation = 0;
+  cropperParameters.scaleX = 1;
+  cropperParameters.scaleY = 1;
+  cropperInstance.value = new Cropper(imgEditorEl, { template: buildCropperTemplate() });
+  cropperInstance.value
+    .getCropperImage()
+    ?.$ready()
+    .catch((error: unknown) => console.error("Cropper: chargement impossible", error));
+  createPreview();
+}
+
+/**
+  * Destroy the current cropper and its preview.
+  * @return void
+  */
+function destroyCropper(): void {
+  cropperInstance.value?.destroy();
+  cropperInstance.value = null;
+  previewHost.value?.replaceChildren();
+}
+
+/**
+  * Create the <cropper-viewer> showing the cropped area in real time.
+  * @return void
+  */
+function createPreview(): void {
+  if (!previewHost.value) {
+    return;
+  }
+  const viewer = document.createElement("cropper-viewer");
+  viewer.setAttribute("selection", `[data-cropper-selection="${cropperSelectionKey}"]`);
+  previewHost.value.replaceChildren(viewer);
 }
 
 /**
@@ -949,7 +1118,7 @@ function fetchImageDimensions(pictureSrc: string): void {
       fileParameters.dimensions.height = img.height;
     };
     img.src = pictureSrc;
-  } catch (e) {
+  } catch {
     fileParameters.dimensions.width = img.width;
     fileParameters.dimensions.height = img.height;
   }
@@ -1030,43 +1199,45 @@ function initTooltips(): void {
 </script>
 
 <style lang="scss">
-@import "cropperjs/dist/cropper.css";
-
 .image-input-vue {
-  /* Ensure the size of the image fit the container perfectly. */
-  .image-modification {
-    display: block;
-
-    /* This rule is very important, please don't ignore this. */
-    max-width: 100%;
+  cropper-canvas {
+    width: 100%;
+    height: 28rem;
   }
+
   .rotate-button {
     display: flex;
     flex-direction: column;
   }
+
   .rotate-drag {
     display: flex;
-    flex-direction: column-reverse;
     width: 100%;
-    & > input {
+    flex-direction: column-reverse;
+
+    > input {
       width: 100%;
     }
   }
+
   .preview-img {
     position: relative;
-    & > div {
+
+    > div {
       position: relative;
-      overflow: hidden;
-      border: 1px solid black;
       top: 50%;
       left: 50%;
+      overflow: hidden;
+      border: 1px solid #000;
       transform: translateX(-50%) translateY(-50%);
     }
   }
+
   input.right-aligned {
-    direction: ltr !important;
     overflow: hidden !important;
+    direction: ltr !important;
   }
+
   input.right-aligned :not(:focus) {
     direction: rtl !important;
     text-align: left !important;

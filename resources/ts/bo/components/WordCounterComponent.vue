@@ -84,8 +84,7 @@ function checkInput(input: HTMLElement|EventTarget|null): HTMLInputElement|HTMLT
   * @return void
   */
 function updateValues(string: string): void {
-  let chars, words;
-  [words, chars] = calculateValues(string);
+  const [words, chars] = calculateValues(string);
   wordsCount.value = words;
   charactersCount.value = chars;
 }
@@ -101,26 +100,27 @@ function calculateValues(string: string): Array<number> {
 </script>
 
 <style lang="scss">
-#word-counter + input[type="text"],
-.word-counter + input[type="text"],
+#word-counter + input[type='text'],
+.word-counter + input[type='text'],
 #word-counter + textarea,
 .word-counter + textarea,
-#word-counter + .input-group > input[type="password"],
-.word-counter + .input-group > input[type="password"],
-#word-counter-varchar + input[type="text"],
-.word-counter-varchar + input[type="text"],
+#word-counter + .input-group > input[type='password'],
+.word-counter + .input-group > input[type='password'],
+#word-counter-varchar + input[type='text'],
+.word-counter-varchar + input[type='text'],
 #word-counter-varchar + textarea,
 .word-counter-varchar + textarea,
-#word-counter-varchar + .input-group > input[type="password"],
-.word-counter-varchar + .input-group > input[type="password"] {
+#word-counter-varchar + .input-group > input[type='password'],
+.word-counter-varchar + .input-group > input[type='password'] {
   border-radius: 0 0 0.375rem 0.375rem;
 }
+
 .word-counter-varchar {
-  color: var(--bs-body-color);
   border: var(--bs-border-width) solid var(--bs-border-color);
   border-bottom: 0;
   background-color: rgb(var(--bs-secondary-bg-rgb));
   border-top-left-radius: 0.375rem;
   border-top-right-radius: 0.375rem;
+  color: var(--bs-body-color);
 }
 </style>

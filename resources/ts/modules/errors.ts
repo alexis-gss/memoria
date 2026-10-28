@@ -1,9 +1,13 @@
+import { AxiosError } from "~/axios";
+
+type ValidationErrorBag = Record<string, string[]>;
+
 export default {
     methods: {
         /**
          * Parse error messages for a specific input.
          *
-         * @param {Record<string, Array<string>>} allErrors 
+         * @param {Record<string, Array<string>>} allErrors
          * @return {string}
          */
         parseValidationErrors(
@@ -49,23 +53,25 @@ export default {
                 : null;
         },
         /**
-          * Return error message after the ajax call.
-          * @param {any} event
-          * @return {void}
-          */
-        ajaxErrorHandler(event: any): void {
+         * Return error message after the ajax call.
+         * @param {AxiosError<{ errors?: ValidationErrorBag }>} event
+         * @return {void}
+         */
+        ajaxErrorHandler(event: AxiosError<{ errors?: ValidationErrorBag }>): void {
             let message = "An error has occurred";
-            if (event.response.status === 422) {
+            const status = event.response?.status;
+
+            if (status === 422) {
                 message = this.parseValidationErrors(
                     event.response?.data?.errors ?? {}
                 ) || message;
                 if (window.vueDebug) {
-                    console.warn(event.response.data.errors);
+                    console.warn(event.response?.data?.errors);
                 }
-            } else if (event.response.status === 419) {
+            } else if (status === 419) {
                 console.log("Your session has expired, the page will be reloaded");
                 setTimeout(() => window.location.reload(), 2000);
-            } else if (event.response.status === 403) {
+            } else if (status === 403) {
                 console.log("You are not authorized to perform this action");
                 setTimeout(() => window.location.reload(), 2000);
             } else {

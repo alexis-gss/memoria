@@ -1,54 +1,52 @@
 @mixin generate-bs-borders($infix, $prefix, $color:null) {
-    $color-var: var(--#{$prefix}border-color);
+  $color-var: var(--#{$prefix}border-color);
 
-    @if $color {
-        $color-var: rgba(var(--#{$prefix}#{$color}-rgb));
-        $color: "-#{$color}";
-    }
+  @if $color {
+    $color-var: rgb(var(--#{$prefix}#{$color}-rgb));
+    $color: '-#{$color}';
+  }
 
-    .border#{$infix}#{$color}-top {
-        border-top: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
-    }
-    .border#{$infix}#{$color}-end {
-        border-right: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
-    }
-    .border#{$infix}#{$color}-bottom {
-        border-bottom: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
-    }
-    .border#{$infix}#{$color}-start {
-        border-left: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
-    }
+  .border#{$infix}#{$color}-top {
+    border-top: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+  }
+  .border#{$infix}#{$color}-end {
+    border-right: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+  }
+  .border#{$infix}#{$color}-bottom {
+    border-bottom: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+  }
+  .border#{$infix}#{$color}-start {
+    border-left: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+  }
 
-    .border#{$infix}#{$color}-0 { border: 0 !important; }
-    .border#{$infix}#{$color}-top-0 { border-top: 0 !important; }
-    .border#{$infix}#{$color}-end-0 { border-right: 0 !important; }
-    .border#{$infix}#{$color}-bottom-0 { border-bottom: 0 !important; }
-    .border#{$infix}#{$color}-start-0 { border-left: 0 !important; }
+  .border#{$infix}#{$color}-0 { border: 0 !important; }
+  .border#{$infix}#{$color}-top-0 { border-top: 0 !important; }
+  .border#{$infix}#{$color}-end-0 { border-right: 0 !important; }
+  .border#{$infix}#{$color}-bottom-0 { border-bottom: 0 !important; }
+  .border#{$infix}#{$color}-start-0 { border-left: 0 !important; }
 
-    @each $idx, $b-width in $border-widths {
-        $pidx: list.index(($border-widths), ($idx $b-width));
-
-        .border#{$infix}#{$color}-top-#{$idx} {
-            border-top: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
-        }
-        .border#{$infix}#{$color}-end-#{$idx} {
-            border-right: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
-        }
-        .border#{$infix}#{$color}-bottom-#{$idx} {
-            border-bottom: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
-        }
-        .border#{$infix}#{$color}-start-#{$idx} {
-            border-left: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
-        }
+  @each $idx, $b-width in $border-widths {
+    .border#{$infix}#{$color}-top-#{$idx} {
+      border-top: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
     }
-
-    .border#{$infix}#{$color}-x {
-        border-right: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
-        border-left: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+    .border#{$infix}#{$color}-end-#{$idx} {
+      border-right: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
     }
-
-    .border#{$infix}#{$color}-y {
-        border-top: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
-        border-bottom: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+    .border#{$infix}#{$color}-bottom-#{$idx} {
+      border-bottom: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
     }
+    .border#{$infix}#{$color}-start-#{$idx} {
+      border-left: $b-width var(--#{$prefix}border-style) #{$color-var} !important;
+    }
+  }
+
+  .border#{$infix}#{$color}-x {
+    border-right: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+    border-left: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+  }
+
+  .border#{$infix}#{$color}-y {
+    border-top: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+    border-bottom: $border-width var(--#{$prefix}border-style) #{$color-var} !important;
+  }
 }

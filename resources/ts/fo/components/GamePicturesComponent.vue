@@ -159,7 +159,7 @@
       </template>
     </div>
     <!-- RELATED GAMES -->
-    <template v-if="!gameLoading && !gridChanging && (gamePage >= gameLastPage) && swiperInitialized">
+    <template v-if="!gameLoading && !gridChanging && (gamePage >= gameLastPage) && swiperInitialized && relatedGamesViews">
       <GamesRelatedComponent
         :game-slug="gameSlug"
         :related-games-views="relatedGamesViews"
@@ -172,7 +172,7 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Toast } from "bootstrap";
-import { computed, onMounted, ref, useAttrs, watch } from "vue";
+import { computed, onMounted, ref, shallowRef, useAttrs, watch } from "vue";
 import { useGlightbox } from "./../utilities/glightbox";
 import errors from "./../../modules/errors";
 import route from "./../../modules/route";
@@ -216,7 +216,7 @@ const validOrders: Array<string> = ["date", "likes"];
 const validGrids: Array<string> = Object.keys(gridPatterns);
 
 /** Games related component variables */
-const relatedGamesViews = ref<LaravelPaginator>();
+const relatedGamesViews = ref<LaravelPaginator<string> | null>(null);
 const swiperInitialized = ref<boolean>(false);
 
 /** Others */
@@ -226,8 +226,8 @@ const picturesRatings = ref<Array<number>>([]);
 const routeName = ref<string>("");
 const ratingLoading = ref<boolean>(false);
 const loadingPromise = ref<Promise<void> | null>(null);
-const tooltips = ref<Tooltips|null>(null);
 const gridChanging = ref<boolean>(false);
+const tooltips = shallowRef<Tooltips|null>(null);
 
 /** Glightbox */
 const lightbox = useGlightbox({
@@ -378,7 +378,7 @@ function getGamePicturesRoute(): string {
   if (!gamePicturesRoute) {
     throw new Error("Undefined route " + routeName.value);
   }
-  let url = new URL(gamePicturesRoute);
+  const url = new URL(gamePicturesRoute);
   return url.origin + url.pathname;
 }
 

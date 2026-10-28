@@ -1,15 +1,15 @@
 @charset "UTF-8";
 
 // * UTILITIES
-@import './utilities/variables';
+@use './utilities/variables';
 
 // * LIBS.
-@import './libs/bootstrap';
-@import "./libs/vue-nestable";
+@use './libs/bootstrap';
+@use './libs/vue-nestable';
 
 // * BASE.
-@import './base/common';
-@import './base/fonts';
+@use './base/common';
+@use './base/fonts';
 
 // * PAGES.
-@import './pages/statistics';
+@use './pages/statistics';
