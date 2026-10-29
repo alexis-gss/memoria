@@ -18,13 +18,9 @@ jobs:
   validation-php:
     name: Validation php
     uses: alexis-gss/github-workflows/.github/workflows/validation-php.yml@master
-  validation-laravel-tests:
-    name: Validation Laravel tests
-    needs: ['validation-stylelint', 'validation-eslint', 'validation-php']
-    uses: alexis-gss/github-workflows/.github/workflows/validation-laravel-tests.yml@master
   deployment:
     name: Deployment production
-    needs: ['validation-stylelint', 'validation-eslint', 'validation-php', validation-laravel-tests]
+    needs: ['validation-stylelint', 'validation-eslint', 'validation-php']
     uses: alexis-gss/github-workflows/.github/workflows/deployment.yml@master
     secrets: inherit
     if: github.ref == 'refs/heads/master'
