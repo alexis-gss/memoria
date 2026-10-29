@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\FormRequest;
 
 class JsonPaginateRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
@@ -34,12 +34,13 @@ class JsonPaginateRequest extends FormRequest
                 'string',
                 'starts_with:\\App\\Models\\',
                 // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
-                function ($attribute, $value, $fail) {
-                    if (!class_exists($value)) {
+                function ($attribute, $value, $fail): void {
+                    if (! class_exists($value)) {
                         $fail("Le modèle spécifié n'existe pas.");
+
                         return;
                     }
-                    if (!is_subclass_of($value, Model::class)) {
+                    if (! is_subclass_of($value, Model::class)) {
                         $fail("Le modèle spécifié n'est pas un modèle Eloquent.");
                     }
                 },
@@ -50,7 +51,7 @@ class JsonPaginateRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string,\Illuminate\Contracts\Translation\Translator|string|array<mixed>|null>
+     * @return array<string,\Illuminate\Translation\Translator|string|array<mixed>|null>
      */
     public function attributes(): array
     {

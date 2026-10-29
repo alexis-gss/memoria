@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Enums\Users\RoleEnum;
@@ -11,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use SplFileInfo;
 
 /**
  * Creates a new user.
@@ -62,14 +65,12 @@ class UserCreate extends Command
     /**
      * The role of the new user.
      *
-     * @var \App\Enums\Users\RoleEnum|null
+     * @var RoleEnum|null
      */
     protected $role;
 
     /**
      * Execute the console command.
-     *
-     * @return integer
      */
     public function handle(): int
     {
@@ -95,7 +96,7 @@ class UserCreate extends Command
         $user->password     = $this->password;
         $user->picture      = FileStorageHelper::storeFile(
             $user,
-            new \SplFileInfo(\resource_path('../database/factories/assets/users/default-picture.png'))
+            new SplFileInfo(\resource_path('../database/factories/assets/users/default-picture.png'))
         );
         $user->published    = true;
         $user->published_at = Carbon::now();
@@ -109,8 +110,6 @@ class UserCreate extends Command
 
     /**
      * Add a first name to the user.
-     *
-     * @return void
      */
     private function addFirstname(): void
     {
@@ -118,7 +117,7 @@ class UserCreate extends Command
             try {
                 $tmp       = $this->ask('Type the wanted user first name', 'John');
                 $validator = Validator::make(['first_name' => $tmp], [
-                    'first_name' => 'required|min:3|max:255'
+                    'first_name' => 'required|min:3|max:255',
                 ]);
                 $validator->validate();
                 $this->first_name = $tmp;
@@ -127,15 +126,14 @@ class UserCreate extends Command
                     'Please provide a valid first name %s',
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
+
                 continue;
             }
-        };
+        }
     }
 
     /**
      * Add a last name to the user.
-     *
-     * @return void
      */
     private function addLastname(): void
     {
@@ -143,7 +141,7 @@ class UserCreate extends Command
             try {
                 $tmp       = $this->ask('Type the wanted user last name', 'Doe');
                 $validator = Validator::make(['last_name' => $tmp], [
-                    'last_name' => 'required|min:3|max:255'
+                    'last_name' => 'required|min:3|max:255',
                 ]);
                 $validator->validate();
                 $this->last_name = $tmp;
@@ -152,15 +150,14 @@ class UserCreate extends Command
                     'Please provide a valid last name %s',
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
+
                 continue;
             }
-        };
+        }
     }
 
     /**
      * Add an email to the user.
-     *
-     * @return void
      */
     private function addEmail(): void
     {
@@ -168,7 +165,7 @@ class UserCreate extends Command
             try {
                 $tmp       = $this->ask('Type the wanted user email', 'john.doe@gmail.com');
                 $validator = Validator::make(['email' => $tmp], [
-                    'email' => 'required|unique:users,email|email:rfc,dns'
+                    'email' => 'required|unique:users,email|email:rfc,dns',
                 ]);
                 $validator->validate();
                 $this->email = $tmp;
@@ -177,31 +174,28 @@ class UserCreate extends Command
                     'Please provide a valid email %s',
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
+
                 continue;
             }
-        };
+        }
     }
 
     /**
      * Add a password to the user.
-     *
-     * @return void
      */
     private function addPassword(): void
     {
         while (
             ($this->password = $this->secret(
-                (!\is_null($this->password) ? 'Failed to confirm, ' : '') . 'Type the wanted user password'
+                (! \is_null($this->password) ? 'Failed to confirm, ' : '') . 'Type the wanted user password'
             )) !== $this->secret('Confirm the password')
         ) {
             continue;
-        };
+        }
     }
 
     /**
      * Add a role to the user.
-     *
-     * @return void
      */
     private function addRole(): void
     {
@@ -212,7 +206,7 @@ class UserCreate extends Command
                     [
                         Str::of(RoleEnum::conceptor->label())->ucFirst()->value(),
                         Str::of(RoleEnum::admin->label())->ucFirst()->value(),
-                        Str::of(RoleEnum::visitor->label())->ucFirst()->value()
+                        Str::of(RoleEnum::visitor->label())->ucFirst()->value(),
                     ],
                     Str::of(RoleEnum::visitor->label())->ucFirst()->value(),
                 );
@@ -226,15 +220,16 @@ class UserCreate extends Command
                 $this->role = RoleEnum::make(ToolboxHelper::getValidatedEnum(
                     $tmp,
                     'role',
-                    '\App\Enums\Users\RoleEnum',
+                    RoleEnum::class,
                 ));
             } catch (ValidationException $e) {
                 $this->error(sprintf(
                     'Please choose from the selection %s',
                     \implode(',', collect($e->errors())->flatten()->all())
                 ));
+
                 continue;
-            } //end try
-        }; //end while
+            } // end try
+        } // end while
     }
 }

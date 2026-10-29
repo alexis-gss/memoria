@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     'view' => [
@@ -7,10 +9,10 @@ return [
 
         'name-homepage' => 'home',
 
-        'resources-index' => 'index',
+        'resources-index'  => 'index',
         'resources-create' => 'create',
         'resources-update' => 'edit',
-        'resources-read' => 'show',
+        'resources-read'   => 'show',
     ],
 
     'route' => [
@@ -31,12 +33,12 @@ return [
         | (the first one to exist will be updated, must be a text field).
         | ex: ['name', 'label', 'title', 'first_name']
         |
-    */
+     */
 
     'list-fields' => [
         'name',
         'label',
         'title',
         'first_name',
-    ]
+    ],
 ];

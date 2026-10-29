@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Pictures;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -8,8 +10,6 @@ class PictureRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public static function rules(): array
     {

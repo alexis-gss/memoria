@@ -1,6 +1,26 @@
 <?php
 
-use Laravel\Telescope\Watchers;
+declare(strict_types=1);
+
+use Laravel\Telescope\Http\Middleware\Authorize;
+use Laravel\Telescope\Watchers\BatchWatcher;
+use Laravel\Telescope\Watchers\CacheWatcher;
+use Laravel\Telescope\Watchers\ClientRequestWatcher;
+use Laravel\Telescope\Watchers\CommandWatcher;
+use Laravel\Telescope\Watchers\DumpWatcher;
+use Laravel\Telescope\Watchers\EventWatcher;
+use Laravel\Telescope\Watchers\ExceptionWatcher;
+use Laravel\Telescope\Watchers\GateWatcher;
+use Laravel\Telescope\Watchers\JobWatcher;
+use Laravel\Telescope\Watchers\LogWatcher;
+use Laravel\Telescope\Watchers\MailWatcher;
+use Laravel\Telescope\Watchers\ModelWatcher;
+use Laravel\Telescope\Watchers\NotificationWatcher;
+use Laravel\Telescope\Watchers\QueryWatcher;
+use Laravel\Telescope\Watchers\RedisWatcher;
+use Laravel\Telescope\Watchers\RequestWatcher;
+use Laravel\Telescope\Watchers\ScheduleWatcher;
+use Laravel\Telescope\Watchers\ViewWatcher;
 
 return [
 
@@ -13,7 +33,7 @@ return [
         | of their individual configuration, which simply provides a single
         | and convenient way to enable or disable Telescope data storage.
         |
-    */
+     */
 
     'enabled' => env('TELESCOPE_ENABLED', false),
 
@@ -26,7 +46,7 @@ return [
         | setting is null, Telescope will reside under the same domain as the
         | application. Otherwise, this value will be used as the subdomain.
         |
-    */
+     */
 
     'domain' => env('TELESCOPE_DOMAIN'),
 
@@ -39,7 +59,7 @@ return [
         | to change this path to anything you like. Note that the URI will not
         | affect the paths of its internal API that aren't exposed to users.
         |
-    */
+     */
 
     'path' => env('TELESCOPE_PATH', 'telescope'),
 
@@ -52,7 +72,7 @@ return [
         | be used to store Telescope's data. In addition, you may set any
         | custom options as needed by the particular driver you choose.
         |
-    */
+     */
 
     'driver' => env('TELESCOPE_DRIVER', 'database'),
 
@@ -72,7 +92,7 @@ return [
         | which will be used to process ProcessPendingUpdate jobs. This can
         | be changed if you would prefer to use a non-default connection.
         |
-    */
+     */
 
     'queue' => [
         'connection' => env('TELESCOPE_QUEUE_CONNECTION', null),
@@ -88,11 +108,11 @@ return [
         | the chance to add your own middleware to this list or change any of
         | the existing middleware. Or, you can simply stick with this list.
         |
-    */
+     */
 
     'middleware' => [
         'web',
-        Laravel\Telescope\Http\Middleware\Authorize::class,
+        Authorize::class,
     ],
 
     /*
@@ -104,7 +124,7 @@ return [
         | not be watched by Telescope. In addition to this list, some Laravel
         | commands, like migrations and queue commands, are always ignored.
         |
-    */
+     */
 
     'only_paths' => [],
 
@@ -125,60 +145,60 @@ return [
         | Telescope. The watchers gather the application's profile data when
         | a request or task is executed. Feel free to customize this list.
         |
-    */
+     */
 
     'watchers' => [
-        Watchers\BatchWatcher::class         => env('TELESCOPE_BATCH_WATCHER', true),
-        Watchers\CacheWatcher::class         => [
+        BatchWatcher::class         => env('TELESCOPE_BATCH_WATCHER', true),
+        CacheWatcher::class         => [
             'enabled' => env('TELESCOPE_CACHE_WATCHER', true),
             'hidden'  => [],
         ],
-        Watchers\ClientRequestWatcher::class => env('TELESCOPE_CLIENT_REQUEST_WATCHER', true),
-        Watchers\CommandWatcher::class       => [
+        ClientRequestWatcher::class => env('TELESCOPE_CLIENT_REQUEST_WATCHER', true),
+        CommandWatcher::class       => [
             'enabled' => env('TELESCOPE_COMMAND_WATCHER', true),
             'ignore'  => [],
         ],
-        Watchers\DumpWatcher::class          => [
+        DumpWatcher::class          => [
             'enabled' => env('TELESCOPE_DUMP_WATCHER', true),
             'always'  => env('TELESCOPE_DUMP_WATCHER_ALWAYS', false),
         ],
-        Watchers\EventWatcher::class         => [
+        EventWatcher::class         => [
             'enabled' => env('TELESCOPE_EVENT_WATCHER', true),
             'ignore'  => [],
         ],
-        Watchers\ExceptionWatcher::class     => env('TELESCOPE_EXCEPTION_WATCHER', true),
-        Watchers\GateWatcher::class          => [
+        ExceptionWatcher::class     => env('TELESCOPE_EXCEPTION_WATCHER', true),
+        GateWatcher::class          => [
             'enabled'          => env('TELESCOPE_GATE_WATCHER', true),
             'ignore_abilities' => [],
             'ignore_packages'  => true,
             'ignore_paths'     => [],
         ],
-        Watchers\JobWatcher::class           => env('TELESCOPE_JOB_WATCHER', true),
-        Watchers\LogWatcher::class           => [
+        JobWatcher::class           => env('TELESCOPE_JOB_WATCHER', true),
+        LogWatcher::class           => [
             'enabled' => env('TELESCOPE_LOG_WATCHER', true),
             'level'   => 'error',
         ],
-        Watchers\MailWatcher::class          => env('TELESCOPE_MAIL_WATCHER', true),
-        Watchers\ModelWatcher::class         => [
+        MailWatcher::class          => env('TELESCOPE_MAIL_WATCHER', true),
+        ModelWatcher::class         => [
             'enabled'    => env('TELESCOPE_MODEL_WATCHER', true),
             'events'     => ['eloquent.*'],
             'hydrations' => true,
         ],
-        Watchers\NotificationWatcher::class  => env('TELESCOPE_NOTIFICATION_WATCHER', true),
-        Watchers\QueryWatcher::class         => [
+        NotificationWatcher::class  => env('TELESCOPE_NOTIFICATION_WATCHER', true),
+        QueryWatcher::class         => [
             'enabled'         => env('TELESCOPE_QUERY_WATCHER', true),
             'ignore_packages' => true,
             'ignore_paths'    => [],
             'slow'            => 100,
         ],
-        Watchers\RedisWatcher::class         => env('TELESCOPE_REDIS_WATCHER', true),
-        Watchers\RequestWatcher::class       => [
+        RedisWatcher::class         => env('TELESCOPE_REDIS_WATCHER', true),
+        RequestWatcher::class       => [
             'enabled'             => env('TELESCOPE_REQUEST_WATCHER', true),
             'size_limit'          => env('TELESCOPE_RESPONSE_SIZE_LIMIT', 64),
             'ignore_http_methods' => [],
             'ignore_status_codes' => [],
         ],
-        Watchers\ScheduleWatcher::class      => env('TELESCOPE_SCHEDULE_WATCHER', true),
-        Watchers\ViewWatcher::class          => env('TELESCOPE_VIEW_WATCHER', true),
+        ScheduleWatcher::class      => env('TELESCOPE_SCHEDULE_WATCHER', true),
+        ViewWatcher::class          => env('TELESCOPE_VIEW_WATCHER', true),
     ],
 ];

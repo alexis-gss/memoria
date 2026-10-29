@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Game;
@@ -19,7 +21,7 @@ final class PictureFactory extends Factory
     {
         return [
             'uuid'      => fake()->uuid(),
-            'label'     => "Picture",
+            'label'     => 'Picture',
             'game_id'   => fake()->randomElement(Game::pluck('id'))
                 ?? Game::factory()->createQuietly(['published' => true]),
             'published' => true,

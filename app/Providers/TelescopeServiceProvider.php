@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Enums\Theme\BootstrapThemeEnum;
@@ -11,8 +13,6 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {

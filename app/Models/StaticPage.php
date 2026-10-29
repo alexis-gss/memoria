@@ -1,31 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\Pages\StaticPageTypeEnum;
+use App\Traits\Models\HasActivityLog;
 use App\Traits\Models\HasTranslations;
 use App\Traits\Models\SchemaOrg;
 use App\Traits\Models\Sitemap;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use LaravelActivityLogs\Traits\HasActivityLog;
 use Spatie\SchemaOrg\Schema;
+use Spatie\SchemaOrg\WebPage;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
 
 /**
- * @property \App\Enums\Pages\StaticPageTypeEnum $type            Page type.
- * @property string                              $seo_title       Page seo title.
- * @property string                              $seo_description Page seo description.
- * @property string                              $title           Page title.
- * @property integer                             $order           Page order.
- * @property-read \Illuminate\Support\Carbon     $created_at      Created date.
- * @property-read \Illuminate\Support\Carbon     $updated_at      Updated date.
+ * @property \App\Enums\Pages\StaticPageTypeEnum $type Page type.
+ * @property string $seo_title Page seo title.
+ * @property string $seo_description Page seo description.
+ * @property string $title Page title.
+ * @property int $order Page order.
+ * @property-read \Illuminate\Support\Carbon $created_at Created date.
+ * @property-read \Illuminate\Support\Carbon $updated_at Updated date.
  *
- * @method static void booted()                    Perform any actions required after the model boots.
- * @method \Spatie\SchemaOrg\WebPage toSchemaOrg() Set micro data.
+ * @method static void booted() Perform any actions required after the model boots.
+ * @method WebPage toSchemaOrg() Set micro data.
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\LaravelActivityLogs\Models\ActivityLog[] $activityLogs
+ * @property-read \Illuminate\Support\Collection|ActivityLog[] $activityLogs
  * Get Activities of the Static page (morph-to-many relationship).
  */
 class StaticPage extends Model implements Sitemapable
@@ -39,7 +42,7 @@ class StaticPage extends Model implements Sitemapable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'seo_title',
@@ -70,44 +73,38 @@ class StaticPage extends Model implements Sitemapable
 
     /**
      * Perform any actions required after the model boots.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
-        static::creating(function () {
+        static::creating(function (): void {
             throw new \RuntimeException(trans('crud.messages.cannot_event_on_model', [
                 'event' => trans('crud.actions.create'),
-                'model' => trans_choice('models.static_page', 1)
+                'model' => trans_choice('models.static_page', 1),
             ]));
         });
-        static::updated(function () {
+        static::updated(function (): void {
             static::updateSitemap();
         });
-        static::deleting(function () {
+        static::deleting(function (): void {
             throw new \RuntimeException(trans('crud.messages.cannot_event_on_model', [
                 'event' => trans('crud.actions.delete'),
-                'model' => trans_choice('models.static_page', 1)
+                'model' => trans_choice('models.static_page', 1),
             ]));
         });
     }
 
     /**
      * Set sitemap tag.
-     *
-     * @return \Spatie\Sitemap\Tags\Url|string|array
      */
-    public function toSitemapTag(): \Spatie\Sitemap\Tags\Url|string|array
+    public function toSitemapTag(): Url | string | array
     {
         return $this->toSitemapTagCustom(route($this->type->routeName()), Url::CHANGE_FREQUENCY_MONTHLY, 1);
     }
 
     /**
      * Set micro data.
-     *
-     * @return \Spatie\SchemaOrg\WebPage
      */
-    public function toSchemaOrg(): \Spatie\SchemaOrg\WebPage
+    public function toSchemaOrg(): WebPage
     {
         return Schema::webPage()
             ->name($this->seo_title)

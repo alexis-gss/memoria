@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Games;
 
 use App\Models\Game;
@@ -14,8 +16,6 @@ class StoreGameRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -24,14 +24,12 @@ class StoreGameRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
         $this->merge([
             'slug'      => Str::of(strip_tags($this->name))->slug()->value(),
-            'music'     => $this->input('music') === null ? null : $this->input('music'),
+            'music'     => $this->input('music') ?? null,
             'published' => $this->boolean('published'),
         ]);
         $this->mergePicture();
@@ -39,8 +37,6 @@ class StoreGameRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -57,13 +53,12 @@ class StoreGameRequest extends FormRequest
             'tags.*'    => 'required|array',
             'tags.*.id' => 'required|numeric|exists:tags,id|distinct',
         ];
+
         return \array_merge($rules, $this->pictureRules(minWidth: 400, minHeight: 225, maxWidth: 400, maxHeight: 225));
     }
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

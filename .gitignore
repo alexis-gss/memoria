@@ -41,3 +41,4 @@ mix-manifest.json
 auth.json
 .phpunit.result.cache
 /tests/coverage
+.rector-cache

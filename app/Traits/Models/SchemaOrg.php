@@ -1,51 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits\Models;
 
+use Spatie\SchemaOrg\Person;
 use Spatie\SchemaOrg\Schema;
+use Spatie\SchemaOrg\WebSite;
 
 trait SchemaOrg
 {
     // * SETTERS
-
     /**
      * Return the schema of person (conceptor).
-     *
-     * @return \Spatie\SchemaOrg\Person
      */
-    public function setPersonSchema(): \Spatie\SchemaOrg\Person
+    public function setPersonSchema(): Person
     {
         return Schema::person()
             ->setProperty('@id', config('app.url') . '#person')
-            ->givenName(explode(" ", config('app.conceptor'))[0])
-            ->familyName(explode(" ", config('app.conceptor'))[1]);
+            ->givenName(explode(' ', config('app.conceptor'))[0])
+            ->familyName(explode(' ', config('app.conceptor'))[1]);
     }
 
     /**
      * Set the website schema.
-     *
-     * @return \Spatie\SchemaOrg\WebSite
      */
-    public function setWebsiteSchema(): \Spatie\SchemaOrg\WebSite
+    public function setWebsiteSchema(): WebSite
     {
         return Schema::website()
             ->setProperty('@id', config('app.url') . '#website')
             ->name(config('app.name'))
             ->about(trans('fo_footer_details', [
                 'conceptor' => config('app.conceptor'),
-                'appName'   => config('app.name')
+                'appName'   => config('app.name'),
             ]))
             ->description(trans('fo_footer_details', [
                 'conceptor' => config('app.conceptor'),
-                'appName'   => config('app.name')
+                'appName'   => config('app.name'),
             ]))
             ->accessModeSufficient(
                 Schema::itemList()
                     ->itemListElement([
-                        "textual",
-                        "visual",
-                        "tactile",
-                        "auditory"
+                        'textual',
+                        'visual',
+                        'tactile',
+                        'auditory',
                     ])
             )
             ->accessibilityControl([
@@ -60,8 +59,8 @@ trait SchemaOrg
                 'structuralNavigation',
             ])
             ->genre(config('schema-org.website.genre'))
-            ->dateCreated("17/02/2022")
-            ->datePublished("17/02/2022")
+            ->dateCreated('17/02/2022')
+            ->datePublished('17/02/2022')
             ->inLanguage(config('app.locales'))
             ->isAccessibleForFree(true)
             ->isFamilyFriendly(true)
@@ -79,23 +78,18 @@ trait SchemaOrg
     }
 
     // * GETTERS
-
     /**
      * Get the person schema.
-     *
-     * @return \Spatie\SchemaOrg\Person
      */
-    public function getPersonSchema(): \Spatie\SchemaOrg\Person
+    public function getPersonSchema(): Person
     {
         return Schema::person()->setProperty('@id', config('app.url') . '#person');
     }
 
     /**
      * Get the website schema.
-     *
-     * @return \Spatie\SchemaOrg\WebSite
      */
-    public function getWebsiteSchema(): \Spatie\SchemaOrg\WebSite
+    public function getWebsiteSchema(): WebSite
     {
         return Schema::website()->setProperty('@id', config('app.url') . '#website');
     }

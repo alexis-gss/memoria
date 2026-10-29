@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Folder;
@@ -18,8 +20,9 @@ final class GameFactory extends Factory
      */
     public function definition(): array
     {
-        $name      = fake()->unique()->word;
+        $name      = fake()->unique()->word();
         $published = fake()->boolean(75);
+
         return [
             'name'         => $name,
             'slug'         => Str::of($name)->slug(),

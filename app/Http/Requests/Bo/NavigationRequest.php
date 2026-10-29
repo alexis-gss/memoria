@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -21,7 +23,7 @@ class NavigationRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string,\Illuminate\Contracts\Translation\Translator|string|array<mixed>|null>
+     * @return array<string,\Illuminate\Translation\Translator|string|array<mixed>|null>
      */
     public function attributes(): array
     {

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -11,11 +14,8 @@ class IgdbController extends Controller
 {
     /**
      * Get the URL of a game from IGDB by its id.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function url(Request $request): \Illuminate\Http\JsonResponse
+    public function url(Request $request): JsonResponse
     {
         $id = (int) $request->input('id');
 

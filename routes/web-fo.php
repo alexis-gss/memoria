@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Fo\GameController;
-use App\Http\Controllers\Fo\StaticPageController;
 use App\Http\Controllers\Fo\RatingController;
+use App\Http\Controllers\Fo\StaticPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('fo.')
-    ->group(function () {
+    ->group(function (): void {
         // * GAME.
         Route::get('/game/{slug}', [GameController::class, 'show'])
             ->where('slug', '^[a-zA-Z0-9-]*$')

@@ -1,56 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Custom cast Html Color
+ * Custom cast Html Color.
+ *
+ * @implements CastsAttributes<string|null, string|int|null>
  */
 class HtmlColor implements CastsAttributes
 {
     /**
      * Cast the given value.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $key
-     * @param mixed                               $value
-     * @param array                               $attributes
-     * @return string
      * @phpcs:disable
      */
-    public function get(Model $model, string $key, mixed $value, array $attributes): string
+    public function get(Model $model, string $key, mixed $value, array $attributes): ?string
     {
-        //phpcs:enable
-        return "#" . $this->zeropad(dechex($value), 6);
+        // phpcs:enable
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return '#' . \str_pad(\dechex(\intval($value)), 6, '0', \STR_PAD_LEFT);
     }
 
     /**
      * Prepare the given value for storage.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $key
-     * @param mixed                               $value
-     * @param array                               $attributes
-     * @return integer
      * @phpcs:disable
      */
-    public function set(Model $model, string $key, mixed $value, array $attributes): int
+    public function set(Model $model, string $key, mixed $value, array $attributes): ?int
     {
-        //phpcs:enable
-        return \intval(hexdec(ltrim($value, '#')));
-    }
+        // phpcs:enable
+        if ($value === null || $value === '') {
+            return null;
+        }
 
-    /**
-     * Pad with zeros a numeric string
-     *
-     * @param string  $num
-     * @param integer $lim
-     * @return string
-     */
-    protected function zeropad(string $num, int $lim): string
-    {
-        return (strlen($num) >= $lim) ? $num : $this->zeropad("0" . $num, $lim);
+        return \intval(\hexdec(\ltrim(\strval($value), '#')));
     }
 }

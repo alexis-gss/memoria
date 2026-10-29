@@ -1,56 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits\Models;
 
 use App\Models\Game;
 use App\Models\StaticPage;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Sitemap\Tags\Url;
+use Illuminate\Support\Facades\Date;
 use Spatie\Sitemap\Sitemap as SpatieSitemap;
+use Spatie\Sitemap\Tags\Url;
 
 trait Sitemap
 {
     /**
      * Update sitemap after changes.
-     *
-     * @return void
      */
     public static function updateSitemap(): void
     {
         SpatieSitemap::create()
             ->add(
                 StaticPage::all()
-                    ->map(fn(StaticPage $staticPage) => $staticPage->toSitemapTag())
+                    ->map(fn (StaticPage $staticPage) => $staticPage->toSitemapTag())
             )
             ->add(
                 Game::query()
                     ->where('published', true)
-                    ->orderBy('slug', 'ASC')
-                    ->whereHas('folder', function (Builder $query) {
+                    ->orderBy('slug', 'asc')
+                    ->whereHas('folder', function (Builder $query): void {
                         $query->where('published', true);
                     })
                     ->get()
-                    ->map(fn(Game $game) => $game->toSitemapTag())
+                    ->map(fn (Game $game) => $game->toSitemapTag())
             )
             ->writeToFile(public_path('sitemap.xml'));
     }
 
     /**
      * Set sitemap tag.
-     *
-     * @param string        $route
-     * @param string        $frequency
-     * @param integer|float $priority
-     * @return \Spatie\Sitemap\Tags\Url|string|array
      */
     public function toSitemapTagCustom(
         string $route,
         string $frequency,
-        int|float $priority
-    ): \Spatie\Sitemap\Tags\Url|string|array {
+        int | float $priority
+    ): Url | string | array {
         return Url::create($route)
-            ->setLastModificationDate(Carbon::create($this->updated_at))
+            ->setLastModificationDate(Date::create($this->updated_at))
             ->setChangeFrequency($frequency)
             ->setPriority($priority);
     }

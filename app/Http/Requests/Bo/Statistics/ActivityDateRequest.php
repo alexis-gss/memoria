@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Statistics;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -8,8 +10,6 @@ class ActivityDateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -21,8 +21,6 @@ class ActivityDateRequest extends FormRequest
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

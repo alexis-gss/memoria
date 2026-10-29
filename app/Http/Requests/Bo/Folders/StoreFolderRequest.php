@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Folders;
 
 use App\Models\Folder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
-use LVR\Colour\Hex;
 
 class StoreFolderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -21,8 +20,6 @@ class StoreFolderRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
@@ -34,8 +31,6 @@ class StoreFolderRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -43,27 +38,22 @@ class StoreFolderRequest extends FormRequest
             'name'      => [
                 'required', 'string', 'min:2', 'max:255',
                 // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
-                function ($attribute, string $value, $fail) {
-                    if (
-                        $this->boolean('published') &&
-                        config('app.locale') !== config('app.fallback_locale')
-                    ) {
+                function ($attribute, string $value, $fail): void {
+                    if ($this->boolean('published') && config('app.locale') !== config('app.fallback_locale')) {
                         $fail(trans('crud.messages.translation_default_required', [
-                            'fallbackLocale' => config('app.fallback_locale')
+                            'fallbackLocale' => config('app.fallback_locale'),
                         ]));
                     }
-                }
+                },
             ],
             'mandatory' => 'required|boolean',
             'published' => 'required|boolean',
-            'color'     => ['required', new Hex()],
+            'color'     => 'required|hex_color',
         ];
     }
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +9,8 @@ use App\Http\Requests\Bo\Folders\StoreFolderRequest;
 use App\Http\Requests\Bo\Folders\UpdateFolderRequest;
 use App\Models\Folder;
 use App\Traits\Controllers\ChangesModelOrder;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -25,13 +29,9 @@ class FolderController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\View
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Folder::query();
 
         /** @var string $search Search field */
@@ -61,147 +61,126 @@ class FolderController extends Controller
 
     /**
      * Show the specified resource.
-     *
-     * @param \App\Models\Folder $folder
-     * @return \Illuminate\Contracts\View\View
      */
-    public function show(Folder $folder): \Illuminate\Contracts\View\View
+    public function show(Folder $folder): View
     {
         return view('back.pages.folders.show', ['folderModel' => $folder]);
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @param \App\Models\Folder $folder
-     * @return \Illuminate\Contracts\View\View
      */
-    public function create(Folder $folder): \Illuminate\Contracts\View\View
+    public function create(Folder $folder): View
     {
         return view('back.pages.folders.create', ['folderModel' => $folder]);
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Folders\StoreFolderRequest $request
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreFolderRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreFolderRequest $request): RedirectResponse
     {
         return DB::transaction(function () use ($request) {
             $folder = (new Folder())->fill($request->validated());
 
             if ($folder->saveOrFail()) {
-                return redirect()->route('bo.folders.edit', $folder)
+                return to_route('bo.folders.edit', $folder)
                     ->with('success', trans('crud.messages.has_been_created', [
-                        'model' => Str::of(trans('models.folder'))->ucfirst()
+                        'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->back()
+
+            return back()
                 ->with('error', trans('crud.messages.cannot_be_created', [
-                    'model' => Str::of(trans('models.folder'))->ucfirst()
+                    'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
                 ]));
         });
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param \App\Models\Folder $folder
-     * @return \Illuminate\Contracts\View\View
      */
-    public function edit(Folder $folder): \Illuminate\Contracts\View\View
+    public function edit(Folder $folder): View
     {
         return view('back.pages.folders.edit', ['folderModel' => $folder]);
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Folders\UpdateFolderRequest $request
-     * @param \App\Models\Folder                                $folder
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateFolderRequest $request, Folder $folder): \Illuminate\Http\RedirectResponse
+    public function update(UpdateFolderRequest $request, Folder $folder): RedirectResponse
     {
         return DB::transaction(function () use ($request, $folder) {
             $folder->fill($request->validated());
 
             if ($folder->saveOrFail()) {
-                return redirect()->route('bo.folders.edit', $folder)
+                return to_route('bo.folders.edit', $folder)
                     ->with('success', trans('crud.messages.has_been_updated', [
-                        'model' => Str::of(trans('models.folder'))->ucfirst()
+                        'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->route('bo.folders.edit', $folder)
+
+            return to_route('bo.folders.edit', $folder)
                 ->with('error', trans('crud.messages.cannot_be_updated', [
-                    'model' => Str::of(trans('models.folder'))->ucfirst()
+                    'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
                 ]));
         });
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param \App\Models\Folder $folder
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(Folder $folder): \Illuminate\Http\RedirectResponse
+    public function destroy(Folder $folder): RedirectResponse
     {
         if ($folder->games->isEmpty()) {
             /** @var array<string,string> */
             $previousQueries = [];
             \parse_str(\parse_url(url()->previous(), \PHP_URL_QUERY), $previousQueries);
             if ($folder->deleteOrFail()) {
-                return redirect()->route('bo.folders.index', $previousQueries)
+                return to_route('bo.folders.index', $previousQueries)
                     ->with('success', trans('crud.messages.has_been_deleted', [
-                        'model' => Str::of(trans('models.folder'))->ucfirst()
+                        'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->back()
+
+            return back()
                 ->with('error', trans('crud.messages.cannot_be_deleted', [
-                    'model' => Str::of(trans('models.folder'))->ucfirst()
-                ]));
-        } else {
-            return redirect()->back()
-                ->with('error', trans('crud.messages.cannot_be_deleted_with_children', [
-                    'model' => Str::of(trans('models.folder'))->ucfirst()
+                    'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
                 ]));
         }
+
+        return back()
+            ->with('error', trans('crud.messages.cannot_be_deleted_with_children', [
+                'model' => Str::of(trans('models.folder'))->ucfirst()->value(),
+            ]));
     }
 
     /**
      * Duplicate the specified resource.
-     *
-     * @param \App\Models\Folder $folder
-     * @return \Illuminate\Contracts\View\View
      */
-    public function duplicate(Folder $folder): \Illuminate\Contracts\View\View
+    public function duplicate(Folder $folder): View
     {
         return $this->create($folder->replicate());
     }
 
     /**
      * Change folder published.
-     *
-     * @param \App\Models\Folder $folder
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function changePublished(Folder $folder): \Illuminate\Http\RedirectResponse
+    public function changePublished(Folder $folder): RedirectResponse
     {
         if ($folder->mandatory) {
             if ($folder->getTranslation('name', config('app.fallback_locale'))) {
-                $folder->update(['published' => !$folder->getOriginal('published')]);
-                return redirect()->back()->with('success', trans('crud.messages.publish_status_saved'));
-            } else {
-                return redirect()->back()->with('error', trans('crud.messages.translation_default_required', [
-                    'fallbackLocale' => config('app.fallback_locale')
-                ]));
+                $folder->update(['published' => ! $folder->getOriginal('published')]);
+
+                return back()->with('success', trans('crud.messages.publish_status_saved'));
             }
-        } else {
-            $folder->update(['published' => !$folder->getOriginal('published')]);
-            return redirect()->back()->with('success', trans('crud.messages.publish_status_saved'));
+
+            return back()->with('error', trans('crud.messages.translation_default_required', [
+                'fallbackLocale' => config('app.fallback_locale'),
+            ]));
         }
+        $folder->update(['published' => ! $folder->getOriginal('published')]);
+
+        return back()->with('success', trans('crud.messages.publish_status_saved'));
     }
 }

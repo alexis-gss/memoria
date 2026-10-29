@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Picture;
@@ -11,18 +13,16 @@ class PictureSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
     public function run(): void
     {
-        Picture::factory(20)->make()->each(function (Picture $picture) {
+        Picture::factory(20)->make()->each(function (Picture $picture): void {
             $picture->saveQuietly();
-            $folder = sprintf("pictures/%s", $picture->game->slug);
-            Storage::disk("public")->makeDirectory($folder);
+            $folder = sprintf('pictures/%s', $picture->game->slug);
+            Storage::disk('public')->makeDirectory($folder);
             File::copy(
                 'database/factories/assets/pictures/default-picture.png',
-                Storage::disk("public")->path($folder . "/" . $picture->uuid . '.webp')
+                Storage::disk('public')->path($folder . '/' . $picture->uuid . '.webp')
             );
         });
     }

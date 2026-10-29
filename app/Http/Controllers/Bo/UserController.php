@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
@@ -8,6 +10,8 @@ use App\Http\Requests\Bo\Users\UpdateUserRequest;
 use App\Models\User;
 use App\Traits\Controllers\ChangesModelOrder;
 use App\Traits\Controllers\UpdateModelPublished;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -27,13 +31,9 @@ class UserController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\View
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = User::query();
 
         /** @var string $search Search field */
@@ -67,46 +67,38 @@ class UserController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @param \App\Models\User $user
-     * @return \Illuminate\Contracts\View\View
      */
-    public function show(User $user): \Illuminate\Contracts\View\View
+    public function show(User $user): View
     {
         return view('back.pages.users.show', ['userModel' => $user]);
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @param \App\Models\User $user
-     * @return \Illuminate\Contracts\View\View
      */
-    public function create(User $user): \Illuminate\Contracts\View\View
+    public function create(User $user): View
     {
         return view('back.pages.users.create', ['userModel' => $user]);
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Users\StoreUserRequest $request
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreUserRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreUserRequest $request): RedirectResponse
     {
         return DB::transaction(function () use ($request) {
             $user = (new User())->fill($request->validated());
 
             if ($user->saveOrFail()) {
-                return redirect()->route('bo.users.edit', $user)
+                return to_route('bo.users.edit', $user)
                     ->with('success', trans('crud.messages.has_been_created', [
-                        'model' => Str::of(trans('models.user'))->ucfirst()
+                        'model' => Str::of(trans('models.user'))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->back()
+
+            return back()
                 ->with('error', trans('crud.messages.cannot_be_created', [
-                    'model' => Str::of(trans('models.user'))->ucfirst()
+                    'model' => Str::of(trans('models.user'))->ucfirst()->value(),
                 ]));
         });
     }
@@ -114,8 +106,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\User $user
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+     * @return View|RedirectResponse
      */
     public function edit(User $user)
     {
@@ -124,59 +115,51 @@ class UserController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Users\UpdateUserRequest $request
-     * @param \App\Models\User                              $user
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateUserRequest $request, User $user): \Illuminate\Http\RedirectResponse
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         return DB::transaction(function () use ($request, $user) {
             $user->fill($request->validated());
 
             if ($user->saveOrFail()) {
-                return redirect()->route('bo.users.edit', $user)
+                return to_route('bo.users.edit', $user)
                     ->with('success', trans('crud.messages.has_been_updated', [
-                        'model' => Str::of(trans('models.user'))->ucfirst()
+                        'model' => Str::of(trans('models.user'))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->route('bo.users.edit', $user)
+
+            return to_route('bo.users.edit', $user)
                 ->with('error', trans('crud.messages.cannot_be_updated', [
-                    'model' => Str::of(trans('models.user'))->ucfirst()
+                    'model' => Str::of(trans('models.user'))->ucfirst()->value(),
                 ]));
         });
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(User $user): \Illuminate\Http\RedirectResponse
+    public function destroy(User $user): RedirectResponse
     {
         /** @var array<string,string> */
         $previousQueries = [];
         \parse_str(\parse_url(url()->previous(), \PHP_URL_QUERY), $previousQueries);
         if ($user->deleteOrFail()) {
-            return redirect()->route('bo.users.index', $previousQueries)
+            return to_route('bo.users.index', $previousQueries)
                 ->with('success', trans('crud.messages.has_been_deleted', [
-                    'model' => Str::of(trans('models.user'))->ucfirst()
+                    'model' => Str::of(trans('models.user'))->ucfirst()->value(),
                 ]));
         }
-        return redirect()->back()
+
+        return back()
             ->with('error', trans('crud.messages.cannot_be_deleted', [
-                'model' => Str::of(trans('models.user'))->ucfirst()
+                'model' => Str::of(trans('models.user'))->ucfirst()->value(),
             ]));
     }
 
     /**
      * Duplicate the specified resource.
-     *
-     * @param \App\Models\User $user
-     * @return \Illuminate\Contracts\View\View
      */
-    public function duplicate(User $user): \Illuminate\Contracts\View\View
+    public function duplicate(User $user): View
     {
         return $this->create($user->replicate());
     }

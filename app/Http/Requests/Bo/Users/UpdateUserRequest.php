@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Users;
 
 use Illuminate\Support\Facades\Gate;
@@ -9,8 +11,6 @@ class UpdateUserRequest extends StoreUserRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -19,8 +19,6 @@ class UpdateUserRequest extends StoreUserRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
@@ -31,15 +29,13 @@ class UpdateUserRequest extends StoreUserRequest
         $this->merge([
             'published' => $authUserModel->getKey() !== $userModel->getKey() ?
                 $this->boolean('published') :
-                true
+                true,
         ]);
         $this->mergePicture();
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -51,7 +47,7 @@ class UpdateUserRequest extends StoreUserRequest
                 'string',
                 'unique:users,email,' . $userModel->getKey(),
                 'email:rfc,strict,dns,spoof,filter',
-                'max:255'
+                'max:255',
             ],
             'password' => [
                 'sometimes', 'nullable', 'required_with:password_confirmation', 'confirmed', 'max:255',
@@ -60,9 +56,10 @@ class UpdateUserRequest extends StoreUserRequest
                     ->mixedCase()
                     ->numbers()
                     ->symbols()
-                    ->uncompromised()
+                    ->uncompromised(),
             ],
         ];
+
         return \array_merge(parent::rules(), $rules);
     }
 }

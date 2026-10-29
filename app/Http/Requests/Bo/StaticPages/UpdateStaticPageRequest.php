@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\StaticPages;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,8 +11,6 @@ class UpdateStaticPageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -19,8 +19,6 @@ class UpdateStaticPageRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -33,8 +31,6 @@ class UpdateStaticPageRequest extends FormRequest
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

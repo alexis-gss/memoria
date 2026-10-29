@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits\Controllers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 
 /**
  * This trait works with Route::bind in App service provider
@@ -13,13 +16,11 @@ trait UpdateModelPublished
 {
     /**
      * Change model published.
-     *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function changePublished(Model $model): \Illuminate\Http\RedirectResponse
+    public function changePublished(Model $model): RedirectResponse
     {
-        $model->update(['published' => !$model->getOriginal('published')]);
-        return redirect()->back()->with('success', trans('crud.messages.publish_status_saved'));
+        $model->update(['published' => ! $model->getOriginal('published')]);
+
+        return back()->with('success', trans('crud.messages.publish_status_saved'));
     }
 }

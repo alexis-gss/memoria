@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Bo\ActivityLogController;
-use App\Http\Controllers\Bo\HomeController;
-use App\Http\Controllers\Bo\GameController;
 use App\Http\Controllers\Bo\FolderController;
+use App\Http\Controllers\Bo\GameController;
+use App\Http\Controllers\Bo\HomeController;
 use App\Http\Controllers\Bo\PictureController;
 use App\Http\Controllers\Bo\RankController;
 use App\Http\Controllers\Bo\StaticPageController;
@@ -11,17 +13,17 @@ use App\Http\Controllers\Bo\StatisticController;
 use App\Http\Controllers\Bo\TagController;
 use App\Http\Controllers\Bo\UserController;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('bo')
     ->name('bo.')
     ->middleware('lang')
     ->group(
-        function () {
+        function (): void {
             // * AUTHENTICABLE ROUTES.
             Route::namespace('\App\Http\Controllers\Bo')
-                ->group(function () {
+                ->group(function (): void {
                     Auth::routes(
                         [
                             'login'    => true,
@@ -34,9 +36,14 @@ Route::prefix('bo')
                     );
                 });
             Route::middleware(['auth:backend', 'logoutusers'])
-                ->group(function () {
+                ->group(function (): void {
                     // * HOME.
                     Route::get('/', [HomeController::class, 'index'])->name('home');
+
+                    // * ACTIVITY LOGS.
+                    Route::resource('activity-logs', ActivityLogController::class)->only(['index', 'show']);
+                    Route::get('/activity-logs/user/{user:id}', [ActivityLogController::class, 'index'])
+                        ->name('activity-logs.user');
 
                     // * STATISTICS.
                     Route::get('/statistics', [StatisticController::class, 'index'])
@@ -92,7 +99,7 @@ Route::prefix('bo')
                     Route::resource('static_pages', StaticPageController::class)
                         ->only(['index', 'show', 'edit', 'update']);
                     Route::patch('/static_pages/{static_page}/change-order/{direction}', [
-                        StaticPageController::class, 'changeOrder'
+                        StaticPageController::class, 'changeOrder',
                     ])->where('direction', 'up|down')->name('static_pages.change-order');
 
                     // * USERS.
@@ -105,7 +112,7 @@ Route::prefix('bo')
                         ->name('users.duplicate');
 
                     // * ACTIVITY LOGS.
-                    Route::middleware('can:isConceptor')->group(function () {
+                    Route::middleware('can:isConceptor')->group(function (): void {
                         Route::resource('activity_logs', ActivityLogController::class)->only(['index', 'show']);
                         Route::get('/activity_logs/user/{user:id}', [ActivityLogController::class, 'index'])
                             ->name('activity_logs.user');

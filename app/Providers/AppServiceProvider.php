@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -11,12 +13,10 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
-        Model::shouldBeStrict(!$this->app->environment('production'));
+        Model::shouldBeStrict(! $this->app->environment('production'));
 
         // * HTTPS FIX
         URL::forceScheme('https');
@@ -27,6 +27,6 @@ class AppServiceProvider extends ServiceProvider
             config('app.locale'),
             \strtoupper(config('app.locale'))
         ));
-        Carbon::setLocale(config('app.locale'));
+        Date::setLocale(config('app.locale'));
     }
 }

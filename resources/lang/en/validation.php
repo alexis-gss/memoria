@@ -46,9 +46,9 @@ return [
     'filled'               => 'The :attribute field must have a value.',
     'gt'                   => [
         'numeric' => 'The :attribute must be greater than :value.',
-        'file' => 'The :attribute must be greater than :value kilobytes.',
-        'string' => 'The :attribute must be greater than :value characters.',
-        'array' => 'The :attribute must have more than :value items.',
+        'file'    => 'The :attribute must be greater than :value kilobytes.',
+        'string'  => 'The :attribute must be greater than :value characters.',
+        'array'   => 'The :attribute must have more than :value items.',
     ],
     'gte'                  => [
         'numeric' => 'The :attribute must be greater than or equal to :value.',
@@ -141,7 +141,7 @@ return [
     'uppercase'            => 'The :attribute field must be in upper case.',
     'url'                  => 'The :attribute must be a valid URL.',
     'uuid'                 => 'The :attribute must be a valid UUID.',
-    'attributes' => [
+    'attributes'           => [
         'address'                  => 'address',
         'age'                      => 'age',
         'amount'                   => 'amount',
@@ -223,10 +223,10 @@ return [
         'folder_mandatory'  => 'mandatory folder',
         'igdb_associated'   => 'IGDB identification associated',
         'id'                => 'identification',
-        'inter'      => [
+        'inter'             => [
             'male'   => 'of the ',
             'female' => 'of the ',
-            'vowel'  => 'of the '
+            'vowel'  => 'of the ',
         ],
         'model'             => 'target element',
         'page_type'         => 'page type',

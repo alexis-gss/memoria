@@ -23,7 +23,7 @@ return [
     'libs' => [
         'toolbox' => [
             'assertFieldIsUnique' => 'La :valeur du champ :attribut est déjà utilisée',
-        ]
+        ],
     ],
     'messages'   => [
         'has_been_created'                => ':model a été créé',
@@ -48,7 +48,7 @@ return [
         'label'         => 'Rechercher :elements',
         'keywords'      => 'Vos mots-clés ici…',
         'apply_search'  => 'Appliquer une recherche',
-        'remove_search' => 'Supprimer la recherche'
+        'remove_search' => 'Supprimer la recherche',
     ],
     'filter' => [
         'sort_ascending'  => 'Trier :name dans l\'ordre croissant',

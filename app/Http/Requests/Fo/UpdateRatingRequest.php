@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Fo;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,8 +11,6 @@ class UpdateRatingRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
@@ -22,7 +22,7 @@ class UpdateRatingRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, mixed>
+     * @return array<string,\Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -35,7 +35,7 @@ class UpdateRatingRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string,\Illuminate\Contracts\Translation\Translator|string|array<mixed>|null>
+     * @return array<string,\Illuminate\Translation\Translator|string|array<mixed>|null>
      */
     public function attributes(): array
     {

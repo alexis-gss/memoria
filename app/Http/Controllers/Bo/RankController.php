@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
@@ -8,8 +10,12 @@ use App\Models\Game;
 use App\Models\Rank;
 use App\Traits\Controllers\ChangesModelOrder;
 use App\Traits\Controllers\UpdateModelPublished;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -28,10 +34,8 @@ class RankController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Contracts\View\View
      */
-    public function index(): \Illuminate\Contracts\View\View
+    public function index(): View
     {
         return view('back.pages.ranks.index', [
             'rankModels'   => $this->getRanksPublished(),
@@ -42,54 +46,47 @@ class RankController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Ranks\StoreRankRequest $request
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreRankRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreRankRequest $request): RedirectResponse
     {
         return DB::transaction(function () use ($request) {
             foreach ($request->validated()['ranks'] as $dataValidated) {
-                $rank = (new Rank())->fill(["game_id" => $dataValidated]);
-                if (!$rank->saveOrFail()) {
-                    return redirect()->back()
+                $rank = (new Rank())->fill(['game_id' => $dataValidated]);
+                if (! $rank->saveOrFail()) {
+                    return back()
                         ->with('error', trans('crud.messages.cannot_be_updated', [
-                            'model' => Str::of(trans('models.rank'))->ucfirst()
+                            'model' => Str::of(trans('models.rank'))->ucfirst()->value(),
                         ]));
                 }
             }
-            return redirect()->route('bo.ranks.index')
+
+            return to_route('bo.ranks.index')
                 ->with('success', trans('crud.messages.has_been_updated', [
-                    'model' => Str::of(trans('models.rank'))->ucfirst()
+                    'model' => Str::of(trans('models.rank'))->ucfirst()->value(),
                 ]));
         });
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param \App\Models\Rank $rank
-     * @return array|\Illuminate\Database\Eloquent\Collection
      */
-    public function destroy(Rank $rank): array|\Illuminate\Database\Eloquent\Collection
+    public function destroy(Rank $rank): array | Collection
     {
         return DB::transaction(function () use ($rank) {
             if ($rank->deleteOrFail()) {
                 return $this->getRanksPublished();
             }
+
             return [
                 'message' => trans('crud.messages.cannot_be_deleted', [
-                    'model' => Str::of(trans('models.rank'))->ucfirst()
-                ])
+                    'model' => Str::of(trans('models.rank'))->ucfirst()->value(),
+                ]),
             ];
         });
     }
 
     /**
      * Save and assign the new order/structure of ranks.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return void
      */
     public function saveOrder(Request $request): void
     {
@@ -102,11 +99,8 @@ class RankController extends Controller
 
     /**
      * Get published games that aren't in ranking.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function jsonSearchPaginateRanks(Request $request): \Illuminate\Pagination\LengthAwarePaginator
+    public function jsonSearchPaginateRanks(Request $request): LengthAwarePaginator
     {
         return $this->getPublishedGamesInNotRanking()
             ->where('name', 'like', "%{$request->input('search')}%")
@@ -115,17 +109,15 @@ class RankController extends Controller
 
     /**
      * Get published games that aren't in ranking.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getPublishedGamesInNotRanking(): \Illuminate\Database\Eloquent\Builder
+    public function getPublishedGamesInNotRanking(): Builder
     {
         return Game::query()
             ->whereNotIn('id', Rank::query()->pluck('game_id')->all())
             ->where('published', true)
-            ->whereHas('folder', function (Builder $query) {
+            ->whereHas('folder', function (Builder $query): void {
                 $query->where('published', true);
             })
-            ->orderBy('slug', 'ASC');
+            ->orderBy('slug', 'asc');
     }
 }

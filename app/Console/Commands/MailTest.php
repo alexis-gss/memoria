@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -26,12 +28,10 @@ class MailTest extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
-        Mail::raw(sprintf('Mail-test from %s %s', \config('app.name'), \config('app.url')), function ($msg) {
+        Mail::raw(sprintf('Mail-test from %s %s', \config('app.name'), \config('app.url')), function ($msg): void {
             $msg->to('john.doe@gmail.com')->subject('Test Email');
         });
 

@@ -6,6 +6,8 @@
  * See: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/.
  */
 
+declare(strict_types=1);
+
 return [
 
     // See: https://docs.sentry.io/concepts/key-terms/dsn-explainer/.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums\Pages;
 
 use App\Traits\Enums\BaseEnum;
@@ -31,8 +33,6 @@ enum StaticPageTypeEnum: int
 
     /**
      * Get Class.
-     *
-     * @return string
      */
     public function routeName(): string
     {

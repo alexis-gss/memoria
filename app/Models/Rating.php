@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property integer                         $id         Id.
- * @property string                          $uuid       IP of the customer.
- * @property \App\Models\Picture             $picture_id Picture associated.
+ * @property int $id Id.
+ * @property string $uuid IP of the customer.
+ * @property \App\Models\Picture $picture_id Picture associated.
  * @property-read \Illuminate\Support\Carbon $created_at Created date.
  * @property-read \Illuminate\Support\Carbon $updated_at Updated date.
- *
  * @property-read \App\Models\Picture $picture Get the Picture that owns the Rating (belongs-to relationship).
  */
 class Rating extends Model
@@ -21,7 +23,7 @@ class Rating extends Model
     /**
      * The attributes that are fillable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'uuid',
@@ -29,13 +31,12 @@ class Rating extends Model
     ];
 
     // * RELATIONSHIPS
-
     /**
      * Get the Picture that owns the Rating (belongs-to relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo<\App\Models\Picture, $this>
      */
-    public function picture(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);
     }

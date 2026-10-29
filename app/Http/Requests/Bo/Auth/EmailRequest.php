@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -8,8 +10,6 @@ class EmailRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -17,14 +17,12 @@ class EmailRequest extends FormRequest
             'token'                 => 'required|string|size:64',
             'email'                 => 'required|email:rfc,strict,dns,spoof,filter|exists:users,email',
             'password'              => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required'
+            'password_confirmation' => 'required',
         ];
     }
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request                                                         $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
-     * @param  string|null                                                                      ...$guards
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \RuntimeException If guard is unhandled.
+     * @param  Closure(Request): Response  $next
+     * @param  string|null  ...$guards
+     *
+     * @throws RuntimeException If guard is unhandled.
+     *
      * @phpcs:disable Squiz.Commenting.FunctionComment.IncorrectTypeHint
      */
-    public function handle(Request $request, \Closure $next, ...$guards): \Symfony\Component\HttpFoundation\Response
+    public function handle(Request $request, Closure $next, ...$guards): Response
     {
         // phpcs:enable phpcs:disable
         $guards = empty($guards) ? [null] : $guards;
@@ -25,17 +30,19 @@ class RedirectIfAuthenticated
             if (auth($guard)->check()) {
                 switch ($guard) {
                     case 'frontend':
-                        return \redirect()->route('fo.games.index');
+                        return to_route('fo.games.index');
                     case 'backend':
-                        if (!$request->routeIs('bo.*')) {
+                        if (! $request->routeIs('bo.*')) {
                             continue 2;
                         }
-                        return \redirect()->route('bo.home');
+
+                        return to_route('bo.home');
                     default:
-                        throw new \RuntimeException("Unhandled guard `{$guard}` .");
+                        throw new RuntimeException("Unhandled guard `{$guard}` .");
                 }
             }
         }
+
         return $next($request);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,20 +11,16 @@ class LinkEmailRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'token' => Str::random(64)
+            'token' => Str::random(64),
         ]);
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -34,8 +32,6 @@ class LinkEmailRequest extends FormRequest
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

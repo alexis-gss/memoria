@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\Users\RoleEnum;
@@ -19,9 +21,10 @@ final class UserFactory extends Factory
     public function definition(): array
     {
         $published = fake()->boolean(75);
+
         return [
-            'first_name'        => fake()->firstname(),
-            'last_name'         => fake()->lastname(),
+            'first_name'        => fake()->firstName(),
+            'last_name'         => fake()->lastName(),
             'email'             => fake()->unique()->email(),
             'email_verified_at' => now(),
             'picture'           => '',

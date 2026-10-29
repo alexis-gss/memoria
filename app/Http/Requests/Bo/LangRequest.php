@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -14,14 +16,14 @@ class LangRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'lang' => 'required|in:' . implode(",", config('app.locales')),
+            'lang' => 'required|in:' . implode(',', config('app.locales')),
         ];
     }
 
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string,\Illuminate\Contracts\Translation\Translator|string|array<mixed>|null>
+     * @return array<string,\Illuminate\Translation\Translator|string|array<mixed>|null>
      */
     public function attributes(): array
     {

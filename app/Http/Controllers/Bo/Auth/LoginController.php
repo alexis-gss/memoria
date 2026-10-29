@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,46 +27,39 @@ class LoginController extends Controller
 
     /**
      * Get the guard to be used during authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\StatefulGuard
      */
-    protected function guard(): \Illuminate\Contracts\Auth\StatefulGuard
+    protected function guard(): StatefulGuard
     {
         return Auth::guard('backend');
     }
 
     /**
      * Show the application's login form.
-     *
-     * @return \Illuminate\Contracts\View\View
      */
-    public function showLoginForm(): \Illuminate\Contracts\View\View
+    public function showLoginForm(): View
     {
         return view('back.auth.login');
     }
 
     /**
      * Where to redirect users after login.
-     *
-     * @return string
      */
     protected function redirectTo(): string
     {
         $targetUrl = response()->redirectToIntended()->getTargetUrl();
+
         return ($targetUrl !== config('app.url')) ? $targetUrl : route('bo.home');
     }
 
     /**
      * Attempt to log the user into the application.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return boolean
      */
     protected function attemptLogin(Request $request): bool
     {
         $credentials = $this->credentials($request);
         // * Attempt login only using published users.
         $credentials['published'] = true;
+
         return $this->guard()->attempt(
             $credentials,
             $request->boolean('remember')

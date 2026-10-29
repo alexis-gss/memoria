@@ -228,7 +228,7 @@ return [
         'inter'             => [
             'male'   => 'du ',
             'female' => 'de la ',
-            'vowel'  => 'de l\''
+            'vowel'  => 'de l\'',
         ],
         'model'             => 'élément ciblé',
         'page_type'         => 'type de page',

@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
@@ -16,18 +20,14 @@ class PictureController extends Controller
     /**
      * Upload multiple chunks of the image.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException Bla.
+     * @throws UploadMissingFileException Bla.
      */
-    public function upload(Request $request): \Illuminate\Http\JsonResponse
+    public function upload(Request $request): JsonResponse
     {
         // Create the file receiver.
-        $receiver = new FileReceiver("file", $request, HandlerFactory::classFromRequest($request));
+        $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
         // Check if the upload is success, throw exception or return response you need.
-        if ($receiver->isUploaded() === false) {
-            throw new UploadMissingFileException();
-        }
+        throw_if($receiver->isUploaded() === false, UploadMissingFileException::class);
         // Receive the file.
         $save = $receiver->receive();
         // Check if the upload has finished (in chunk mode it will send smaller files).
@@ -43,21 +43,17 @@ class PictureController extends Controller
         // We are in chunk mode, lets send the current progress.
         /** @var \Pion\Laravel\ChunkUpload\Handler\AbstractHandler $handler */
         $handler = $save->handler();
+
         return response()->json([
-            "done"   => $handler->getPercentageDone(),
-            'status' => true
+            'done'   => $handler->getPercentageDone(),
+            'status' => true,
         ]);
     }
 
     /**
      * Validate the assembled upload and store it as a .webp image.
-     *
-     * @param \Illuminate\Http\UploadedFile $file
-     * @param mixed                         $uuid
-     * @param string|false                  $gameSlug
-     * @return \Illuminate\Http\JsonResponse
      */
-    protected function store(UploadedFile $file, mixed $uuid, string|false $gameSlug): \Illuminate\Http\JsonResponse
+    protected function store(UploadedFile $file, mixed $uuid, string | false $gameSlug): JsonResponse
     {
         // Generate a new UUID if none was provided.
         if ($uuid === false) {
@@ -65,13 +61,11 @@ class PictureController extends Controller
         }
 
         // The game slug is required to build the storage path.
-        if ($gameSlug === false) {
-            abort(422, 'Missing parameter gameSlug');
-        }
+        abort_if($gameSlug === false, 422, 'Missing parameter gameSlug');
 
         // Build the destination folder and create it if it doesn't exist yet.
-        $finalPath = Storage::disk("public")->path(sprintf("pictures/%s/", $gameSlug));
-        if (!is_dir($finalPath)) {
+        $finalPath = Storage::disk('public')->path(sprintf('pictures/%s/', $gameSlug));
+        if (! is_dir($finalPath)) {
             mkdir($finalPath, 0755, true);
         }
 
@@ -82,7 +76,8 @@ class PictureController extends Controller
         // Fails for corrupted, truncated or non-image files.
         // @phpcs:disabled Generic.PHP.NoSilencedErrors.Discouraged
         if (@getimagesize($tmpPath) === false) {
-            unlink($tmpPath);
+            File::delete($tmpPath);
+
             return response()->json(['error' => 'Invalid or corrupted image file'], 422);
         }
 
@@ -90,7 +85,8 @@ class PictureController extends Controller
         $image = @imagecreatefromstring(file_get_contents($tmpPath));
         // @phpcs:enable
         if ($image === false) {
-            unlink($tmpPath);
+            File::delete($tmpPath);
+
             return response()->json(['error' => 'Image format not supported'], 422);
         }
 
@@ -100,11 +96,11 @@ class PictureController extends Controller
         imagesavealpha($image, true);
 
         // Save as .webp and free the memory used by the image.
-        imagewebp($image, $finalPath . $uuid . ".webp", IMG_WEBP_LOSSLESS);
+        imagewebp($image, $finalPath . $uuid . '.webp', IMG_WEBP_LOSSLESS);
         unset($image);
 
         // Remove the temporary assembled file.
-        unlink($tmpPath);
+        File::delete($tmpPath);
 
         return response()->json([
             'uid' => $uuid,

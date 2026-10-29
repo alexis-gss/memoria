@@ -1,33 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * @property integer                         $id           Id.
- * @property \App\Models\Game                $game_id      Game associated.
- * @property string                          $uuid         Uuid.
- * @property string                          $label        Label.
- * @property boolean                         $published    Published status.
+ * @property int $id Id.
+ * @property \App\Models\Game $game_id Game associated.
+ * @property string $uuid Uuid.
+ * @property string $label Label.
+ * @property bool $published Published status.
  * @property-read \Illuminate\Support\Carbon $created_at   Created date.
  * @property-read \Illuminate\Support\Carbon $updated_at   Updated date.
  *
- * @method static void booted()                                              Perform any actions required after the
- * model boots.
- * @method static void updatePictures(Game $game, array $request)          Differentiate between old and new
- * pictures, remove oldests and save news.
+ * @method static void booted() Perform any actions required after the
+ *                              model boots.
+ * @method static void updatePictures(Game $game, array $request) Differentiate between old and new
+ *                                                                pictures, remove oldests and save news.
  * @method static void renameFolderSavedPictures(Game $game, string $slug) Rename the folder where there is
- * saved pictures.
- * @method static void removePicture(self $model)                          Delete one specific picture.
- * @method static void removePictures(Collection $pictures)                Remove all pictures previously associated.
+ *                                                                         saved pictures.
+ * @method static void removePicture(self $model) Delete one specific picture.
+ * @method static void removePictures(Collection $pictures) Remove all pictures previously associated.
  *
  * @property-read \App\Models\Game $game
  * Get the Game that owns the Picture (belongs-to relationship).
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Rating[] $ratings
+ * @property-read \Illuminate\Database\Eloquent\Collection|Rating[] $ratings
  * Get Ratings of the Picture (has-many relationship).
  */
 class Picture extends Model
@@ -37,14 +41,14 @@ class Picture extends Model
     /**
      * The relationships that should always be loaded.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $with = ['ratings'];
 
     /**
      * The attributes that are fillable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'game_id',
@@ -55,25 +59,18 @@ class Picture extends Model
 
     /**
      * Perform any actions required after the model boots.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
-        static::deleting(function (self $picture) {
+        static::deleting(function (self $picture): void {
             self::removePicture($picture);
         });
     }
 
     // * METHODS
-
     /**
      * Differentiate between old and new pictures,
      * remove oldests and save news.
-     *
-     * @param \App\Models\Game $game
-     * @param array            $request
-     * @return void
      */
     public static function updatePictures(Game $game, array $request): void
     {
@@ -95,38 +92,31 @@ class Picture extends Model
                 $picture->label = pathinfo($request['label'][$key])['filename'];
                 $picture->saveOrFail();
                 $newPictures->add($picture);
-            } //end foreach
-        } //end if
+            } // end foreach
+        } // end if
         (new Picture())->removePictures($picturesAlreadySaved->diff($newPictures));
     }
 
     /**
      * Rename the folder where pictures are saved.
-     *
-     * @param \App\Models\Game $game
-     * @param string           $slug
-     * @return void
      */
     public static function renameFolderSavedPictures(Game $game, string $slug): void
     {
         if ($slug !== $game->slug) {
-            $directory = Storage::disk('public')->path("pictures/" . $slug);
+            $directory = Storage::disk('public')->path('pictures/' . $slug);
             if (is_dir($directory)) {
-                rename($directory, Storage::disk('public')->path("pictures/" . $game->slug));
+                rename($directory, Storage::disk('public')->path('pictures/' . $game->slug));
             }
         }
     }
 
     /**
      * Delete one specific picture.
-     *
-     * @param self $picture
-     * @return void
      */
     private static function removePicture(self $picture): void
     {
         $picture  = Picture::query()->where('id', $picture->getKey())->with('game')->first();
-        $pathFile = "pictures/" . $picture->game->slug . "/" . $picture->uuid . ".webp";
+        $pathFile = 'pictures/' . $picture->game->slug . '/' . $picture->uuid . '.webp';
         if (Storage::disk('public')->exists($pathFile)) {
             Storage::disk('public')->delete($pathFile);
         }
@@ -135,8 +125,7 @@ class Picture extends Model
     /**
      * Remove all pictures previously associated.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $pictures
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Collection  $pictures
      */
     public static function removePictures(Collection $pictures): void
     {
@@ -146,13 +135,12 @@ class Picture extends Model
     }
 
     // * RELATIONSHIPS
-
     /**
      * Get the Game that owns the Picture (belongs-to relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo<\App\Models\Game, $this>
      */
-    public function game(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class);
     }
@@ -160,9 +148,9 @@ class Picture extends Model
     /**
      * Get Ratings of the Picture (has-many relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany<\App\Models\Rating, $this>
      */
-    public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);
     }

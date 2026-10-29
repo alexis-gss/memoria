@@ -1,35 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Casts\HtmlColor;
 use App\Lib\Helpers\ToolboxHelper;
+use App\Traits\Models\HasActivityLog;
 use App\Traits\Models\HasTranslations;
 use App\Traits\Models\Sitemap;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
-use LaravelActivityLogs\Traits\HasActivityLog;
 
 /**
- * @property integer                         $id           Id.
- * @property string                          $slug         Slug of the name.
- * @property string                          $name         Name.
- * @property \App\Casts\HtmlColor            $color        Color.
- * @property integer                         $order        Order.
- * @property boolean                         $mandatory    Mandatory status.
- * @property boolean                         $published    Published status.
+ * @property int $id Id.
+ * @property string $slug Slug of the name.
+ * @property string $name Name.
+ * @property \App\Casts\HtmlColor $color Color.
+ * @property int $order Order.
+ * @property bool $mandatory Mandatory status.
+ * @property bool $published Published status.
  * @property \Illuminate\Support\Carbon|null $published_at Published date update.
  * @property-read \Illuminate\Support\Carbon $created_at   Created date.
  * @property-read \Illuminate\Support\Carbon $updated_at   Updated date.
  *
- * @method static void booted()                       Perform any actions required after the model boots.
+ * @method static void booted() Perform any actions required after the model boots.
  * @method static void setPublishedDate(self $folder) Set model's published date.
- * @method static void setOrder(self $folder)         Set model's order after the last element of the list.
+ * @method static void setOrder(self $folder) Set model's order after the last element of the list.
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\LaravelActivityLogs\Models\ActivityLog[] $activityLogs
+ * @property-read \Illuminate\Support\Collection|\App\Models\ActivityLog[] $activityLogs
  * Get Activities of the Folder (morph-to-many relationship).
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Game[] $games
+ * @property-read \Illuminate\Support\Collection|\App\Models\Game[] $games
  * Get Games of the Folder (has-many relationship).
  */
 class Folder extends Model
@@ -42,7 +45,7 @@ class Folder extends Model
     /**
      * The attributes that are fillable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'slug',
@@ -63,7 +66,7 @@ class Folder extends Model
         'color'        => HtmlColor::class,
         'mandatory'    => 'boolean',
         'published'    => 'boolean',
-        'published_at' => 'datetime'
+        'published_at' => 'datetime',
     ];
 
     /**
@@ -77,40 +80,35 @@ class Folder extends Model
 
     /**
      * Perform any actions required after the model boots.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
-        static::creating(function (self $folder) {
+        static::creating(function (self $folder): void {
             self::setSlug($folder);
             self::setOrder($folder);
             self::setPublishedDate($folder);
             self::setDefaultTranslation($folder);
         });
-        static::created(function () {
+        static::created(function (): void {
             static::updateSitemap();
         });
-        static::updating(function (self $folder) {
+        static::updating(function (self $folder): void {
             self::setSlug($folder);
             self::setPublishedDate($folder);
             self::setDefaultTranslation($folder);
         });
-        static::updated(function () {
+        static::updated(function (): void {
             static::updateSitemap();
         });
-        static::deleted(function () {
+        static::deleted(function (): void {
             static::updateSitemap();
         });
     }
 
     // * METHODS
-
     /**
      * Set model's slug.
      *
-     * @param self $folder
-     * @return void
      * @throws \Illuminate\Validation\ValidationException If a folder name already exists.
      */
     private static function setSlug(self $folder): void
@@ -126,14 +124,10 @@ class Folder extends Model
 
     /**
      * Set model's default translation.
-     *
-     * @param self $folder
-     *
-     * @return void
      */
     private static function setDefaultTranslation(self $folder): void
     {
-        if (!$folder->mandatory) {
+        if (! $folder->mandatory) {
             if (config('app.locale') !== config('app.fallback_locale')) {
                 $folder->setTranslation('name', config('app.fallback_locale'), $folder->name);
             }
@@ -148,10 +142,6 @@ class Folder extends Model
 
     /**
      * Set model's published date.
-     *
-     * @param self $folder
-     *
-     * @return void
      */
     private static function setPublishedDate(self $folder): void
     {
@@ -160,9 +150,6 @@ class Folder extends Model
 
     /**
      * Set model's order after the last element of the list.
-     *
-     * @param self $folder
-     * @return void
      */
     private static function setOrder(self $folder): void
     {
@@ -170,13 +157,12 @@ class Folder extends Model
     }
 
     // * RELATIONSHIPS
-
     /**
      * Get Games of the Folder (has-many relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany<\App\Models\Game, $this>
      */
-    public function games(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function games(): HasMany
     {
         return $this->hasMany(Game::class);
     }

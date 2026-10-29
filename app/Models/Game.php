@@ -1,46 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Lib\Helpers\FileStorageHelper;
+use App\Traits\Models\HasActivityLog;
 use App\Traits\Models\SchemaOrg;
 use App\Traits\Models\Sitemap;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
-use LaravelActivityLogs\Traits\HasActivityLog;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\Date;
 use Spatie\SchemaOrg\Schema;
+use Spatie\SchemaOrg\WebPage;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
 
 /**
- * @property integer                         $id           Id.
- * @property string                          $name         Name.
- * @property string                          $slug         Slug of the name.
- * @property string                          $picture      Path of the game's picture.
- * @property string|null                     $music        Path of the game's music.
- * @property \App\Models\Folder              $folder_id    Folder associated.
- * @property integer                         $igdb_id      Id of the game in IGDB.
- * @property integer                         $order        Order.
- * @property boolean                         $published    Published status.
+ * @property int $id Id.
+ * @property string $name Name.
+ * @property string $slug Slug of the name.
+ * @property string $picture Path of the game's picture.
+ * @property string|null $music Path of the game's music.
+ * @property \App\Models\Folder $folder_id Folder associated.
+ * @property int $igdb_id Id of the game in IGDB.
+ * @property int $order Order.
+ * @property bool $published Published status.
  * @property \Illuminate\Support\Carbon|null $published_at Published date update.
  * @property-read \Illuminate\Support\Carbon $created_at   Created date.
  * @property-read \Illuminate\Support\Carbon $updated_at   Updated date.
  *
- * @method static void booted()                     Perform any actions required after the model boots.
+ * @method static void booted() Perform any actions required after the model boots.
  * @method static void setPublishedDate(self $game) Set model's published date.
- * @method static void setOrder(self $game)         Set model's order after the last element of the list.
- * @method \Spatie\SchemaOrg\WebPage toSchemaOrg()  Set micro data.
+ * @method static void setOrder(self $game) Set model's order after the last element of the list.
+ * @method WebPage toSchemaOrg() Set micro data.
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\LaravelActivityLogs\Models\ActivityLog[] $activityLogs
+ * @property-read \Illuminate\Support\Collection|\App\Models\ActivityLog[] $activityLogs
  * Get Activities of the Game (morph-to-many relationship).
  * @property-read \App\Models\Folder $folder
  * Get Folder that owns the Game (belongs-to relationship).
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tag[] $tags
+ * @property-read \Illuminate\Support\Collection|\App\Models\Tag[] $tags
  * Get Tags of the Game (morph-to-many relationship).
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Picture[] $pictures
+ * @property-read \Illuminate\Support\Collection|\App\Models\Picture[] $pictures
  * Get Pictures of the Game (has-many relationship).
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Rank[] $rank
+ * @property-read \Illuminate\Support\Collection|\App\Models\Rank[] $rank
  * Get Rank of the Game (belongs-to relationship).
  */
 class Game extends Model implements Sitemapable
@@ -53,7 +60,7 @@ class Game extends Model implements Sitemapable
     /**
      * The attributes that are fillable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -74,42 +81,40 @@ class Game extends Model implements Sitemapable
      */
     protected $casts = [
         'published'    => 'boolean',
-        'published_at' => 'datetime'
+        'published_at' => 'datetime',
     ];
 
     /**
      * Perform any actions required after the model boots.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
-        static::creating(function (self $game) {
+        static::creating(function (self $game): void {
             self::setOrder($game);
             self::setImage($game);
             self::setMusic($game);
             self::setPublishedDate($game);
-            (new Picture())->renameFolderSavedPictures($game, "default_folder");
+            (new Picture())->renameFolderSavedPictures($game, 'default_folder');
         });
-        static::created(function () {
+        static::created(function (): void {
             static::updateSitemap();
         });
-        static::updating(function (self $game) {
+        static::updating(function (self $game): void {
             self::setImage($game);
             self::setMusic($game);
             self::setPublishedDate($game);
             (new Picture())->renameFolderSavedPictures($game, $game->getOriginal('slug'));
         });
-        static::updated(function (self $game) {
+        static::updated(function (self $game): void {
             static::updateSitemap();
             FileStorageHelper::removeOldFile($game, 'picture');
             FileStorageHelper::removeOldFile($game, 'music');
         });
-        static::deleting(function (self $game) {
+        static::deleting(function (self $game): void {
             (new Tag())->removeTags($game);
             (new Picture())->removePictures($game->pictures);
         });
-        static::deleted(function (self $game) {
+        static::deleted(function (self $game): void {
             static::updateSitemap();
             FileStorageHelper::removeOldFile($game, 'picture');
             FileStorageHelper::removeOldFile($game, 'music');
@@ -120,24 +125,18 @@ class Game extends Model implements Sitemapable
 
     /**
      * Set model's published date.
-     *
-     * @param self $game
-     * @return void
      */
     private static function setPublishedDate(self $game): void
     {
-        if ($game->published && !$game->getOriginal('published')) {
-            $game->published_at = Carbon::now();
-        } elseif (!$game->published) {
+        if ($game->published && ! $game->getOriginal('published')) {
+            $game->published_at = Date::now();
+        } elseif (! $game->published) {
             $game->published_at = null;
         }
     }
 
     /**
      * Set model's game's picture.
-     *
-     * @param self $game
-     * @return void
      */
     private static function setImage(self $game): void
     {
@@ -146,9 +145,6 @@ class Game extends Model implements Sitemapable
 
     /**
      * Set model's game's music.
-     *
-     * @param self $game
-     * @return void
      */
     private static function setMusic(self $game): void
     {
@@ -157,9 +153,6 @@ class Game extends Model implements Sitemapable
 
     /**
      * Set model's order after the last element of the list.
-     *
-     * @param self $game
-     * @return void
      */
     private static function setOrder(self $game): void
     {
@@ -168,20 +161,16 @@ class Game extends Model implements Sitemapable
 
     /**
      * Set sitemap tag.
-     *
-     * @return \Spatie\Sitemap\Tags\Url|string|array
      */
-    public function toSitemapTag(): \Spatie\Sitemap\Tags\Url|string|array
+    public function toSitemapTag(): Url | string | array
     {
         return $this->toSitemapTagCustom(route('fo.games.show', $this->slug), Url::CHANGE_FREQUENCY_YEARLY, 0.9);
     }
 
     /**
      * Set micro data.
-     *
-     * @return \Spatie\SchemaOrg\WebPage
      */
-    public function toSchemaOrg(): \Spatie\SchemaOrg\WebPage
+    public function toSchemaOrg(): WebPage
     {
         return Schema::webPage()
             ->name($this->name)
@@ -204,7 +193,7 @@ class Game extends Model implements Sitemapable
                     ->inLanguage(config('app.locale'))
                     ->datePublished($this->published_at)
                     ->isAccessibleForFree(true)
-                    ->genre("Game image gallery")
+                    ->genre('Game image gallery')
                     ->headline($this->name)
                     ->isPartOf(
                         Schema::creativeWorkSeries()->name($this->folder->name)
@@ -213,10 +202,10 @@ class Game extends Model implements Sitemapable
                     ->primaryImageOfPage(
                         Schema::imageObject()
                             ->url(asset($this->picture))
-                            ->headline("Main picture from the game " . $this->name)
+                            ->headline('Main picture from the game ' . $this->name)
                     )
                     ->mainEntity(Schema::thing()->name($this->name))
-                    ->about(Schema::thing()->name("Pictures from the game " . $this->name))
+                    ->about(Schema::thing()->name('Pictures from the game ' . $this->name))
                     ->reviewedBy($this->getPersonSchema())
                     ->editor($this->getPersonSchema())
                     ->publisher($this->getPersonSchema())
@@ -226,13 +215,12 @@ class Game extends Model implements Sitemapable
     }
 
     // * RELATIONSHIPS
-
     /**
      * Get Folder that owns the Game (belongs-to relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo<\App\Models\Folder, $this>
      */
-    public function folder(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function folder(): BelongsTo
     {
         return $this->belongsTo(Folder::class);
     }
@@ -240,9 +228,9 @@ class Game extends Model implements Sitemapable
     /**
      * Get Tags of the Game (morph-to-many relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\Tag, $this>
      */
-    public function tags(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
@@ -250,19 +238,17 @@ class Game extends Model implements Sitemapable
     /**
      * Get Pictures of the Game (has-many relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany<\App\Models\Picture, $this>
      */
-    public function pictures(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function pictures(): HasMany
     {
         return $this->hasMany(Picture::class);
     }
 
     /**
      * Get Rank of the Game (belongs-to relationship).
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne|null
      */
-    public function rank(): \Illuminate\Database\Eloquent\Relations\HasOne|null
+    public function rank(): ?HasOne
     {
         return $this->hasOne(Rank::class);
     }
@@ -270,9 +256,9 @@ class Game extends Model implements Sitemapable
     /**
      * Get Visits of the Game (has-many relationship).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany<\App\Models\Visit, $this>
      */
-    public function visits(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function visits(): HasMany
     {
         return $this->hasMany(Visit::class);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,18 +13,17 @@ class LogoutUnpublishedUsers
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        /** @var \App\Models\User|null $userModel */
         $userModel = Auth::user();
-        if (!is_null($userModel) && !$userModel->published) {
+        if (! is_null($userModel) && ! $userModel->published) {
             Auth::logout();
-            return redirect()->route('bo.login')->with('warning', trans('auth.unpublished_user'));
+
+            return to_route('bo.login')->with('warning', trans('auth.unpublished_user'));
         }
+
         return $next($request);
     }
 }

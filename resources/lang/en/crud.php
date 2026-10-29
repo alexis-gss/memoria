@@ -23,7 +23,7 @@ return [
     'libs'       => [
         'toolbox' => [
             'assertFieldIsUnique' => 'The :value for the :attribute field is already in use',
-        ]
+        ],
     ],
     'messages'   => [
         'has_been_created'                => ':model has been created',
@@ -46,7 +46,7 @@ return [
         'label'         => 'Search :elements',
         'keywords'      => 'Your keywords here…',
         'apply_search'  => 'Apply a search',
-        'remove_search' => 'Remove the search'
+        'remove_search' => 'Remove the search',
     ],
     'filter' => [
         'sort_ascending'  => 'Sort :name in ascending order',

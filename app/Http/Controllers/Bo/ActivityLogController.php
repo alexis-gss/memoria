@@ -1,25 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use LaravelActivityLogs\Models\ActivityLog;
 
 class ActivityLogController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\View
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
-        /** Authorize action */
         $this->authorize('isConceptor');
 
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = ActivityLog::query()->with('user');
 
         /** @var \App\Models\User|null $userModel */
@@ -56,11 +54,8 @@ class ActivityLogController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param \LaravelActivityLogs\Models\ActivityLog $activity_log
-     * @return \Illuminate\Contracts\View\View
      */
-    public function show(ActivityLog $activity_log): \Illuminate\Contracts\View\View
+    public function show(ActivityLog $activity_log): View
     {
         /** Authorize action */
         $this->authorize('isConceptor');

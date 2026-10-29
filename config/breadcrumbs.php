@@ -1,5 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
+use Diglactic\Breadcrumbs\Generator;
+use Diglactic\Breadcrumbs\Manager;
+
 return [
 
     /*
@@ -21,7 +26,7 @@ return [
         |
         | Or a custom view, e.g. '_partials/breadcrumbs'.
         |
-    */
+     */
 
     'view' => 'components/breadcrumbs/breadcrumb-layout',
 
@@ -35,7 +40,7 @@ return [
         | - base_path('routes/breadcrumbs.php')
         | - glob(base_path('breadcrumbs/*.php'))
         |
-    */
+     */
 
     'files' => [
         base_path('routes/breadcrumbs-bo.php'),
@@ -49,7 +54,7 @@ return [
         |
         | Determine when to throw an exception.
         |
-    */
+     */
 
     // * When route-bound breadcrumbs are used but the current route doesn't have a name (UnnamedRouteException)
     'unnamed-route-exception' => true,
@@ -67,11 +72,11 @@ return [
         |
         | Subclass the default classes for more advanced customisations.
         |
-    */
+     */
 
     // * Manager
-    'manager-class' => Diglactic\Breadcrumbs\Manager::class,
+    'manager-class' => Manager::class,
 
     // * Generator
-    'generator-class' => Diglactic\Breadcrumbs\Generator::class,
+    'generator-class' => Generator::class,
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
@@ -11,6 +13,8 @@ use App\Models\Picture;
 use App\Models\Tag;
 use App\Traits\Controllers\ChangesModelOrder;
 use App\Traits\Controllers\UpdateModelPublished;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -32,13 +36,9 @@ class GameController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\View
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Game::query()->with(['folder', 'pictures']);
 
         /** @var string $search Search field */
@@ -68,37 +68,28 @@ class GameController extends Controller
 
     /**
      * Show the specified resource.
-     *
-     * @param \App\Models\Game $game
-     * @return \Illuminate\Contracts\View\View
      */
-    public function show(Game $game): \Illuminate\Contracts\View\View
+    public function show(Game $game): View
     {
         return view('back.pages.games.show', ['gameModel' => $game]);
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @param \App\Models\Game $game
-     * @return \Illuminate\Contracts\View\View
      */
-    public function create(Game $game): \Illuminate\Contracts\View\View
+    public function create(Game $game): View
     {
         return view('back.pages.games.create', [
             'gameModel'    => $game,
             'folderModels' => $this->getFoldersPublished(true, $this->modelsPerPage),
-            'tagModels'    => $this->getTagsPublished(true, $this->modelsPerPage)
+            'tagModels'    => $this->getTagsPublished(true, $this->modelsPerPage),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Games\StoreGameRequest $request
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreGameRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreGameRequest $request): RedirectResponse
     {
         return DB::transaction(function () use ($request) {
             $game = (new Game())->fill(Arr::except($request->validated(), ['tags']));
@@ -109,41 +100,36 @@ class GameController extends Controller
                     PictureRequest::rules()
                 )->validated());
                 (new Tag())->setTags($game, collect(request()->tags));
-                return redirect()->route('bo.games.edit', $game)
+
+                return to_route('bo.games.edit', $game)
                     ->with('success', trans('crud.messages.has_been_created', [
-                        'model' => Str::of(trans_choice('models.game', 1))->ucfirst()
+                        'model' => Str::of(trans_choice('models.game', 1))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->back()
+
+            return back()
                 ->with('error', trans('crud.messages.cannot_be_created', [
-                    'model' => Str::of(trans_choice('models.game', 1))->ucfirst()
+                    'model' => Str::of(trans_choice('models.game', 1))->ucfirst()->value(),
                 ]));
         });
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param \App\Models\Game $game
-     * @return \Illuminate\Contracts\View\View
      */
-    public function edit(Game $game): \Illuminate\Contracts\View\View
+    public function edit(Game $game): View
     {
         return view('back.pages.games.edit', [
             'gameModel'    => $game,
             'folderModels' => $this->getFoldersPublished(true, $this->modelsPerPage),
-            'tagModels'    => $this->getTagsPublished(true, $this->modelsPerPage)
+            'tagModels'    => $this->getTagsPublished(true, $this->modelsPerPage),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\Games\UpdateGameRequest $request
-     * @param \App\Models\Game                              $game
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateGameRequest $request, Game $game): \Illuminate\Http\RedirectResponse
+    public function update(UpdateGameRequest $request, Game $game): RedirectResponse
     {
         return DB::transaction(function () use ($request, $game) {
             $game->fill(Arr::except($request->validated(), ['tags']));
@@ -153,48 +139,44 @@ class GameController extends Controller
             )->validated());
             (new Tag())->setTags($game, collect($request->tags));
             if ($game->saveOrFail()) {
-                return redirect()->route('bo.games.edit', $game)
+                return to_route('bo.games.edit', $game)
                     ->with('success', trans('crud.messages.has_been_updated', [
-                        'model' => Str::of(trans_choice('models.game', 1))->ucfirst()
+                        'model' => Str::of(trans_choice('models.game', 1))->ucfirst()->value(),
                     ]));
             }
-            return redirect()->route('bo.games.edit', $game)
+
+            return to_route('bo.games.edit', $game)
                 ->with('error', trans('crud.messages.cannot_be_updated', [
-                    'model' => Str::of(trans_choice('models.game', 1))->ucfirst()
+                    'model' => Str::of(trans_choice('models.game', 1))->ucfirst()->value(),
                 ]));
         });
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param \App\Models\Game $game
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(Game $game): \Illuminate\Http\RedirectResponse
+    public function destroy(Game $game): RedirectResponse
     {
         /** @var array<string,string> */
         $previousQueries = [];
         \parse_str(\parse_url(url()->previous(), \PHP_URL_QUERY), $previousQueries);
         if ($game->deleteOrFail()) {
-            return redirect()->route('bo.games.index', $previousQueries)
+            return to_route('bo.games.index', $previousQueries)
                 ->with('success', trans('crud.messages.has_been_deleted', [
-                    'model' => Str::of(trans_choice('models.game', 1))->ucfirst()
+                    'model' => Str::of(trans_choice('models.game', 1))->ucfirst()->value(),
                 ]));
         }
-        return redirect()->back()
+
+        return back()
             ->with('error', trans('crud.messages.cannot_be_deleted', [
-                'model' => Str::of(trans_choice('models.game', 1))->ucfirst()
+                'model' => Str::of(trans_choice('models.game', 1))->ucfirst()->value(),
             ]));
     }
 
     /**
      * Duplicate the specified resource.
-     *
-     * @param \App\Models\Game $game
-     * @return \Illuminate\Contracts\View\View
      */
-    public function duplicate(Game $game): \Illuminate\Contracts\View\View
+    public function duplicate(Game $game): View
     {
         return $this->create($game->replicate());
     }

@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Bo;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Bo\StaticPages\UpdateStaticPageRequest;
 use App\Models\StaticPage;
 use App\Traits\Controllers\ChangesModelOrder;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -24,13 +28,9 @@ class StaticPageController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\View
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = StaticPage::query();
 
         /** @var string $search Search field */
@@ -62,47 +62,38 @@ class StaticPageController extends Controller
 
     /**
      * Show the specified resource.
-     *
-     * @param \App\Models\StaticPage $static_page
-     * @return \Illuminate\Contracts\View\View
      */
-    public function show(StaticPage $static_page): \Illuminate\Contracts\View\View
+    public function show(StaticPage $static_page): View
     {
         return view('back.pages.static_pages.show', ['staticPageModel' => $static_page]);
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param \App\Models\StaticPage $static_page
-     * @return \Illuminate\Contracts\View\View
      */
-    public function edit(StaticPage $static_page): \Illuminate\Contracts\View\View
+    public function edit(StaticPage $static_page): View
     {
         return view('back.pages.static_pages.edit', ['staticPageModel' => $static_page]);
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param \App\Http\Requests\Bo\StaticPages\UpdateStaticPageRequest $request
-     * @param \App\Models\StaticPage                                    $static_page
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateStaticPageRequest $request, StaticPage $static_page): \Illuminate\Http\RedirectResponse
+    public function update(UpdateStaticPageRequest $request, StaticPage $static_page): RedirectResponse
     {
         return DB::transaction(function () use ($request, $static_page) {
             $static_page->fill($request->validated());
 
             if ($static_page->saveOrFail()) {
-                return redirect()->route('bo.static_pages.edit', $static_page)
+                return to_route('bo.static_pages.edit', $static_page)
                     ->with('success', trans('crud.messages.has_been_updated', [
-                        'model' => Str::ucfirst(trans_choice('models.static_page', 1))
+                        'model' => Str::ucfirst(trans_choice('models.static_page', 1)),
                     ]));
             }
-            return redirect()->route('bo.static_pages.edit', $static_page)
+
+            return to_route('bo.static_pages.edit', $static_page)
                 ->with('error', trans('crud.messages.cannot_be_updated', [
-                    'model' => Str::ucfirst(trans_choice('models.static_page', 1))
+                    'model' => Str::ucfirst(trans_choice('models.static_page', 1)),
                 ]));
         });
     }

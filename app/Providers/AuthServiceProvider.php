@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Enums\Users\RoleEnum;
@@ -11,13 +13,9 @@ class AuthServiceProvider extends ServiceProvider
 {
     /**
      * Register any authentication / authorization services.
-     *
-     * @return void
      */
     public function boot(): void
     {
-        Gate::define('isConceptor', function (User $user) {
-            return $user->role === RoleEnum::conceptor;
-        });
+        Gate::define('isConceptor', fn (User $user) => $user->role === RoleEnum::conceptor);
     }
 }

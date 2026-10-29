@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Fo;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Fo\UpdateRatingRequest;
 use App\Models\Picture;
 use App\Models\Rating;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -13,12 +16,8 @@ class RatingController extends Controller
 {
     /**
      * Update the specified resource.
-     *
-     * @param \App\Http\Requests\Fo\UpdateRatingRequest $request
-     * @param \App\Models\Rating                        $rating
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateRatingRequest $request, Rating $rating): \Illuminate\Http\JsonResponse
+    public function update(UpdateRatingRequest $request, Rating $rating): JsonResponse
     {
         return DB::transaction(function () use ($request, $rating) {
             $validatedData = $request->validated();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies\Rules;
 
 use App\Enums\Users\RoleEnum;
@@ -12,8 +14,6 @@ abstract class UserStaticRules
 {
     /**
      * Allow everyone.
-     *
-     * @return boolean
      */
     public static function everyOne(): bool
     {
@@ -22,8 +22,6 @@ abstract class UserStaticRules
 
     /**
      * Allow no one.
-     *
-     * @return boolean
      */
     public static function noOne(): bool
     {
@@ -32,10 +30,6 @@ abstract class UserStaticRules
 
     /**
      * At least a minimum role.
-     *
-     * @param \App\Models\User          $user
-     * @param \App\Enums\Users\RoleEnum $minRole
-     * @return boolean
      */
     public static function atLeastRole(User $user, RoleEnum $minRole): bool
     {

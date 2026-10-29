@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Ranks;
 
 use App\Models\Rank;
@@ -10,8 +12,6 @@ class StoreRankRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -20,22 +20,16 @@ class StoreRankRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'ranks' => collect($this->ranks)->map(function ($rank) {
-                return intval($rank['id']);
-            })->toArray(),
+            'ranks' => collect($this->ranks)->map(fn ($rank) => intval($rank['id']))->all(),
         ]);
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -47,8 +41,6 @@ class StoreRankRequest extends FormRequest
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

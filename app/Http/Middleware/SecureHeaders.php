@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -7,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
+use Symfony\Component\HttpFoundation\Response;
 
 class SecureHeaders
 {
@@ -25,12 +28,11 @@ class SecureHeaders
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request                                                         $request
-     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  Closure(Request): Response  $next
+     *
      * @phpcs:disable Squiz.Commenting.FunctionComment.IncorrectTypeHint
      */
-    public function handle(Request $request, Closure $next): \Symfony\Component\HttpFoundation\Response
+    public function handle(Request $request, Closure $next): Response
     {
         // phpcs:enable
         View::share('nonce', $nonce = Vite::useCspNonce());
@@ -49,24 +51,22 @@ class SecureHeaders
             "default-src 'none';",
             "manifest-src 'self';",
             "connect-src 'self' blob:;",
-            "img-src * data: blob:;",
-            "frame-src ;",
+            'img-src * data: blob:;',
+            'frame-src ;',
             "media-src 'self';",
             "font-src 'self' data: ;",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-            "script-src 'self' {$jsDev} ;"
+            "script-src 'self' {$jsDev} ;",
         ];
 
         $response->headers->set('Content-Security-Policy', implode(' ', $cspPolicies) . $reportUri);
         $response->headers->set('Feature-Policy', 'fullscreen \'self\';');
+
         return $response;
     }
 
     /**
      * Remove unwanted headers.
-     *
-     * @param array $headerList
-     * @return void
      */
     private function removeUnwantedHeaders(array $headerList): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits\Requests;
 
 use App\Lib\Helpers\ToolboxHelper;
@@ -7,43 +9,56 @@ use App\Lib\Helpers\ToolboxHelper;
 trait HasPicture
 {
     /**
-     * Minimum width
+     * Required picture.
      *
-     * @var integer
+     * @var bool
+     */
+    private $required = true;
+
+    /**
+     * Minimum limit.
+     *
+     * @var int
+     */
+    private $limitMin = 100;
+
+    /**
+     * Maximum limit.
+     *
+     * @var int
+     */
+    private $limitMax = 3840;
+
+    /**
+     * Minimum width.
+     *
+     * @var int
      */
     private $minWidth = 100;
 
     /**
-     * Maximum width
+     * Maximum width.
      *
-     * @var integer
+     * @var int
      */
     private $maxWidth = 3840;
 
     /**
-     * Minimum height
+     * Minimum height.
      *
-     * @var integer
+     * @var int
      */
     private $minHeight = 100;
 
     /**
-     * Maximum height
+     * Maximum height.
      *
-     * @var integer
+     * @var int
      */
     private $maxHeight = 2160;
 
     /**
      * Image rules.
-     *
-     * @param string       $name
-     * @param boolean      $required
-     * @param integer|null $minWidth
-     * @param integer|null $minHeight
-     * @param integer|null $maxWidth
-     * @param integer|null $maxHeight
-     * @return array
      */
     public function pictureRules(
         string $name = 'picture',
@@ -54,33 +69,24 @@ trait HasPicture
         ?int $maxHeight = null
     ): array {
         $sizes = (object) [
-            'minWidth'  => $minWidth ?? $this->minWidth,
+            'minWidth'  => $minWidth  ?? $this->minWidth,
             'minHeight' => $minHeight ?? $this->minHeight,
-            'maxWidth'  => $maxWidth ?? $this->maxWidth,
-            'maxHeight' => $maxHeight ?? $this->maxHeight
+            'maxWidth'  => $maxWidth  ?? $this->maxWidth,
+            'maxHeight' => $maxHeight ?? $this->maxHeight,
         ];
+
         return [
             $name => [
                 $required ? 'required' : 'nullable',
-                function (string $attribute, $value, callable $fail) use ($sizes) {
+                function (string $attribute, $value, callable $fail) use ($sizes): void {
                     ToolboxHelper::validatePicture($attribute, $value, $fail, $sizes);
-                }
-            ]
+                },
+            ],
         ];
     }
 
     /**
      * Images rules.
-     *
-     * @param string       $name
-     * @param boolean      $required
-     * @param integer|null $limitMin
-     * @param integer|null $limitMax
-     * @param integer|null $minWidth
-     * @param integer|null $minHeight
-     * @param integer|null $maxWidth
-     * @param integer|null $maxHeight
-     * @return array
      */
     public function picturesRules(
         string $name = 'pictures',
@@ -93,30 +99,28 @@ trait HasPicture
         ?int $maxHeight = null
     ): array {
         $sizes = (object) [
-            'required'  => $required ?? $this->required,
-            'limitMin'  => $limitMin ?? $this->limitMin,
-            'limitMax'  => $limitMax ?? $this->limitMax,
-            'minWidth'  => $minWidth ?? $this->minWidth,
+            'required'  => $required  ?? $this->required,
+            'limitMin'  => $limitMin  ?? $this->limitMin,
+            'limitMax'  => $limitMax  ?? $this->limitMax,
+            'minWidth'  => $minWidth  ?? $this->minWidth,
             'minHeight' => $minHeight ?? $this->minHeight,
-            'maxWidth'  => $maxWidth ?? $this->maxWidth,
-            'maxHeight' => $maxHeight ?? $this->maxHeight
+            'maxWidth'  => $maxWidth  ?? $this->maxWidth,
+            'maxHeight' => $maxHeight ?? $this->maxHeight,
         ];
+
         return [
-            "{$name}" => ($required ? 'required' : 'nullable') . "|array|between:$limitMin,$limitMax",
+            "{$name}"   => ($required ? 'required' : 'nullable') . "|array|between:$limitMin,$limitMax",
             "{$name}.*" => [
                 ($required ? 'required' : 'nullable'),
-                function (string $attribute, $value, callable $fail) use ($sizes) {
+                function (string $attribute, $value, callable $fail) use ($sizes): void {
                     ToolboxHelper::validatePicture($attribute, $value, $fail, $sizes);
-                }
-            ]
+                },
+            ],
         ];
     }
 
     /**
      * Merges picture field with request data.
-     *
-     * @param string $name
-     * @return void
      */
     protected function mergePicture(string $name = 'picture'): void
     {
@@ -127,6 +131,7 @@ trait HasPicture
             if ($picturePath === 'false') {
                 // * Empty picture and exit
                 $this->merge([$name => []]);
+
                 return;
             }
             $decodedPath = \urldecode($picturePath);
@@ -134,20 +139,17 @@ trait HasPicture
                 "{$name}Validate" => array_merge(
                     $this->{"{$name}Validate"},
                     [\public_path(ltrim($decodedPath, '/'))]
-                )
+                ),
             ]);
             $changedPicture = ltrim($decodedPath, '/');
             $this->merge([
-                $name => $changedPicture
+                $name => $changedPicture,
             ]);
-        } //end if
+        } // end if
     }
 
     /**
      * Merges pictures fields with request data.
-     *
-     * @param string $name
-     * @return void
      */
     protected function mergePictures(string $name = 'pictures'): void
     {
@@ -159,6 +161,7 @@ trait HasPicture
                 if ($picturePath === 'false') {
                     // * Empty picture and exit
                     $this->merge([$name => []]);
+
                     return;
                 }
                 $decodedPath = \urldecode($picturePath);
@@ -166,14 +169,14 @@ trait HasPicture
                     "{$name}Validate" => array_merge(
                         $this->{"{$name}Validate"},
                         [\public_path(ltrim($decodedPath, '/'))]
-                    )
+                    ),
                 ]);
                 $changedPicture       = $this->{$name};
                 $changedPicture[$key] = ltrim($decodedPath, '/');
                 $this->merge([
-                    $name => $changedPicture
+                    $name => $changedPicture,
                 ]);
             }
-        } //end if
+        } // end if
     }
 }

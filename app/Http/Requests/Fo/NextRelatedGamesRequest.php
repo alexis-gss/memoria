@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Fo;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -8,8 +10,6 @@ class NextRelatedGamesRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
@@ -33,7 +33,7 @@ class NextRelatedGamesRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string,\Illuminate\Contracts\Translation\Translator|string|array<mixed>|null>
+     * @return array<string,\Illuminate\Translation\Translator|string|array<mixed>|null>
      */
     public function attributes(): array
     {

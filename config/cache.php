@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Str;
 
 return [
@@ -13,7 +15,7 @@ return [
         | using this caching library. This connection is used when another is
         | not explicitly specified when executing a given caching function.
         |
-    */
+     */
 
     'default' => env('CACHE_DRIVER', 'file'),
 
@@ -29,7 +31,7 @@ return [
         | Supported drivers: "apc", "array", "database", "file",
         |         "memcached", "redis", "dynamodb", "octane", "null"
         |
-    */
+     */
 
     'stores' => [
         'apc' => [
@@ -99,7 +101,7 @@ return [
         | be other applications utilizing the same cache. So, we'll specify a
         | value to get prefixed to all our keys so we can avoid collisions.
         |
-    */
+     */
 
-    'prefix' => env('CACHE_PREFIX', Str::of(env('APP_NAME', 'laravel'), '_')->slug() . '_cache'),
+    'prefix' => env('CACHE_PREFIX', Str::of(env('APP_NAME', 'laravel'))->slug() . '_cache'),
 ];

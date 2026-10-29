@@ -4,6 +4,8 @@
  * @see https://github.com/pionl/laravel-chunk-upload
  */
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -17,7 +19,7 @@ return [
          */
 
         'chunks' => 'chunks',
-        'disk' => 'local',
+        'disk'   => 'local',
     ],
     'clear' => [
 
@@ -26,7 +28,7 @@ return [
          */
 
         'timestamp' => '-3 HOURS',
-        'schedule' => [
+        'schedule'  => [
             'enabled' => true,
             // Run every hour on the 25th minute.
             'cron' => '25 * * * *',

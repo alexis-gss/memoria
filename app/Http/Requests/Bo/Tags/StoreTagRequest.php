@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Tags;
 
 use App\Models\Tag;
@@ -10,8 +12,6 @@ class StoreTagRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -20,20 +20,16 @@ class StoreTagRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'published' => $this->boolean('published')
+            'published' => $this->boolean('published'),
         ]);
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -41,31 +37,28 @@ class StoreTagRequest extends FormRequest
             'name'      => [
                 'required', 'string', 'min:2', 'max:25',
                 // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
-                function ($attribute, string $value, $fail) {
+                function ($attribute, string $value, $fail): void {
                     if (
-                        $this->boolean('published') &&
-                        config('app.locale') !== config('app.fallback_locale')
+                        $this->boolean('published') && config('app.locale') !== config('app.fallback_locale')
                     ) {
                         $fail(trans('crud.messages.translation_default_required', [
-                            'fallbackLocale' => config('app.fallback_locale')
+                            'fallbackLocale' => config('app.fallback_locale'),
                         ]));
                     }
-                }
+                },
             ],
-            'published' => 'required|boolean'
+            'published' => 'required|boolean',
         ];
     }
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {
         return [
             'name'      => trans('validation.attributes.name'),
-            'published' => trans('validation.custom.publishment')
+            'published' => trans('validation.custom.publishment'),
         ];
     }
 }

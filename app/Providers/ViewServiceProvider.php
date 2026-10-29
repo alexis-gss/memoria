@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
-use App\Models\Game;
+use App\Models\ActivityLog;
 use App\Models\Folder;
+use App\Models\Game;
 use App\Models\Rank;
 use App\Models\StaticPage;
 use App\Models\Tag;
@@ -15,22 +18,17 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use LaravelActivityLogs\Models\ActivityLog;
 use Throwable;
 
 class ViewServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
         // Get data from composer.json.
-        $appInfos = Cache::remember('composer', 360, function () {
-            return json_decode(File::get(app_path('../composer.json')));
-        });
+        $appInfos = Cache::remember('composer', 360, fn () => json_decode(File::get(app_path('../composer.json'))));
 
         // Share composer.json infos.
         View::share('globalName', $appInfos->name);
@@ -46,37 +44,37 @@ class ViewServiceProvider extends ServiceProvider
         View::share('globalRanks', collect());
         View::share('globalStaticPages', collect());
 
-        if (!app()->runningInConsole()) {
+        if (! app()->runningInConsole()) {
             try {
                 if (
-                    Schema::hasTable('games') &&
-                    Schema::hasTable('folders') &&
-                    Schema::hasTable('tags') &&
-                    Schema::hasTable('users') &&
-                    Schema::hasTable('activity_logs') &&
-                    Schema::hasTable('ranks') &&
-                    Schema::hasTable('static_pages')
+                    Schema::hasTable('games')
+                    && Schema::hasTable('folders')
+                    && Schema::hasTable('tags')
+                    && Schema::hasTable('users')
+                    && Schema::hasTable('activity_logs')
+                    && Schema::hasTable('ranks')
+                    && Schema::hasTable('static_pages')
                 ) {
-                    View::share('globalGames', Game::query()->with('pictures')->orderBy('name', 'ASC')->get());
-                    View::share('globalFolders', Folder::query()->with('games')->orderBy('name', 'ASC')->get());
-                    View::share('globalTags', Tag::query()->with('games')->orderBy('name', 'ASC')->get());
-                    View::share('globalUsers', User::query()->orderBy('last_name', 'ASC')->get());
+                    View::share('globalGames', Game::query()->with('pictures')->orderBy('name', 'asc')->get());
+                    View::share('globalFolders', Folder::query()->with('games')->orderBy('name', 'asc')->get());
+                    View::share('globalTags', Tag::query()->with('games')->orderBy('name', 'asc')->get());
+                    View::share('globalUsers', User::query()->orderBy('last_name', 'asc')->get());
                     View::share('globalActivities', ActivityLog::query()->with('user')->get());
-                    View::share('globalRanks', Rank::query()->orderBy('rank', 'ASC')->get());
-                    View::share('globalStaticPages', StaticPage::query()->orderBy('title', 'ASC')->get());
+                    View::share('globalRanks', Rank::query()->orderBy('rank', 'asc')->get());
+                    View::share('globalStaticPages', StaticPage::query()->orderBy('title', 'asc')->get());
                 }
             } catch (Throwable $e) {
                 // Keep the application error pages renderable
                 Log::warning('Unable to load global view data.', [
                     'exception' => $e::class,
-                    'message' => $e->getMessage(),
+                    'message'   => $e->getMessage(),
                 ]);
-            } //end try
+            } // end try
 
             // Pagination
             (collect(explode('/', request()->getPathInfo()))->get(1) === 'bo')
                 ? Paginator::defaultView('components.back.pagination')
                 : Paginator::useBootstrapFive();
-        } //end if
+        } // end if
     }
 }

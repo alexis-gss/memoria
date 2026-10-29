@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Fo;
 
 use Illuminate\Contracts\Validation\Validator;
@@ -11,8 +13,6 @@ class ShowGameRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
@@ -24,7 +24,7 @@ class ShowGameRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, mixed>
+     * @return array<string,\Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -36,7 +36,7 @@ class ShowGameRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string,\Illuminate\Contracts\Translation\Translator|string|array<mixed>|null>
+     * @return array<string,\Illuminate\Translation\Translator|string|array<mixed>|null>
      */
     public function attributes(): array
     {
@@ -48,18 +48,14 @@ class ShowGameRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
-     * @return void
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException HTTP error.
+     * @throws HttpResponseException HTTP error.
      */
     protected function failedValidation(Validator $validator): void
     {
-        if ($validator->errors()->has('slug')) {
-            abort(Response::HTTP_NOT_FOUND);
-        }
+        abort_if($validator->errors()->has('slug'), Response::HTTP_NOT_FOUND);
 
         throw new HttpResponseException(
-            redirect()->back()->withErrors($validator)->withInput()
+            back()->withErrors($validator)->withInput()
         );
     }
 }

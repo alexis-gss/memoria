@@ -1,39 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\Users\RoleEnum;
 use App\Lib\Helpers\FileStorageHelper;
+use App\Traits\Models\HasActivityLog;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
-use LaravelActivityLogs\Traits\HasActivityLog;
 
 /**
- * @property integer                         $id                Id.
- * @property string                          $first_name        Firstname.
- * @property string                          $last_name         Lastname.
- * @property string                          $email             Email.
- * @property string                          $picture           Path of the account's picture.
- * @property string                          $password          Password.
- * @property \App\Enums\Users\RoleEnum       $role              Role.
- * @property integer                         $order             Order.
- * @property boolean                         $published         Published status.
- * @property \Illuminate\Support\Carbon|null $published_at      Publication status update date.
+ * @property int $id Id.
+ * @property string $first_name Firstname.
+ * @property string $last_name Lastname.
+ * @property string $email Email.
+ * @property string $picture Path of the account's picture.
+ * @property string $password Password.
+ * @property \App\Enums\Users\RoleEnum $role Role.
+ * @property int $order Order.
+ * @property bool $published Published status.
+ * @property \Illuminate\Support\Carbon|null $published_at Publication status update date.
  * @property \Illuminate\Support\Carbon|null $email_verified_at Email verified date.
  * @property-read \Illuminate\Support\Carbon $created_at        Created date.
  * @property-read \Illuminate\Support\Carbon $updated_at        Updated date.
  *
- * @method static void booted()                          Perform any actions required after the model boots.
+ * @method static void booted() Perform any actions required after the model boots.
  * @method static void updatePublishedStatus(self $user) Check if the authenticable user can update the
- * published status.
- * @method static void setImage(self $user)              Set model's account's picture.
- * @method static void setOrder(self $user)              Set model's order after the last element of the list.
- * @method static void updatePassword(self $user)        Update model's password.
+ *                                                       published status.
+ * @method static void setImage(self $user) Set model's account's picture.
+ * @method static void setOrder(self $user) Set model's order after the last element of the list.
+ * @method static void updatePassword(self $user) Update model's password.
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\LaravelActivityLogs\Models\ActivityLog[] $activityLogs
+ * @property-read \Illuminate\Support\Collection|ActivityLog[] $activityLogs
  * Get Activities of the User (has-many relationship).
  */
 class User extends Authenticatable
@@ -45,7 +47,7 @@ class User extends Authenticatable
     /**
      * The attributes that are fillable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'first_name',
@@ -75,7 +77,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -84,27 +86,25 @@ class User extends Authenticatable
 
     /**
      * Perform any actions required after the model boots.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
-        static::creating(function (self $user) {
+        static::creating(function (self $user): void {
             self::updatePassword($user);
             self::setOrder($user);
             self::setImage($user);
             self::checkElevationPrivileges($user);
         });
-        static::updating(function (self $user) {
+        static::updating(function (self $user): void {
             self::updatePassword($user);
             self::setImage($user);
             self::updatePublishedStatus($user);
             self::checkElevationPrivileges($user);
         });
-        static::updated(function (self $user) {
+        static::updated(function (self $user): void {
             FileStorageHelper::removeOldFile($user, 'picture');
         });
-        static::deleted(function (self $user) {
+        static::deleted(function (self $user): void {
             FileStorageHelper::removeFile($user, 'picture');
         });
     }
@@ -113,13 +113,10 @@ class User extends Authenticatable
 
     /**
      * Check if the authenticable user can update the published status.
-     *
-     * @param self $user
-     * @return void
      */
     private static function updatePublishedStatus(self $user): void
     {
-        if (optional(auth('backend')->user())->getKey() === $user->getKey()) {
+        if (auth('backend')->user()?->getKey() === $user->getKey()) {
             \validator(
                 ['published'          => $user->published],
                 ['published'          => 'required|boolean|accepted'],
@@ -130,9 +127,6 @@ class User extends Authenticatable
 
     /**
      * Prevent user elevation privileges.
-     *
-     * @param self $user
-     * @return void
      */
     private static function checkElevationPrivileges(self $user): void
     {
@@ -144,9 +138,6 @@ class User extends Authenticatable
 
     /**
      * Set model's account's picture.
-     *
-     * @param self $user
-     * @return void
      */
     private static function setImage(self $user): void
     {
@@ -155,9 +146,6 @@ class User extends Authenticatable
 
     /**
      * Set model's order after the last element of the list.
-     *
-     * @param self $user
-     * @return void
      */
     private static function setOrder(self $user): void
     {
@@ -166,9 +154,6 @@ class User extends Authenticatable
 
     /**
      * Update model's password.
-     *
-     * @param self $user
-     * @return void
      */
     private static function updatePassword(self $user): void
     {

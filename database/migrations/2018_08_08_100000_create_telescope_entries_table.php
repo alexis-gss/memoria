@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class () extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
-        Schema::create('telescope_entries', function (Blueprint $table) {
+        Schema::create('telescope_entries', function (Blueprint $table): void {
             $table->bigIncrements('sequence')->comment('Telescope sequence.');
             $table->uuid('uuid')->unique()->comment('Telescope UUID.');
             $table->uuid('batch_id')->comment('Telescope batch id.');
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->index(['type', 'should_display_on_index']);
         });
 
-        Schema::create('telescope_entries_tags', function (Blueprint $table) {
+        Schema::create('telescope_entries_tags', function (Blueprint $table): void {
             $table->uuid('entry_uuid')->comment('Telescope entry UUID.');
             $table->string('tag')->comment('Telescope entry tag.');
 
@@ -42,15 +42,13 @@ return new class extends Migration
                 ->onDelete('cascade');
         });
 
-        Schema::create('telescope_monitoring', function (Blueprint $table) {
+        Schema::create('telescope_monitoring', function (Blueprint $table): void {
             $table->string('tag')->primary()->comment('Telescope monitoring tag.');
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

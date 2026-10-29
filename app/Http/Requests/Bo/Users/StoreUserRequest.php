@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Bo\Users;
 
 use App\Enums\Users\RoleEnum;
@@ -16,8 +18,6 @@ class StoreUserRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return boolean
      */
     public function authorize(): bool
     {
@@ -26,20 +26,17 @@ class StoreUserRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'published' => $this->boolean('published')
+            'published' => $this->boolean('published'),
         ]);
         $this->mergePicture();
     }
+
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -55,17 +52,16 @@ class StoreUserRequest extends FormRequest
                     ->mixedCase()
                     ->numbers()
                     ->symbols()
-                    ->uncompromised()
+                    ->uncompromised(),
             ],
-            'published'  => 'required|boolean'
+            'published'  => 'required|boolean',
         ];
+
         return \array_merge($rules, $this->pictureRules(minWidth: 100, minHeight: 100, maxWidth: 100, maxHeight: 100));
     }
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {
@@ -81,7 +77,7 @@ class StoreUserRequest extends FormRequest
             'password.numbers'       => trans('validation.password.numbers'),
             'password.symbols'       => trans('validation.password.symbols'),
             'password.uncompromised' => trans('validation.password.uncompromised'),
-            'published'              => trans('validation.custom.publishment')
+            'published'              => trans('validation.custom.publishment'),
         ];
     }
 }

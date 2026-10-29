@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Mails\Auth;
 
 use App\Models\User;
@@ -14,15 +16,11 @@ class ResetPassword extends Mailable
     use Queueable;
     use SerializesModels;
 
-    /**
-     * @var \App\Models\User $user
-     */
     private User $user;
 
     /**
      * Create a new message instance.
      *
-     * @param \App\Models\User $user
      * @return void
      */
     public function __construct(User $user)
@@ -32,10 +30,8 @@ class ResetPassword extends Mailable
 
     /**
      * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
      */
-    public function envelope(): \Illuminate\Mail\Mailables\Envelope
+    public function envelope(): Envelope
     {
         return new Envelope(
             subject: sprintf(
@@ -48,10 +44,8 @@ class ResetPassword extends Mailable
 
     /**
      * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content(): \Illuminate\Mail\Mailables\Content
+    public function content(): Content
     {
         return new Content(
             markdown: 'back.emails.reset-password',

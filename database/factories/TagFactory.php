@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,8 +19,9 @@ final class TagFactory extends Factory
      */
     public function definition(): array
     {
-        $name      = fake()->unique()->word;
+        $name      = fake()->unique()->word();
         $published = fake()->boolean(75);
+
         return [
             'name'         => $name,
             'slug'         => Str::of($name)->slug(),
