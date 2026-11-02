@@ -6,6 +6,24 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.6.0] - 02.11.26**
+
+### Added
+-   feat: ✨ add search sorting by latest added games
+-   feat: ✨ add like and fullscreen buttons to the glightbox view screen
+-   feat: ✨ load next pictures from glightbox next action
+
+### Changed
+-   chore: 📦 update npm dependencies with eslint/stylelint configurations
+-   chore: 📦 update composer dependencies with phpcs/phpstan/pint/rector configurations
+
+### Fixed
+-   fix: 🚨 solving eslint/stylelint linters errors
+-   fix: 🚨 solving php linters errors
+-   fix: 💚 update github workflows with latest updates
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.5.4...v5.6.0
+
 ## **[v5.5.4] - 01.10.26**
 
 ### Changed
