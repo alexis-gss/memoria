@@ -135,7 +135,7 @@ class FolderController extends Controller
         if ($folder->games->isEmpty()) {
             /** @var array<string,string> */
             $previousQueries = [];
-            \parse_str(\parse_url(url()->previous(), \PHP_URL_QUERY), $previousQueries);
+            \parse_str(\parse_url(url()->previous(), \PHP_URL_QUERY) ?? '', $previousQueries);
             if ($folder->deleteOrFail()) {
                 return to_route('bo.folders.index', $previousQueries)
                     ->with('success', trans('crud.messages.has_been_deleted', [
