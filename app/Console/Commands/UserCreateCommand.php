@@ -13,19 +13,18 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use SplFileInfo;
 
 /**
  * Creates a new user.
  */
-class UserCreate extends Command
+class UserCreateCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:user';
+    protected $signature = 'memoria:make:user';
 
     /**
      * The console command description.
@@ -96,7 +95,7 @@ class UserCreate extends Command
         $user->password     = $this->password;
         $user->picture      = FileStorageHelper::storeFile(
             $user,
-            new SplFileInfo(\resource_path('../database/factories/assets/users/default-picture.png'))
+            new \SplFileInfo(\resource_path('../database/factories/assets/users/default-picture.png'))
         );
         $user->published    = true;
         $user->published_at = Carbon::now();

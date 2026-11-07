@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Mail;
 /**
  * Test if mail is sending.
  */
-class MailTest extends Command
+class MailTestCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'mail:test';
+    protected $signature = 'memoria:mail:test';
 
     /**
      * The console command description.
