@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Lib\Helpers\FileStorageHelper;
+use App\Lib\Helpers\PictureHelper;
 use App\Traits\Models\HasActivityLog;
 use App\Traits\Models\SchemaOrg;
 use App\Traits\Models\Sitemap;
@@ -94,7 +95,7 @@ class Game extends Model implements Sitemapable
             self::setImage($game);
             self::setMusic($game);
             self::setPublishedDate($game);
-            (new Picture())->renameFolderSavedPictures($game, 'default_folder');
+            PictureHelper::renameDirectory('default-folder', $game->slug);
         });
         static::created(function (): void {
             static::updateSitemap();
@@ -103,7 +104,7 @@ class Game extends Model implements Sitemapable
             self::setImage($game);
             self::setMusic($game);
             self::setPublishedDate($game);
-            (new Picture())->renameFolderSavedPictures($game, $game->getOriginal('slug'));
+            PictureHelper::renameDirectory($game->getOriginal('slug'), $game->slug);
         });
         static::updated(function (self $game): void {
             static::updateSitemap();

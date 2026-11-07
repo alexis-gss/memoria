@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Lib\Helpers\PictureHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id Id.
@@ -24,8 +24,6 @@ use Illuminate\Support\Facades\Storage;
  *                              model boots.
  * @method static void updatePictures(Game $game, array $request) Differentiate between old and new
  *                                                                pictures, remove oldests and save news.
- * @method static void renameFolderSavedPictures(Game $game, string $slug) Rename the folder where there is
- *                                                                         saved pictures.
  * @method static void removePicture(self $model) Delete one specific picture.
  * @method static void removePictures(Collection $pictures) Remove all pictures previously associated.
  *
@@ -98,40 +96,24 @@ class Picture extends Model
     }
 
     /**
-     * Rename the folder where pictures are saved.
-     */
-    public static function renameFolderSavedPictures(Game $game, string $slug): void
-    {
-        if ($slug !== $game->slug) {
-            $directory = Storage::disk('public')->path('pictures/' . $slug);
-            if (is_dir($directory)) {
-                rename($directory, Storage::disk('public')->path('pictures/' . $game->slug));
-            }
-        }
-    }
-
-    /**
      * Delete one specific picture.
      */
     private static function removePicture(self $picture): void
     {
-        $picture  = Picture::query()->where('id', $picture->getKey())->with('game')->first();
-        $pathFile = 'pictures/' . $picture->game->slug . '/' . $picture->uuid . '.webp';
-        if (Storage::disk('public')->exists($pathFile)) {
-            Storage::disk('public')->delete($pathFile);
-        }
+        $picture->loadMissing('game');
+        PictureHelper::delete($picture->game->slug, $picture->uuid);
     }
 
     /**
      * Remove all pictures previously associated.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $pictures
+     * @param  \Illuminate\Database\Eloquent\Collection<int, self>  $pictures
      */
     public static function removePictures(Collection $pictures): void
     {
-        foreach ($pictures as $picture) {
-            $picture->delete();
-        }
+        $pictures->each(function (self $picture): void {
+            self::removePicture($picture);
+        });
     }
 
     // * RELATIONSHIPS

@@ -80,10 +80,11 @@
                   >
                     <div class="ratio ratio-16x9 rounded-3">
                       <img
-                        :src="getPicturePath(getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
+                        :src="getThumbnailPath(getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
                         :alt="'Picture n°' + (getPictureNumber(paginateIndex, templateIndex) + pictureIndex + 1) + ' from the game ' + gameName"
                         :title="'Picture n°' + (getPictureNumber(paginateIndex, templateIndex) + pictureIndex + 1) + ' from the game ' + gameName"
                         class="d-none w-100 z-1"
+                        @error="onThumbnailError($event, getPictureNumber(paginateIndex, templateIndex) + pictureIndex)"
                         @load="gameImageLazyLoad"
                       >
                       <div class="picture-loader position-absolute top-0 start-0 w-100 h-100">
@@ -430,6 +431,26 @@ function displayImage(image: HTMLImageElement, parentClass: string): void {
   */
 function getPicturePath(number: number): string {
   return `${location.origin}/storage/pictures/${gameSlug.value}/${gamePictures.value[number].uuid}.webp`;
+}
+
+/**
+  * Return the path of the thumbnail.
+  * @param {number} number
+  * @return {string}
+  */
+function getThumbnailPath(number: number): string {
+  return `${location.origin}/storage/pictures/${gameSlug.value}/thumbnails/${gamePictures.value[number].uuid}.webp`;
+}
+
+/**
+  * Triggered when a thumbnail fails to load, replace it with the original picture.
+  * @param {number} number
+  * @return {string}
+  */
+function onThumbnailError(event: Event, number: number): void {
+  const img = event.target as HTMLImageElement;
+  img.onerror = null;
+  img.src = getPicturePath(number);
 }
 
 /**

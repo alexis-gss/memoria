@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Lib\Helpers\PictureHelper;
 use App\Models\Game;
 use App\Models\Picture;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -16,85 +17,27 @@ class DeleteUnassociatedPictures implements ShouldBeUnique, ShouldQueue
     use Queueable;
 
     /**
-     * All directories of pictures from storage.
-     *
-     * @var array<string>
-     */
-    private $storageDirectories = [];
-
-    /**
-     * All pictures saved from storage.
-     *
-     * @var array<string>
-     */
-    private $storagePictures = [];
-
-    /**
-     * All games slug saved from database.
-     *
-     * @var array<string>
-     */
-    private $gamesSlug = [];
-
-    /**
-     * All pictures saved from database.
-     *
-     * @var \Illuminate\Support\Collection
-     */
-    private $pictures;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
-    {
-        $this->storageDirectories = Storage::disk('public')->allDirectories('pictures');
-        $this->storagePictures    = Storage::disk('public')->allFiles('pictures');
-        $this->gamesSlug          = Game::query()->get()->pluck('slug')->toArray();
-        $this->pictures           = Picture::query()->get();
-        $this->handle();
-    }
-
-    /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $this->deleteChunks();
-        $this->deleteUnassociatedDirectories();
-        $this->deleteUnassociatedPictures();
-    }
-
-    /**
-     * Delete all failed/uncompleted chunks.
-     */
-    public function deleteChunks(): void
-    {
+        // Delete all failed/uncompleted chunks.
         Storage::deleteDirectory('chunks');
-    }
 
-    /**
-     * Delete all directories which have not equivalent to a game slug in the database.
-     */
-    public function deleteUnassociatedDirectories(): void
-    {
-        foreach ($this->storageDirectories as $directory) {
-            $directoryExplode = explode('/', $directory);
-            if (! in_array($directoryExplode[count($directoryExplode) - 1], $this->gamesSlug)) {
-                Storage::disk('public')->deleteDirectory($directory);
-            }
-        }
-    }
+        // Every game slug is expected, even without picture, with the uuids of its pictures.
+        $expected = Game::query()
+            ->pluck('slug')
+            ->mapWithKeys(fn (string $slug): array => [$slug => []])
+            ->all();
 
-    /**
-     * Delete all pictures which have not equivalent to a picture uuid in the database.
-     */
-    public function deleteUnassociatedPictures(): void
-    {
-        foreach ($this->storagePictures as $picture) {
-            if ($this->pictures->where('uuid', explode('.', explode('/', $picture)[2])[0])->isEmpty()) {
-                Storage::disk('public')->delete($picture);
-            }
-        }
+        Picture::query()
+            ->without('ratings')
+            ->with('game:id,slug')
+            ->get()
+            ->each(function (Picture $picture) use (&$expected): void {
+                $expected[$picture->game->slug][] = $picture->uuid;
+            });
+
+        PictureHelper::purgeOrphans($expected);
     }
 }
