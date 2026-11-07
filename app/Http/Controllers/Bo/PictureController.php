@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Bo;
 
+use App\Exceptions\PictureUploadException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,55 +56,115 @@ class PictureController extends Controller
      */
     protected function store(UploadedFile $file, mixed $uuid, string | false $gameSlug): JsonResponse
     {
-        // Generate a new UUID if none was provided.
-        if ($uuid === false) {
-            $uuid = Str::uuid();
-        }
-
-        // The game slug is required to build the storage path.
-        abort_if($gameSlug === false, 422, 'Missing parameter gameSlug');
-
-        // Build the destination folder and create it if it doesn't exist yet.
-        $finalPath = Storage::disk('public')->path(sprintf('pictures/%s/', $gameSlug));
-        if (! is_dir($finalPath)) {
-            mkdir($finalPath, 0755, true);
-        }
-
         // Path of the temporary file assembled from the chunks.
         $tmpPath = $file->getPathname();
 
-        // Check the file is a real image based on its content, not its extension.
-        // Fails for corrupted, truncated or non-image files.
+        try {
+            $uuid      = $this->resolveUuid($uuid);
+            $gameSlug  = $this->resolveGameSlug($gameSlug);
+            $image     = $this->decodeImage($tmpPath);
+            $directory = $this->prepareDirectory($gameSlug);
+
+            $this->saveAsWebp($image, sprintf('%s/%s.webp', $directory, $uuid));
+        } catch (PictureUploadException $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->status());
+        } finally {
+            // Always remove the temporary assembled file, on success or failure.
+            File::delete($tmpPath);
+        }
+
+        return response()->json(['uid' => $uuid]);
+    }
+
+    /**
+     * Return a valid uuid, generating one if none was provided.
+     *
+     * @throws PictureUploadException
+     */
+    private function resolveUuid(mixed $uuid): string
+    {
+        if ($uuid === false) {
+            return Str::uuid()->toString();
+        }
+
+        if (! is_string($uuid) || ! Str::isUuid($uuid)) {
+            throw new PictureUploadException('Invalid uuid');
+        }
+
+        return $uuid;
+    }
+
+    /**
+     * Check the game slug, as it ends up in a file path.
+     *
+     * @throws PictureUploadException
+     */
+    private function resolveGameSlug(string | false $gameSlug): string
+    {
+        if ($gameSlug === false) {
+            throw new PictureUploadException('Missing parameter gameSlug');
+        }
+
+        if (preg_match('/^[a-z0-9-]+$/', $gameSlug) !== 1) {
+            throw new PictureUploadException('Invalid gameSlug');
+        }
+
+        return $gameSlug;
+    }
+
+    /**
+     * Create the destination folder if it doesn't exist yet and return its path.
+     *
+     * @throws PictureUploadException
+     */
+    private function prepareDirectory(string $gameSlug): string
+    {
+        $directory = Storage::disk('public')->path('pictures/' . $gameSlug);
+
+        if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+            throw new PictureUploadException('Unable to create directory', 500);
+        }
+
+        return $directory;
+    }
+
+    /**
+     * Check the file is a real image based on its content, then decode it
+     * (JPEG, PNG, GIF, WebP…).
+     *
+     * @throws PictureUploadException
+     */
+    private function decodeImage(string $path): \GdImage
+    {
         // @phpcs:disabled Generic.PHP.NoSilencedErrors.Discouraged
-        if (@getimagesize($tmpPath) === false) {
-            File::delete($tmpPath);
-
-            return response()->json(['error' => 'Invalid or corrupted image file'], 422);
+        if (@getimagesize($path) === false) {
+            throw new PictureUploadException('Invalid or corrupted image file');
         }
 
-        // Decode the image with automatic format detection (JPEG, PNG, GIF, WebP…).
-        $image = @imagecreatefromstring(file_get_contents($tmpPath));
+        $image = @imagecreatefromstring((string) file_get_contents($path));
         // @phpcs:enable
-        if ($image === false) {
-            File::delete($tmpPath);
 
-            return response()->json(['error' => 'Image format not supported'], 422);
+        if ($image === false) {
+            throw new PictureUploadException('Image format not supported');
         }
 
+        return $image;
+    }
+
+    /**
+     * Convert the image to a lossless .webp file at the given path.
+     *
+     * @throws PictureUploadException
+     */
+    private function saveAsWebp(\GdImage $image, string $target): void
+    {
         // Convert palette images to true color and preserve PNG transparency.
         imagepalettetotruecolor($image);
         imagealphablending($image, true);
         imagesavealpha($image, true);
 
-        // Save as .webp and free the memory used by the image.
-        imagewebp($image, $finalPath . $uuid . '.webp', IMG_WEBP_LOSSLESS);
-        unset($image);
-
-        // Remove the temporary assembled file.
-        File::delete($tmpPath);
-
-        return response()->json([
-            'uid' => $uuid,
-        ]);
+        if (imagewebp($image, $target, IMG_WEBP_LOSSLESS) === false) {
+            throw new PictureUploadException('Unable to save image', 500);
+        }
     }
 }

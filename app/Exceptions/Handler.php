@@ -60,10 +60,12 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception): Response
     {
         // phpcs:enable
-        if ($exception instanceof HttpExceptionInterface) {
+        if ($exception instanceof HttpExceptionInterface && ! $request->expectsJson()) {
             $statusCode = $exception->getStatusCode();
 
-            return response()->view("errors.pages.{$statusCode}", [], $statusCode);
+            if (view()->exists("errors.pages.{$statusCode}")) {
+                return response()->view("errors.pages.{$statusCode}", [], $statusCode);
+            }
         }
 
         return parent::render($request, $exception);
