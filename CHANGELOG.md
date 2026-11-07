@@ -6,6 +6,20 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.7.0] - 07.11.26**
+
+### Added
+-   feat: ✨ apply Memoria scope to commands and introduce job commands
+
+### Changed
+-   refactor: ♻️ centralize picture file handling in PictureHelper
+
+### Fixed
+-   fix: 🐛 provide default value for previous url query string
+-   fix: 🐛 remove unbalanced ob_get_clean causing headers already sent
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.6.0...v5.7.0
+
 ## **[v5.6.0] - 02.11.26**
 
 ### Added
