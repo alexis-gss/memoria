@@ -1,6 +1,8 @@
-<x-breadcrumbs.breadcrumb-body :brParam="$brParam" />
 @php
-    $breadcrumbHtml = ob_get_clean();
+    $breadcrumbHtml = \Illuminate\Support\Facades\Blade::render(
+        '<x-breadcrumbs.breadcrumb-body :brParam="$brParam" />',
+        ['brParam' => $brParam]
+    );
     $navData = [
         'visible'        => (request()->routeIs('fo.games.show') && isset($gameModel) && !is_null($gameModel))
             || request()->routeIs('fo.ranks.index'),
