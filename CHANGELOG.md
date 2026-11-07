@@ -6,6 +6,16 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.6.1] - 07.11.26**
+
+### Changed
+-   refactor: ♻️ extract validation and conversion from upload store
+
+### Fixed
+-   fix: 🐛 remove unbalanced ob_get_clean causing headers already sent
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.6.0...v5.6.1
+
 ## **[v5.6.0] - 02.11.26**
 
 ### Added
