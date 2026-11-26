@@ -6,6 +6,17 @@ All notable changes to `memoria` will be documented in this file.
 - This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 - Commits respect [Conventionnal commits](https://www.conventionalcommits.org/en/v1.0.0/) & use [Gitmoji](https://gitmoji.dev/).
 
+## **[v5.7.1] - 26.11.26**
+
+### Changed
+-   feat: ✨ improve generate thumbnails command with some options
+-   chore: ⬆️ bump dependencies
+
+### Fixed
+-   fix: 🩹 add new line between comments
+
+Full changelog: https://github.com/alexis-gss/memoria/compare/v5.7.0...v5.7.1
+
 ## **[v5.7.0] - 07.11.26**
 
 ### Added
