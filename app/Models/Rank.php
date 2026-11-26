@@ -55,6 +55,7 @@ class Rank extends Model
     }
 
     // * RELATIONSHIPS
+
     /**
      * Get Games of the Rank (belongs-to relationship).
      *

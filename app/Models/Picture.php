@@ -66,6 +66,7 @@ class Picture extends Model
     }
 
     // * METHODS
+
     /**
      * Differentiate between old and new pictures,
      * remove oldests and save news.
@@ -117,6 +118,7 @@ class Picture extends Model
     }
 
     // * RELATIONSHIPS
+
     /**
      * Get the Game that owns the Picture (belongs-to relationship).
      *

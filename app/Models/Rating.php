@@ -31,6 +31,7 @@ class Rating extends Model
     ];
 
     // * RELATIONSHIPS
+
     /**
      * Get the Picture that owns the Rating (belongs-to relationship).
      *

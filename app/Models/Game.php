@@ -216,6 +216,7 @@ class Game extends Model implements Sitemapable
     }
 
     // * RELATIONSHIPS
+
     /**
      * Get Folder that owns the Game (belongs-to relationship).
      *

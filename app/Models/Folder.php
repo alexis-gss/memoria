@@ -106,6 +106,7 @@ class Folder extends Model
     }
 
     // * METHODS
+
     /**
      * Set model's slug.
      *
@@ -157,6 +158,7 @@ class Folder extends Model
     }
 
     // * RELATIONSHIPS
+
     /**
      * Get Games of the Folder (has-many relationship).
      *

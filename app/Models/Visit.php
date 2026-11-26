@@ -35,6 +35,7 @@ class Visit extends Model
     ];
 
     // * METHODS
+
     /**
      * Set a visit and return a uuid.
      */
@@ -69,6 +70,7 @@ class Visit extends Model
     }
 
     // * RELATIONSHIPS
+
     /**
      * Get the Game that owns Visits (belongs-to relationship).
      *

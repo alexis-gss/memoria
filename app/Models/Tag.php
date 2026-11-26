@@ -93,6 +93,7 @@ class Tag extends Model
     }
 
     // * METHODS
+
     /**
      * Set model's slug.
      *
